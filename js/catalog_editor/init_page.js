@@ -1,13 +1,10 @@
 
-// shared code between editor, code_editor, and catalog_editor
-// This is one of the code files assembled into pjui.js. 
   var mpg = ui.mpg;
  
   ui.displayMessageInSvg = function (msg) {
     pj.root.__hide();
     ui.svgMessageDiv.$show();
     ui.svgMessageDiv.$html(msg);
-    //ui.svgDiv.$html("<div style='text-align:center;width:100%;padding-top:20px;font-weight:bold'>"+msg+"</div>");
   }
 
   ui.clearError = function () {
@@ -52,11 +49,6 @@ ui.genButtons = function (container,options) {
       mpg.set("alert_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
       mpg.set("confirm_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
-     
-      /*
-      var htl = ui.hasTitleLegend();
-      fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
-      */
       $('body').css({"background-color":"#eeeeee"});
   
       cb();

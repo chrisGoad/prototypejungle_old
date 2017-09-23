@@ -12,7 +12,6 @@ var msgPadding = "5pt";
 var inspectDom = false;
 var uiWidth;
 var insertKind;
-//ui.fitMode = false;
 ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code','replace'
 var unpackedUrl,unbuiltMsg;
 
@@ -68,7 +67,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;mmargin-left:20px;mmargin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;mmargin-top:40px"></div>'),
          ui.insertDivCol3 = html.Element.mk('<div id="col3" style="display:inline-block;cursor:pointer;position:absolute;mmargin-left:20px;mmargin-top:40px"></div>'),
-         //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
     
@@ -94,21 +92,13 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
   var awinht = $(window).height();
-  //var pwinwid = awinwid - 2 * wpad;
-  //var pwinht = awinht - 2 * vpad;
   var pageWidth = awinwid - 2 * wpad;
   var pageHeight = awinht - 2 * vpad;
   var lrs = (awinwid - pageWidth)/2;  
-  //if (ui.includeDoc) {
-  //  var docTop = pageHeight * 0.8 - 20;
-  //  var docHeight = awinht - pageHeight - 30;
-  //}
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 5;
   uiWidth = 0.5 * pageWidth - 10;;
   svgwd = 0.5 * pageWidth;
- // var treeOuterWidth = uiWidth;///2;
- // var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
   var topHt = -15 + topbarDiv.__element.offsetHeight;
   cols.$css({left:"5px",width:pageWidth+"px",top:topHt+"px"});
@@ -119,8 +109,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
   var svght = pageHeight - actionHt -0;
   var panelHeaderHt = 26; // the area above the object/code/data/component panels 
- // var treeHt = svght;
- // tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
   ui.svgDiv.$css({id:"svgdiv",left:"0px",/*docwd+"px"*/width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
@@ -132,28 +120,20 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.insertDivCol1.$css({left:"0px",width:colWidthPx});
     ui.insertDivCol2.$css({left:colWidthPx,width:colWidthPx});
     ui.insertDivCol3.$css({left:(2*colWidth)+"px",width:colWidthPx});
-//  }
-//  if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
   } else {
     ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth  + "px"),height:(svght-0)+"px"});
     ui.codeDiv.$css({width:(uiWidth + "px"),height:(svght-80)+"px"});
   }
   svg.main.resize(svgwd,svght); 
-   svg.main.positionButtons(svgwd);
-   //var noteWidth = Math.min(svgwd-40,570);
-   //var noteLeft = 0.5 * (svgwd - 40 - noteWidth);
-   //tree.noteDiv.$css({left:noteLeft+"px",width:noteWidth +"px"});
-   //if ((ui.panelMode === 'data') && ui.dataDivContainsData) {
-   // ui.viewData();
-   //}
-   if (firstLayout) {
-     firstLayout = false; 
-     ui.layout(noDraw);
-   }
-   if (!noDraw) {
-     svg.main.fitContents(ui.fitFactor);
-   }
+  svg.main.positionButtons(svgwd);
+  if (firstLayout) {
+    firstLayout = false; 
+    ui.layout(noDraw);
+  }
+  if (!noDraw) {
+    svg.main.fitContents(ui.fitFactor);
+  }
 }
 
 
@@ -318,34 +298,9 @@ ui.fileBut.$click(function () {
 
 /* end file options section */
 
-/*
-var insertOwn = function (v) {
-  ui.insertItem('/'+v.path,v.where);
-}
-  */
   
 ui.elementsToHideOnError = [];
-  // a prototype for the divs that hold elements of the prototype chain
-//tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
-//ui.errorDiv =  html.wrap('error','div');
-//ui.elementsToHideOnError.push(cols);
-//ui.elementsToHideOnError.push(actionDiv);
-//ui.elementsToHideOnError.push(docDiv);
-//tree.obDiv.click = function () {dom.unpop();};
-/*
-tree.viewNote = function(k,note) {
-  var h = k?'<b>'+k+':</b> '+note:note;
-  mpg.lightbox.pop();
-  mpg.lightbox.setHtml(h)
-  return;
-}
-*/
-/*
-function mkLink(url) {
-   return '<a href="'+url+'">'+url+'</a>';
- } 
-*/
-
+ 
 var afterSave = function (err,path,cb) {
     // todo deal with failure
     if (err) {
@@ -362,8 +317,6 @@ var afterSave = function (err,path,cb) {
     
     var dest = '/code.html?source='+url;
     location.href = dest;
-    //ui.changed[ui.selectedUrl] = false;
-    //ui.showChangedStatus();
   }
  
 saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
@@ -378,7 +331,6 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
 var afterResave = function (err,path) {
     // todo deal with failure
     ui.runningSpan.$hide();
-
     if (err) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
@@ -414,8 +366,7 @@ var popCatalog= function (forViewing) {
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
-  ui.layout();
-                        
+  ui.layout();                     
   var options = {role:null,tabsDiv:ui.insertTab.__element,catalogUrl:ui.catalogUrl,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
                           //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
@@ -439,23 +390,9 @@ var popCatalog= function (forViewing) {
     }
     pj.catalog.getAndShow(options);
 }
-  
-  /*
-closeInsert = function () {
-  ui.panelMode = 'code';
-  ui.layout();
-}
-ui.closeInsertBut.$click(closeInsert);
-*/
-ui.alert = function (msg) {
-  mpg.lightbox.pop();
-  mpg.lightbox.setHtml(msg);
-}
-
 
 ui.changed = {};
 ui.elsByUrl = {};
-
 ui.itemSaved = true;
 
 var count = 0;
@@ -652,8 +589,6 @@ var runSource = function () {
     pj.loadedScripts[src] = ui.editorValue();
   }
   ui.displayMessage(ui.runningSpan,'...running...');
- // ui.runningSpan.$html('...running...');
- // ui.runningSpan.$show();
   wasError = false;
   window.setTimeout(function() {
     if (!pj.installErrorSource) {
@@ -690,7 +625,3 @@ setClickFunction(ui.saveAsBut,function () {
 });
 
 var enableButtons = function () {};
-
-
-
-

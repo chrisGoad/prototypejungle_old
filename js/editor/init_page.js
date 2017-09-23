@@ -44,8 +44,6 @@ ui.genMainPage = function (cb) {
     $('body').css({"background-color":"#eeeeee"});
     var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
     var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
-    // var lb = lightbox.newLightbox(r);
-    //lb.box.$css({"padding-left":"20px"}); 
     mpg.set("lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
     mpg.set("alert_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
     mpg.set("confirm_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
@@ -125,7 +123,6 @@ ui.initPage = function (o) {
       var noUrl = true;
     }
     initFsel();
-    //ui.fitFactor = 0.8;
     svg.fitStdExtent = (ui.whichPage === 'structure_editor') && !(ui.source);
     ui.genMainPage(ui.afterPageGenerated);
   });
@@ -136,7 +133,7 @@ ui.afterPageGenerated = function () {
   if (ui.sourceFile  && ui.fileDisplay) {
     ui.fileDisplay.$html(ui.sourceFile);
   }
-  ui.installMainItem(ui.source,ui.dataUrl);//,undefined,ui.afterTheInstall);  
+  ui.installMainItem(ui.source,ui.dataUrl);
 }
 
 

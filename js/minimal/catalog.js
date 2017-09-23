@@ -159,7 +159,6 @@ pj.catalog.show = function (catalogState,forInsertt) {
   }
    var mkDrag = function (el,selected) {
     return function() {
-      //pj.catalog.highlightElement(catalogState,el);
       whenDrag(selected)
     }
   }
@@ -223,8 +222,6 @@ pj.catalog.show = function (catalogState,forInsertt) {
     if (selected.svg) {
       pj.storageUrl(selected.svg,function (url) {img.src = url;});
     }
-    //img.src = selected.svg?pj.storageUrl(selected.svg):undefined; //NEEDS UPDATE FOR CALLBACK VERSION
-
   }
   catalogState.elements = allEls;
   showCurrentTab(catalogState);

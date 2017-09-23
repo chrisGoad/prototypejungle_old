@@ -1,10 +1,7 @@
 
-  
-//var treePadding = 0;
 var bkColor = "white";
 var docDiv;
 var minWidth = 1000;
-//var plusbut,minusbut;
 var flatInputFont = "8pt arial";
 var uiDiv,dataDiv,topbarDiv,obDivTitle;
 var msgPadding = "5pt";
@@ -13,7 +10,6 @@ var uiWidth;
 var insertKind;
 ui.fitMode = false;
 var unpackedUrl,unbuiltMsg;
-//ui.docMode = 1;
 ui.entryInputs = {};
 ui.booleanEntries = {};
 
@@ -57,7 +53,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
       ui.newEntryBut= html.Element.mk('<div class="ubutton">New Entry</div>'),
-    // ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -112,10 +107,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
   var bkg = "white";
-  //var svgwd = 500;
-  //var svght = 500;
-  //var ar = 0.48//0.5;
-  //var pdw = 0;// minimum padding on sides
   var wpad = 10;
   var vpad = 5;//minimum sum of padding on top and bottom
   var cdims = geom.Point.mk(svgwd,svght);
@@ -124,10 +115,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var pageWidth = awinwid - 2 * wpad;
   var pageHeight = awinht - 2 * vpad;
   var lrs = (awinwid - pageWidth)/2;  
-  //if (ui.includeDoc) {
-  //  var docTop = pageHeight * 0.8 - 20;
-  //  var docHeight = awinht - pageHeight - 30;
-  //}
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 0;
   var entryWidth = pageWidth/2;
@@ -188,12 +175,11 @@ var arrayRemoveSpaces = function (a) {
 ui.popChooser = function(keys,operation) {
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
-  //ui.chooserMode = 'open';
   if (mpg.lightbox) {
     mpg.lightbox.dismiss();
   }
   var lb = mpg.chooser_lightbox;
-  var src = '/chooser.html';//(pj.devVersion)?"/chooserd.html":"/chooser.html";
+  var src = '/chooser.html';
   if (!chooserBeenPopped) {
     lb.setContent(chooserDiv);
     chooserBeenPopped = true;
@@ -240,18 +226,9 @@ ui.setFselDisabled = function () {
    var disabled = fsel.disabled;
    disabled.new = !ui.source;
    disabled.saveCatalog =  disabled.save = !fb.currentUser;
-   //ui.itemPath = ownedFilePath(ui.source);
    disabled.save = !fileIsOwned(ui.source);//ui.itemPath;
    fsel.updateDisabled();
 }
-
-
-var notSignedIn = function () {
-  location.href = "https://prototype-jungle.org/sign_in.html"
-}
-
-
-
 
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];

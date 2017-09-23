@@ -92,7 +92,7 @@ ui.svgInstall = function () {
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.findInstance = function (url) {
-  var proto = pj.installedItems[url]; //'/diagram/graph2.js'];
+  var proto = pj.installedItems[url]; 
   if (!proto) {
     return undefined;
   }
@@ -118,7 +118,6 @@ ui.finishMainInstall = function () {
       var emsg = '<p style="font-weight:bold">'+e+'</p>';
     }
     pj.displayError(emsg);
-    //ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
   }
   if (!ui.installError) {
     pj.ui.itemSource = loadingItem;

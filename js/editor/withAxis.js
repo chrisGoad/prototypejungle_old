@@ -1,5 +1,4 @@
 
-// graph support; the basic operations on vertices are dispatched to the containing diagram
 // support for drawings with axes, in which shapes may have associated data
 
 ui.findAxis = function () {

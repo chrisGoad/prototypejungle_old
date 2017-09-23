@@ -1,0 +1,1 @@
+The files in this directory are assembled into the catalog_editor module. See the read me for /admin.
