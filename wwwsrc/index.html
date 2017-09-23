@@ -4,31 +4,19 @@
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 var href =  window.location.href
-var atDev =  false;//(href.indexOf('://prototypejungle-dev') > -1)||(href.indexOf('://127.0.0.1') > -1);
+var atDev =  false;
 pj.ready(function () {
-  debugger;
-  /*var releaseTypeSpan =  document.getElementById('releaseType');
-  if (atDev) {
-    releaseTypeSpan.innerHTML = 'beta';
-    var prodP = document.getElementById('atProduction');
-    prodP.style.display = "none";*/
-      fb.setCurrentUser(function () {
-      var signIn = document.getElementById('signInButton');
-      var account = document.getElementById('accountButton');
-      if (fb.account) {
-        signIn.style.display="none";
-        account.style.display="inline";
-      } else {
-         signIn.style.display="inline";
-         account.style.display="none";  
-      }
-    });
- /* } else {
-    releaseTypeSpan.innerHTML = 'prerelease';
-    var devP = document.getElementById('atDev');
-    devP.style.display = "none";
-  }*/
- 
+  fb.setCurrentUser(function () {
+    var signIn = document.getElementById('signInButton');
+    var account = document.getElementById('accountButton');
+    if (fb.account) {
+      signIn.style.display="none";
+      account.style.display="inline";
+    } else {
+       signIn.style.display="inline";
+       account.style.display="none";  
+    }
+  });
 });
 
 </script>
@@ -43,7 +31,7 @@ pj.ready(function () {
 
 <div id="diagrams" style="padding-left:0px;padding-top:10px">
   
-  <div style="display:inline-block;0px;background-color:white;border:solid thin black">
+  <div style="display:inline-block;background-color:white;border:solid thin black">
     <a href="/draw.html?source=/diagram/cayleyD3.js&intro=prototypes">
        <img height="125px" wwidth="100px" src=    "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2FcayleyD3.svg?alt=media"/>
     </a>
@@ -62,6 +50,7 @@ pj.ready(function () {
      </a>
   </div>
 
+
   <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
      <a href="/draw.html?source=(sys)/forMainPage/feynman.item">
 
@@ -70,10 +59,11 @@ pj.ready(function () {
   </div>
 
 <!--
+
 <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
       <a href="/draw.html?source=(sys)/forMainPage/gates6.item">
 
-      <img height="125px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fgates6.svg?alt=media"/>
+      <img height="125px"  width="200px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fgates6.svg?alt=media"/>
       </a>
 </div>
 -->
@@ -93,7 +83,6 @@ in the UI. Here is a simple  <a href="/draw.html?source=/example/simpleDiagramAs
 <span style="position:relative;top:5px"><img height="20px" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"></a> and here is the <a href="/doc/network.html">code</a></span> which implements it, with explanation.  </p>
 </p>
 <p style="font-size:13pt;"><b>Technology:</b>
-<!--The interface provides access for everyone to the prototype realm, normally the province of programmers.-->
  A prototype tree is a new variety of JavaScript component  which retains its structure of prototypical inheritance when saved.
  Prototype trees  enable a flexible and uniform scheme for the treatment of diagrams via API and UI. 
 Here is a programmer's  
@@ -104,9 +93,7 @@ which provides access to  everyone else.</p>
 If so desired, these components can be shared via  the global <a href="/catalogEdit.html?source=(sys)/global.catalog">catalog</a>.
 All PrototypeJungle code is <a href="https://github.com/chrisGoad/prototypejungle/tree/master">open source</a>, but, given the coding environment, you don't need to fork this code to write JavaScript for your own diagrams.
  </p>
- <p id="atProduction" style="font-size:9pt"><!-- PrototypeJungle is not yet in general release, and signing in requires an
- invite key.--> Note: experimentation - making diagrams and writing and testing code - is possible without signing in. Signing in <i>is</i> needed to save your work.<!--
- For an invite key, please contact prototypejungle@gmail.com--></p>
+ <p id="atProduction" style="font-size:9pt"> Note: experimentation - making diagrams and writing and testing code - is possible without signing in. Signing in <i>is</i> needed to save your work.</p>
 </p>
 
 

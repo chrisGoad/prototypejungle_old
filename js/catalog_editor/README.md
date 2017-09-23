@@ -1,1 +1,1 @@
-The files in this directory are assembled into the catalog_editor module. See the read me for [/admin](https://github.com/chrisGoad/prototypejungle/tree/master/admin).
+The files in this directory are assembled into the catalog_editor module. See the read me for [/admin](../../admin).

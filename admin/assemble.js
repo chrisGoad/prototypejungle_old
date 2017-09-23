@@ -1,9 +1,8 @@
-var toProtochart = 0;
 /*
 Usage:
 
 cd c:\prototypejungle
-node admin/assemble.js core
+node admin/assemble.js <module>
 
 */
 var what = process.argv[2]; 
@@ -34,7 +33,6 @@ fileLists['catalog_editor'] = editorCommon.concat(["catalog_editor/page","catalo
                                
 fileLists['minimal']  = ["core/pj","core/pageutils"];//,"minimal/catalog"];
 fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","ui/ui2","minimal/catalog","minimal/browser"];
-//fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","minimal/catalog","minimal/browser"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
