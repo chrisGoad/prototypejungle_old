@@ -84,7 +84,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   var firstLayout = true;
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
-  debugger;
   var bkg = "white";
   var svgwd = 500;
   var svght = 500;
@@ -630,7 +629,6 @@ ui.catchInRunSource = true;
 
 var runViaInstall = function (src) {
   pj.install(src,function (erm,rs) {
-    debugger;
     if (erm) {
       ui.displayError(ui.runningSpan,'Error: '+erm);
       pj.root = svg.Element.mk('<g/>');

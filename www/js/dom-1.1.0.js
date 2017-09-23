@@ -30,7 +30,6 @@ pj.Mark.mk = function (index,presentation) {
 }
 */
 pj.Spread.update = function () {
-  debugger;
   if (this.__newData) {
     this.inSync = false;
   }
@@ -641,7 +640,6 @@ geom.LineSegment.pointAlong = function (fraction) {
 }
 
 geom.LineSegment.intersect = function (line1) {
-  debugger;
   var line0 = this;
   var e0 = line0.end0;
   var e1 = line0.end1;
@@ -768,9 +766,7 @@ geom.Rectangle.sides = function () {
 // intersects the rectangle. Used in graph construction interface. Could be optimized in several ways
 // retuns {interesection:Point,side:integer,sideFraction:real}. sideFraction is the fraction  of the way along the side
 // at which the interesection point appears.
-geom.Rectangle.peripheryAtDirection = function(direction) {
-  debugger;
-  
+geom.Rectangle.peripheryAtDirection = function(direction) {  
   var sides = this.sides();
   var dim = 2*Math.max(this.extent.x,this.extent.y);
   var center = this.center();
@@ -2236,7 +2232,6 @@ svg.Element.__removeChildrenInFront = function (index) {
 
 // replaces a child while keeping the order of children
 svg.Element.__replaceChild = function(child,replacement) {
-  debugger;
   var pel = this.__element;
   var idx = child.__setIndex;
   var name = child.__name;
@@ -3013,7 +3008,6 @@ svg.Root.fitContents = function (fitFactor,dontDraw,onlyIfNeeded) {
   if (cxf) {
     cn.__removeAttribute("transform");
   }
-  debugger;
   var xf = this.fitContentsTransform(ff);
   if (fitAdjust) {
     xf.set("translation",xf.translation.plus(fitAdjust));

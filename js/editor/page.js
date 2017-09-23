@@ -388,7 +388,7 @@ fsel.onSelect = function (n) {
       if ((opt === 'saveAsSvg') && ui.fileModified) {
           setYesNoText('This file is unsaved; do you want to generate SVG anyway, losing your changes?');
           afterYes = selectFile; 
-          mpg.lightbox.pop();
+          mpg.confirm_lightbox.pop();
         
       } else {
         selectFile();
@@ -425,7 +425,6 @@ ui.roleAppears = function (role,iroles) {
 /* called from ui module */
 
 var insertLastStep = function (point,scale) {
-  debugger;
   if (ui.customInsert) {
     var rs = ui.customInsert(ui.insertProto);
   }
@@ -476,7 +475,6 @@ ui.finalizeInsert = function (point,scale) {
 
 /* version where each insert has its own proto */
 var setupForInsertCommon = function (proto) {
-  debugger;
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
   
@@ -534,7 +532,6 @@ var popInsertPanelForCloning = function () {
 }
 
 var setupForClone = function (forAddToCohort) {
-  debugger;
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
@@ -561,7 +558,6 @@ var setupForClone = function (forAddToCohort) {
 }
 
 var setupForInsert = function (catalogEntry,cb) {
-  debugger;
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   insertSettings = catalogEntry.settings;
@@ -582,7 +578,6 @@ var setupForInsert = function (catalogEntry,cb) {
 }
 
 ui.dropListener = function (draggedOver,point,scale) {
-  debugger;
   if (ui.draggingText && draggedOver) {
     addText(draggedOver);
     return;
@@ -615,7 +610,6 @@ ui.dropListener = function (draggedOver,point,scale) {
 var catalogState = {};
 
 ui.popInserts= function (mode) {
-  debugger;
   selectedForInsert = undefined;
   ui.draggingText = false;
   if (mode === 'replace') {
@@ -654,7 +648,6 @@ setClickFunction(ui.insertBut,() => ui.popInserts('insert'));
 setClickFunction(ui.replaceBut,() => ui.popInserts('replace'));
 setClickFunction(ui.replaceProtoBut,() => ui.popInserts('replaceProto'));
 setClickFunction(ui.gridBut,() => {
-  debugger;
   var grid = pj.root.__grid;
   if (!grid ||  grid.__hidden()) {
       if (grid) {
@@ -767,7 +760,6 @@ var textboxCatalogEntry = {id:"textbox",roles:["vertex"],url:"/text/textbox.js"}
 
 var addText = function (item) { // add text to the given item
   setupForInsert(textboxCatalogEntry,function () {
-    debugger;
     var parent = item.__parent;
     var name = item.__name;
     var newProto = ui.insertProto;
@@ -785,7 +777,6 @@ var addText = function (item) { // add text to the given item
 }
 
 var transferProperties = function (dst,src) {
-  debugger;
   var position = src.__getTranslation();
   var transferredProperties = src.__transferredProperties;
   var diagramTransferredProperties = ui.diagramTransferredProperties(src);
@@ -800,7 +791,6 @@ var transferProperties = function (dst,src) {
 }
 
 var replaceIt = function (replaced,replacementProto) {
-  debugger;
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
@@ -811,9 +801,6 @@ var replaceIt = function (replaced,replacementProto) {
 }
 
 pj.deepCopyOwnProperties = function (dest,src) {
-  if (!dest) {
-    debugger;
-  }
   var names = Object.getOwnPropertyNames(src);
   names.forEach(function (name) {
     if (pj.internal(name)) {
@@ -865,7 +852,6 @@ ui.transferUIStatus = function (dst,src) {
 var replaceLastStep = function (ireplaced,replacedTop) {
   var newProto,replaced,topProto;
   console.log('replaceLastStep',ireplaced.__name);
-  debugger;
   newProto = ui.insertProto;
   if (ireplaced !== replacedTop) {
     topProto = newPrototypeWithReplacedChild(Object.getPrototypeOf(replacedTop),ireplaced.__name,ui.insertProto);
@@ -892,7 +878,6 @@ var replaceLastStep = function (ireplaced,replacedTop) {
 
 
 var replacePrototypeLastStep = function (ireplaced,replacedTop) {
-  debugger;
   var replaced,topProto;
   var  replacementProto = ui.insertProto; // the part in part case
   if (ireplaced !== replacedTop) {
@@ -933,7 +918,6 @@ ui.replacePrototype = function (catalogEntry) {
 }
 
 ui.replaceFromClone = function (toReplace) {
-  debugger;
   if (toReplace === pj.selectedMode) {
      return;
   }
@@ -961,11 +945,9 @@ ui.standardDelete = function (item) {
 }
 setClickFunction(ui.deleteBut,function () {
   var selnode = pj.selectedNode;
-  debugger;
   ui.unselect();
   ui.popInserts();
   var diagram = ui.containingDiagram(selnode);
-  debugger;
   if (diagram && diagram.__delete) {
     diagram.__delete(selnode);
   } else {
@@ -1103,11 +1085,6 @@ resaveItem = function () {
   saveItem(ui.itemPath,undefined,doneSaving);
 }
 
-ui.alert = function (msg) {
-  mpg.lightbox.pop();
-  mpg.lightbox.setHtml(msg);
-}
-
   
 ui.itemSaved = true;
 
@@ -1218,7 +1195,6 @@ var nowSelectingForActionPanel = false;
 var actionPanelLastSelection;
 
 ui.resumeActionPanelAfterSelect = function (iitem) {
-  debugger;
    nowSelectingForActionPanel = false;
   ui.enableTopbarButtons();
   actionPanelCommon.__element.style.display = "block";
@@ -1278,7 +1254,6 @@ ui.resumeActionPanelAfterCloning = function () {
 
 
 ui.setActionPanelContents = function (item) {
-  debugger;
   actionPanelCustom.__element.innerHTML = '';
   if (!item) {
     return;
@@ -1349,8 +1324,7 @@ setClickFunction(ui.showCohortButtons,function () {
 });
 
 var showClones = function (proto) {
-  debugger;
-   var inheritors = pj.inheritors(proto);
+  var inheritors = pj.inheritors(proto);
   console.log('inheritor count',inheritors.length)
   svg.highlightNodes(inheritors);
 
@@ -1397,7 +1371,6 @@ setClickFunction(ui.splitCohortAction,function () {
     var protoProto = Object.getPrototypeOf(proto);
     ui.forking = pj.inheritors(proto);
     var transferredProperties = proto.__transferredProperties;
-    debugger;
     ui.forkProto = ui.installPrototype(proto.__name,protoProto);
     pj.setPropertiesFromOwn(ui.forkProto,proto,transferredProperties);
     ui.transferOwnExtent(ui.forkProto,proto);
@@ -1417,7 +1390,6 @@ setClickFunction(ui.splitCohortAction,function () {
 
 
 ui.performFork = function (item) {
-  debugger;
   if (ui.forking.indexOf(item) > -1) {
     var nm = item.__name;
     var highlight = item.__highlight;

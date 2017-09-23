@@ -53,7 +53,6 @@ fb.setCurrentUserOnly = function (cb) {
   var  auth = firebase.auth();
   fb.currentUser = auth.currentUser;
   if (!fb.currentUser) {
-    //auth.onAuthStateChanged(function(user) {
     auth.onIdTokenChanged(function(user) {
       fb.currentUser = user;
       if (cb) {
@@ -123,7 +122,6 @@ fb.users = {}; //maps usernames to uids
 fb.inviteKeyToAccount = function (key,cb) {
   var aref = fb.rootRef.child('account');
   aref.orderByChild('inviteKey').equalTo(key).once('value',function (snap) {
-    debugger;
     var val = snap.val();
     cb(val);
   });
@@ -132,7 +130,6 @@ fb.inviteKeyToAccount = function (key,cb) {
 fb.inviteKeyExists = function (key,cb) {
   var ref = fb.rootRef.child('inviteKeys').child(key);
   ref.once("value").then(function (snap) {
-    debugger;
     var val = snap.val();
     cb(!!val);
   });
@@ -142,7 +139,6 @@ fb.inviteKeyExists = function (key,cb) {
 fb.currentCount = function (cb) {
     var ref = fb.rootRef.child('currentCount');
     ref.once("value").then(function (snap) {
-      debugger;
       var val = snap.val();
       cb(val);
     });
@@ -153,7 +149,6 @@ fb.currentCount = function (cb) {
 fb.maxCount = function (cb) {
     var ref = fb.rootRef.child('maxCount');
     ref.once("value").then(function (snap) {
-      debugger;
       var val = snap.val();
       cb(val);
     });
@@ -175,7 +170,6 @@ fb.setMaxCount = function (value,cb) {
 fb.userNameToAccount = function (userName,cb) {
   var aref = fb.rootRef.child('account');
   aref.orderByChild('userName').equalTo(userName).once('value',function (snap) {
-    debugger;
     var val = snap.val();
     cb(val);
   });

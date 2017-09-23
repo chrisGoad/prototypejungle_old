@@ -111,7 +111,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   var firstLayout = true;
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
-  debugger;
   var bkg = "white";
   //var svgwd = 500;
   //var svght = 500;
@@ -242,7 +241,6 @@ ui.setFselDisabled = function () {
    disabled.new = !ui.source;
    disabled.saveCatalog =  disabled.save = !fb.currentUser;
    //ui.itemPath = ownedFilePath(ui.source);
-   debugger;
    disabled.save = !fileIsOwned(ui.source);//ui.itemPath;
    fsel.updateDisabled();
 }

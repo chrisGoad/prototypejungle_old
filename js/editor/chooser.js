@@ -298,7 +298,6 @@ var actOnSelectedItem = function (deleteRequested) {
     setError({text:"No item selected",div1:true});
     return
   }
-  debugger;
   var pth = currentUserName() + (fpth?("/"+fpth):"") +"/"+selectedItemName;
   if (itemsMode === "open"  || itemsMode === "dataSource") {
     if (deleteRequested) {
@@ -641,7 +640,6 @@ var nameChecker = function (input,e) {
  }
  
 ui.genMainPage = function (options) {
-  debugger;
   if (pj.mainPage) return;
   pj.mainPage = mpg; 
   mpg.__draw(document.body);

@@ -92,13 +92,13 @@ var setupYesNo = function (itext) {
        yesBut =  html.Element.mk('<div class="button">Yes</div>'),
        noBut =  html.Element.mk('<div class="button">No</div>')
       ]);
-    mpg.lightbox.setContent(yesNoButtons);
+    mpg.confirm_lightbox.setContent(yesNoButtons);
     yesBut.$click(function () {
      afterYes();
-     mpg.lightbox.dismiss();
+     mpg.confirm_lightbox.dismiss();
     });
     noBut.$click(function () {
-      mpg.lightbox.dismiss();
+      mpg.confirm_lightbox.dismiss();
     });
 }
 
@@ -109,8 +109,15 @@ var setYesNoText = function (text) {
 ui.confirm = function (text,yesF) {
   yesNoText.$html(text);
   afterYes = yesF;
-  mpg.lightbox.pop();
+  mpg.confirm_lightbox.pop();
 }
+
+
+ui.alert = function (msg) {
+  mpg.alert_lightbox.pop();
+  mpg.alert_lightbox.setHtml(msg);
+}
+
 
 window.addEventListener("beforeunload", function (event) {
   var msg = "There are unsaved changes. Are you sure you want to leave this page?";
@@ -122,7 +129,6 @@ window.addEventListener("beforeunload", function (event) {
 
 
 ui.openStructureEditor = function () {
-  debugger;
   var url = '/draw.html';
   if (ui.source && pj.endsIn(ui.source,'.js')) {
     url += '?source='+ui.source;

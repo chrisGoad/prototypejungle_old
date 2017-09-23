@@ -294,7 +294,6 @@ var mouseDownListener = function (root,e) {
       pj.log('control','control',"SHIFTER111RRR!!");
         iselnd.__select("svg");
       var diagram = ui.containingDiagram(controlled);
-      debugger;
       draggingInDiagram = draggingNoDiagram = false;
       if (diagram) {
         if (controlled.__draggableInDiagram &&diagram.__dragStep) {
@@ -503,7 +502,6 @@ var dropListener = function (root,e) {
   } else {
       console.log('DROP  OVER NOTHING');
   }
-  debugger;
   controlActivity = undefined;
   if (!ui.dropListener) {
     return;

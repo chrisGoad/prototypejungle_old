@@ -163,18 +163,28 @@ item.deleteSubtree = function (vertex,topCall) {
     var edge = edges[vertex.incomingEdge];
     edge.remove();
   
-  } 
-  vertex.remove();
+  }
+  this.graph.__delete(vertex);
+  //vertex.remove();
 }
 
 
 item.__delete = function (vertex) {
+  debugger;
+  var graph = this.graph;
+  if (vertex.__role == 'edge') {
+    if (vertex.__treeEdge) {
+      ui.alert('Edges that are part of the tree cannot be deleted');
+    } else {
+      graph.__delete(vertex);
+    }
+    return;
+  }
   if (vertex.__role !== 'vertex') {
-    ui.alert('Only nodes, not connectors, can be deleted');
+    ui.standardDelete(vertex);
     return;
   }
   var thisHere = this;
-  var graph = this.graph;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
     var root = graph.vertices.V0;
     if (root === vertex) {
@@ -202,6 +212,7 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
   var vertices = graph.vertices;
   var edgeP = edges.E0?Object.getPrototypeOf(edges.E0):undefined;// use proto of E0 as the prototype for new nodes
   var newEdge = graph.addEdge(edgeP);
+  newEdge.__treeEdge = true;
   var vertexP = Object.getPrototypeOf(vertices.V0);// use proto of V0 as the prototype for new nodes
   //ui.hide(vertexP,['descendants']);
   var newVertex=  graph.addVertex(vertexP);

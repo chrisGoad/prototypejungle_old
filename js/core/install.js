@@ -249,7 +249,6 @@ pj.loadItem = function (src) {
 }
 
 const evalWithCatch = function (src,script) {
-  debugger;
   if (pj.catchInstall) {
     try {
       eval(script);

@@ -565,7 +565,6 @@ geom.LineSegment.pointAlong = function (fraction) {
 }
 
 geom.LineSegment.intersect = function (line1) {
-  debugger;
   var line0 = this;
   var e0 = line0.end0;
   var e1 = line0.end1;
@@ -692,9 +691,7 @@ geom.Rectangle.sides = function () {
 // intersects the rectangle. Used in graph construction interface. Could be optimized in several ways
 // retuns {interesection:Point,side:integer,sideFraction:real}. sideFraction is the fraction  of the way along the side
 // at which the interesection point appears.
-geom.Rectangle.peripheryAtDirection = function(direction) {
-  debugger;
-  
+geom.Rectangle.peripheryAtDirection = function(direction) {  
   var sides = this.sides();
   var dim = 2*Math.max(this.extent.x,this.extent.y);
   var center = this.center();

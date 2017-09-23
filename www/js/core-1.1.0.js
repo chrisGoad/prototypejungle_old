@@ -352,11 +352,6 @@ pj.watch = function (node,prop) {
  
 // returns val
 pj.Object.set = function (key,val) {
-  if (key === '__container') {
-    console.log("XFERRED PROPS");
-    debugger;
-    //code
-  }
   let idx,path,name,parent;
   if (arguments.length === 1) {
     pj.extend(this,key);
@@ -948,7 +943,6 @@ pj.nodeMethod('remove',function (dontRemoveFromArray) {
       fn(this);
   });
   if (isArray) {
-    debugger;
     if (!dontRemoveFromArray) {
       let idx = parent.indexOf(this);
       let ln = parent.length;
@@ -1722,7 +1716,6 @@ pj.Object.__update = function () {
   pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);
-    debugger;
     if (pj.catchUpdateErrors) {
       try {
         this.update();     
@@ -3036,7 +3029,6 @@ pj.loadItem = function (src) {
 }
 
 const evalWithCatch = function (src,script) {
-  debugger;
   if (pj.catchInstall) {
     try {
       eval(script);

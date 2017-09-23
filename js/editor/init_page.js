@@ -44,9 +44,11 @@ ui.genMainPage = function (cb) {
     $('body').css({"background-color":"#eeeeee"});
     var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
     var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
-     var lb = lightbox.newLightbox(r);
-    lb.box.$css({"padding-left":"20px"}); 
-    mpg.set("lightbox",lb);
+    // var lb = lightbox.newLightbox(r);
+    //lb.box.$css({"padding-left":"20px"}); 
+    mpg.set("lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
+    mpg.set("alert_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
+    mpg.set("confirm_lightbox",lightbox.newLightbox(r)).box.$css({"padding-left":"20px"});
     mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
     mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
     mpg.set("textedit_lightbox",lightbox.newLightbox(r));

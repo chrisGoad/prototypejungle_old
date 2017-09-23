@@ -313,11 +313,6 @@ pj.watch = function (node,prop) {
  
 // returns val
 pj.Object.set = function (key,val) {
-  if (key === '__container') {
-    console.log("XFERRED PROPS");
-    debugger;
-    //code
-  }
   let idx,path,name,parent;
   if (arguments.length === 1) {
     pj.extend(this,key);
@@ -909,7 +904,6 @@ pj.nodeMethod('remove',function (dontRemoveFromArray) {
       fn(this);
   });
   if (isArray) {
-    debugger;
     if (!dontRemoveFromArray) {
       let idx = parent.indexOf(this);
       let ln = parent.length;

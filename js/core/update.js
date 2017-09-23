@@ -61,7 +61,6 @@ pj.Object.__update = function () {
   pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);
-    debugger;
     if (pj.catchUpdateErrors) {
       try {
         this.update();     

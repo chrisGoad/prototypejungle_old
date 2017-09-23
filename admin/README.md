@@ -1,12 +1,12 @@
 PrototypeJungle
 ===============
 
-There is a build process for the site, involving the scripts:
+There is a build process for the site, involving the script 
 /admin/assemble.js 
 
-These are run by node, which you should install.
+This is run by node, which you should install.
 You need to install the npm modules minify and babel as well. I used these
-commands (cd'd to the root of the PrototypeJungle repo)
+commands (cd'd to the root of the PrototypeJungle repo):
 
 npm install minify
 

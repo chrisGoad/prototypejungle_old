@@ -29,7 +29,6 @@ pj.Mark.mk = function (index,presentation) {
 }
 */
 pj.Spread.update = function () {
-  debugger;
   if (this.__newData) {
     this.inSync = false;
   }

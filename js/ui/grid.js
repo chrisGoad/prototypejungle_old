@@ -24,7 +24,6 @@ ui.adjustGridRect = function (bnds) { // assure that the corner is an even count
   
   
 ui.updateGrid = function(grid) {
-  debugger;
   if (grid.__hidden()) {
     return;
   }

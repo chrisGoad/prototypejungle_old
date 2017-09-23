@@ -46,7 +46,6 @@ ui.installAsSvgContents= function (itm) {
 }
 
 ui.svgInstall = function () {
-  debugger;
   var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
   if (ui.main && atTopLevel) {
     pj.root = ui.main;
@@ -106,19 +105,6 @@ ui.findInstance = function (url) {
   }
 }
 
-var hideInstalledItems = function () {
-  return;
-  debugger;
-  for (var path in pj.installedItems) {
-    if (path !== ui.mainUrl) {
-      var item = pj.installedItems[path];
-      if (svg.Element.isPrototypeOf(item)) {
-        item.__hide();
-      }
-    }
-  }
-}
-
 pj.displayError = function (msg) {
   ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+msg+'</div>'); 
 }
@@ -146,7 +132,6 @@ ui.finishMainInstall = function () {
   } else if (ui.whichPage === 'structure_editor') {
       tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
   }
-  hideInstalledItems();
   enableButtons();
   $(window).resize(function() {
     ui.layout();

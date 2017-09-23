@@ -86,7 +86,6 @@ var saveFieldValue = function (field) {
 var checkCount = function (cb) {
   fb.maxCount(function (max) {
     fb.currentCount(function (current) {
-      debugger;
       if (current+1 < max) {
         cb(current);
       } else {
@@ -116,7 +115,6 @@ var saveAccount = function () {
   }
   fields.forEach(saveFieldValue);
   if (isNew) {
-    debugger;
     newFields.forEach(saveFieldValue);
     checkUserName(fb.account.userName,function (userNameOk) {
       if (userNameOk) {
@@ -161,7 +159,6 @@ pj.account.pageReady = function () {
     setHandler('cancel',function () {location.href = '/diagrams.html';});
     setHandler('cancel2',function () {location.href = '/index.html';});
     fb.getAccount(undefined,function (erm,account) {
-      debugger;
       if (!account) {
         account = fb.account = {};//name:'',profile:'',email:''};
         isNew = true;

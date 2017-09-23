@@ -191,7 +191,6 @@ svg.Element.__removeChildrenInFront = function (index) {
 
 // replaces a child while keeping the order of children
 svg.Element.__replaceChild = function(child,replacement) {
-  debugger;
   var pel = this.__element;
   var idx = child.__setIndex;
   var name = child.__name;
@@ -968,7 +967,6 @@ svg.Root.fitContents = function (fitFactor,dontDraw,onlyIfNeeded) {
   if (cxf) {
     cn.__removeAttribute("transform");
   }
-  debugger;
   var xf = this.fitContentsTransform(ff);
   if (fitAdjust) {
     xf.set("translation",xf.translation.plus(fitAdjust));
