@@ -19,7 +19,6 @@ item.RadiantP.__dimension = item.cellDimension*1.5;
 item.RadiantP.numRays = 50;
 var zeroPoint = geom.Point.mk(0,0);
 item.update = function () {
-  debugger;
    var i,j;
      if (this.occupants.length > 0) {
       return;

@@ -1,6 +1,5 @@
 'use strict';
 pj.require('/diagram/graph.js',function (graphP) {
-  debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 let item = pj.svg.Element.mk('<g/>');
 
@@ -41,7 +40,6 @@ var descendants = function (vertex) {
 }
 
 item.positionRelative = function (root) {
-  debugger;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges
   var rootVertex = vertices.V0;
@@ -82,7 +80,6 @@ item.positionRelative = function (root) {
 
 
 item.computeRelativePositions = function (root) {
-  debugger;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges;
   var recurse = function (rootLabel) {
@@ -104,11 +101,9 @@ item.computeRelativePositions = function (root) {
 
 item.positionvertices = function (root) {
   // now generate absolute  positions
-  debugger;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges;
   var recurse  = function (rootLabel,position) {
-    console.log('positioning',rootLabel,' at ',position);
     var vertex = vertices[rootLabel];
     if (position) {
       var myPosition = position.plus(vertex.relPosition__);
@@ -170,7 +165,6 @@ item.deleteSubtree = function (vertex,topCall) {
 
 
 item.__delete = function (vertex) {
-  debugger;
   var graph = this.graph;
   if (vertex.__role == 'edge') {
     if (vertex.__treeEdge) {
@@ -280,7 +274,6 @@ item.buildFromData = function (data) {
 item.__dragStep = function (vertex,pos) {
  var localPos = geom.toLocalCoords(this,pos);
  vertex.__moveto(localPos);
- debugger;
  this.positionvertices(vertex);
  this.update();
 }

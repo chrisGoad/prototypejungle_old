@@ -775,7 +775,6 @@ geom.Rectangle.peripheryAtDirection = function(direction) {
     var side = sides[i];
     var intersection = line.intersect(sides[i]);
     if (intersection) {
-      //return intersection;
       var fractionAlong =  ((intersection.difference(side.end0)).length())/(side.length());
       return {intersection:intersection,side:i,sideFraction:fractionAlong};
     }
@@ -783,7 +782,6 @@ geom.Rectangle.peripheryAtDirection = function(direction) {
 }
 
 geom.Rectangle.alongPeriphery = function (edge,fraction) {
-  console.log('edge',edge,'fraction',fraction);
   var sides = this.sides();
   var side = sides[edge];
   return side.pointAlong(fraction);
@@ -1674,35 +1672,12 @@ pj.Object.__iterDomTree = function (fn) {
     var ch;
     if (pj.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
       ch = thisHere[k];
-      //if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
       if (pj.__isDomEL(ch)) {
         sch.push(ch);
       }
     }
   });// now sort by __setIndex
   pj.sortByIndex(sch);
- /* cmf = function (a,b) {
-    var ai = a.__setIndex;
-    var bi;
-    if (ai === undefined) {
-      ai = parseInt(a.__name);
-    }
-    ai = isNaN(ai)?0:ai;
-    bi = b.__setIndex;
-    if (bi === undefined) {
-      bi = parseInt(b.__name);
-    }
-    bi = isNaN(bi)?0:bi;
-    return (ai < bi)?-1:1;
-  }*/
-  //sch.sort(cmf);
-  /* for debugging 
-  var names = '';
-  sch.forEach(function (ch) {
-    names += ch.__name +' ';
-  });
-  console.log('ORDER ADDED ',names);
-  */
   sch.forEach(function (ch) {
     fn(ch,ch.__name);
   });
@@ -2666,7 +2641,6 @@ var allocateHighlights = function (n) {
 var highlightNode = function (node,highlight) {
   var bounds,root,ebounds,ln,extent,corner;
   if (!node.__bounds) {
-    console.log('no bounds for ',node.__name);
     return;
   }
   bounds = node.__bounds(svg.main);

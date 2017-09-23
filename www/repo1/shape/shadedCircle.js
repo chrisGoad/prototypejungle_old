@@ -36,7 +36,6 @@ item.__contents.__unselectable = true;
 
 var count = 0;
 item.update = function () {
-  debugger;
   var circle = this.__contents;
   var gradient = this.defs.gradient;
   var id = 'g'+(count++);
@@ -59,7 +58,6 @@ item.__getExtent = function () {
 
 item.__setExtent = function (extent,nm) {
   var ext;
-  console.log('nm',nm);
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if ((nm === 'c10') || (nm === 'c12'))  {

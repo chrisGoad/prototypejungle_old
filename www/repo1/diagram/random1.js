@@ -220,7 +220,6 @@ item.update = function () {
       }
       var line = this.randomLine(ll);
 
-      console.log(ll);
      
       //if (line.length() >ll) {
       //  continue;

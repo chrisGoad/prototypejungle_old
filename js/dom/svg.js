@@ -625,7 +625,6 @@ var allocateHighlights = function (n) {
 var highlightNode = function (node,highlight) {
   var bounds,root,ebounds,ln,extent,corner;
   if (!node.__bounds) {
-    console.log('no bounds for ',node.__name);
     return;
   }
   bounds = node.__bounds(svg.main);

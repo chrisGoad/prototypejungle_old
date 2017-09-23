@@ -502,35 +502,12 @@ pj.Object.__iterDomTree = function (fn) {
     var ch;
     if (pj.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
       ch = thisHere[k];
-      //if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
       if (pj.__isDomEL(ch)) {
         sch.push(ch);
       }
     }
   });// now sort by __setIndex
   pj.sortByIndex(sch);
- /* cmf = function (a,b) {
-    var ai = a.__setIndex;
-    var bi;
-    if (ai === undefined) {
-      ai = parseInt(a.__name);
-    }
-    ai = isNaN(ai)?0:ai;
-    bi = b.__setIndex;
-    if (bi === undefined) {
-      bi = parseInt(b.__name);
-    }
-    bi = isNaN(bi)?0:bi;
-    return (ai < bi)?-1:1;
-  }*/
-  //sch.sort(cmf);
-  /* for debugging 
-  var names = '';
-  sch.forEach(function (ch) {
-    names += ch.__name +' ';
-  });
-  console.log('ORDER ADDED ',names);
-  */
   sch.forEach(function (ch) {
     fn(ch,ch.__name);
   });

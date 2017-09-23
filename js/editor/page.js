@@ -851,7 +851,7 @@ ui.transferUIStatus = function (dst,src) {
 // ireplaced might be a child of replacedTop, eg the box in a text box
 var replaceLastStep = function (ireplaced,replacedTop) {
   var newProto,replaced,topProto;
-  console.log('replaceLastStep',ireplaced.__name);
+  pj.log('replace','replaceLastStep',ireplaced.__name);
   newProto = ui.insertProto;
   if (ireplaced !== replacedTop) {
     topProto = newPrototypeWithReplacedChild(Object.getPrototypeOf(replacedTop),ireplaced.__name,ui.insertProto);
@@ -1010,7 +1010,6 @@ enableButtons = function () {
   }
 }
 pj.selectCallbacks.push(enableButtons);
-console.log('pushing enableButtons onto selectCallbacks');
 pj.unselectCallbacks.push(function () {
   enableButtons();
   actionPanelMessage.__element.innerHTML="No item selected";
@@ -1325,7 +1324,6 @@ setClickFunction(ui.showCohortButtons,function () {
 
 var showClones = function (proto) {
   var inheritors = pj.inheritors(proto);
-  console.log('inheritor count',inheritors.length)
   svg.highlightNodes(inheritors);
 
 }
@@ -1375,7 +1373,6 @@ setClickFunction(ui.splitCohortAction,function () {
     pj.setPropertiesFromOwn(ui.forkProto,proto,transferredProperties);
     ui.transferOwnExtent(ui.forkProto,proto);
     ui.transferUIStatus(ui.forkProto,proto);
-    console.log('inheritor count',ui.forking.length);
     ui.unselect();
     svg.highlightNodes(ui.forking);
     actionPanelMessage.__element.innerHTML = "Select the highlighted items that you wish to split off into a new cohort";

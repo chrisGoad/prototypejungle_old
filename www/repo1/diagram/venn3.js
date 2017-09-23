@@ -2,7 +2,6 @@
 pj.require('/shape/shaded_circle.js',function (circlePP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
-debugger;
 var circleP = item.set("circleP",circlePP.instantiate());
 circleP.__hide();
 

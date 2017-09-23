@@ -262,8 +262,6 @@ ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
   var boxDim = ui.updateBoxSize();
   extent = controlBounds.extent;
-
-  console.log('BOXDIM', boxDim,'x',extent.x,'y',extent.y);
   if (isNaN(extent.x) || isNaN(extent.y)) {
      pj.error('NaN');
   }

@@ -485,11 +485,6 @@ var dragOverListener = function (root,e) {
         //svg.unhighlight();
       }
     }
-    if (draggingOver) {
-      console.log('DRAG OVER',draggingOver.__name);
-    } else {
-      console.log('DRAG  OVER NOTHING');
-    }
   }
 }
 
@@ -498,9 +493,9 @@ var dragOverListener = function (root,e) {
 var dropListener = function (root,e) {
   var cp,xf;
   if (draggingOver) {
-      console.log('DROP OVER',draggingOver.__name);
+      pj.log('control','DROP OVER',draggingOver.__name);
   } else {
-      console.log('DROP  OVER NOTHING');
+      pj.log('control','DROP  OVER NOTHING');
   }
   controlActivity = undefined;
   if (!ui.dropListener) {

@@ -179,7 +179,7 @@ ui.installPrototype = function (id,proto) {
     pj.root.prototypes[anm] = proto;
     return proto;
   }
-  console.log('install','Adding prototype',anm);
+  pj.log('install','Adding prototype '+anm);
   var iproto = (proto.__get('__sourceUrl'))?proto.instantiate():proto;
   iproto.__hide();
   pj.root.prototypes.set(anm,iproto);

@@ -852,7 +852,7 @@ tree.refresh = function () {
   sh = tree.shownItem;
   if (sh) {
     if (sh===pj.root) {
-      return undefined;
+      return top?pj.root:undefined;
     }
     if (top ) {
       pr = pj.root;

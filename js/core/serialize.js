@@ -263,7 +263,6 @@ pj.serialize = function (root) {
     propNames.forEach(function (prop) {
       addToResult(prop,atomic);
     });
-    console.log('the props',rs);
     return rs;
   }
   

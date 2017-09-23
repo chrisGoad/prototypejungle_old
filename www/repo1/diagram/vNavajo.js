@@ -38,13 +38,10 @@ let dataa = {text:'root',d:[
 }
 
 item.update = function () {
-   debugger;
    if (!this.initialized)  {
     this.tree.buildFromData(data.vdata);
-    //this.tree.buildSimpleTree();
     this.initialized = true;
   }
-  debugger;
   this.tree.update();
 }
 return item;

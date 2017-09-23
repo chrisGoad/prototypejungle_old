@@ -134,8 +134,6 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   var graph = ui.containingDiagram(this);
-
-  console.log('updateCP',idx);
   switch (idx) {
     case 0:
       if (this.end0vertex) {

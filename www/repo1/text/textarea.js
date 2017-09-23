@@ -122,7 +122,6 @@ item.arrangeWords = function (text) { //,inewLines) {
   var widths = this.widths;
   var textHt = this.textHt;
   var wspacing =  0.3*textHt;
-  console.log('wspacing',wspacing);
   var lineSpacing = textHt + this.lineSep;
   var cx = 0;
   var index = 0;

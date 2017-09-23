@@ -51,7 +51,6 @@ item.update = function () {
   var segment0 = geom.LineSegment.mk(right,top);
   var ln = segment0.length();
   var fractionFromCorner = 0.5*this.cornerCurviness;
-  debugger;
   var segment1 = geom.LineSegment.mk(top,left);
   var segment2 = geom.LineSegment.mk(left,bottom);
   var segment3 = geom.LineSegment.mk(bottom,right);

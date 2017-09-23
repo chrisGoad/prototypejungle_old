@@ -403,7 +403,6 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   var direction1 = direction0.minus();
   end0.copyto(vertex0pos);
   end1.copyto(vertex1pos);
-  debugger;
   var tailPeriphery = vertex0.peripheryAtDirection(direction1);
   this.vertexTailGap = tailPeriphery.intersection.distance(vertex0.__getTranslation())
   var headPeriphery = vertex1.peripheryAtDirection(direction0);

@@ -119,7 +119,6 @@ item.__updateControlPoint = function (idx,pos) {
 
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
-  console.log('updateCP',idx);
   var graph = ui.containingDiagram(this);
   switch (idx) {
     case 0:

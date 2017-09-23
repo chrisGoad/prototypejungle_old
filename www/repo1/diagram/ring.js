@@ -1,7 +1,6 @@
 'use strict';
 
 pj.require('/diagram/graph.js','/text/textrect.js','/shape/arcArrow.js',function (graphP,vertexPP,arrowPP) {
-debugger;
 const geom = pj.geom,ui = pj.ui
 let item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
@@ -35,12 +34,10 @@ arrowP['stroke-width'] = 3;
 vertexP.fill = 'white';
 item.builtCount = 0;
 item.update = function () {
-   debugger;
   let count = this.count;
   let built = this.builtCount;
   let radius = this.__dimension/2;
   arrowP.clockwise = this.clockwise;
-  debugger;
   for (let i = 0;i< count;i++) {
     let angle =(i* Math.PI * 2)/count
     if (!this.clockwise) {
@@ -52,33 +49,17 @@ item.update = function () {
     if (i < built) {
       vertex = this.graph.vertices[name];
     } else {
-      //vertex = this.graph.addVertex(null,'V'+i);
-      debugger;
       vertex = this.graph.addVertex();
       vertex.__show();
     }
     vertex.__moveto(position);
    
   }
-  /*const addRingEdge = function (e,v0,v1) {
-    let name = 'E'+i;
-    let edge = this.graph.addEdge(null,name);
-    edge.__show();
-    this.graph.connect(name,0,'V'+v0);
-    this.graph.connect(name,1,'V'+((i+1)%count));
-  }
-  if (built === 0) {
-    //code
-  }*/
-  //if (i === count) {
-  //  //code
-  //}
   if (count < built) {
     for (let i = count;i<built;i++) {
       let vname = 'V'+i;
       let vertex = this.graph.vertices[vname];
       vertex.remove();
-      debugger;
       let ename = 'E'+i;
       let edge = this.graph.edges[ename];
       edge.remove();
@@ -126,7 +107,6 @@ item.__setExtent = function (extent,nm) {
 }
 
 item.graph.setRingCount = function (graph,value) {
-  debugger;
   var ring = graph.__parent;
   ring.count = value;
   ring.update();

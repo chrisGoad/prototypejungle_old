@@ -7,14 +7,13 @@ pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-var item = svg.Element.mk('<g/>');// x1="0" y1="0" x2="500" y2="50" stroke="black" stroke-width="2"/>');
+var item = svg.Element.mk('<g/>');
 item.rows= 10;
 item.cols = 10;
 item.spacing = 200;
 item.set("occupants",pj.Array.mk());
 
 item.update = function () {
-  debugger;
    var i,j;
      if (this.occupants.length > 0) {
       return;

@@ -16,7 +16,6 @@ item.set('LineP',LinePP.instantiate().__hide());
 
 var zeroPoint = geom.Point.mk(0,0);
 item.update = function () {
-  debugger;
    var i;
    if (this.lines.length > 0) {
       return;

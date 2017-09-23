@@ -32,8 +32,6 @@ item.set('arrowHeadP',arrowHeadPP.instantiate());
 let arrowHeadP = item.arrowHeadP;
 arrowHeadP.__hide();
 item.__role = 'multiOut';
-//ui.setupAsMultiOut(item);
-debugger;
 item.outCount = item.outEnds.length;
 item.includeEndControls = true;
 item.__adjustable = true;
@@ -78,7 +76,6 @@ item.buildArrowHeads= function () {
 
 // new ends are always placed between the last two ends
 item.initializeNewEnds = function () {
-  debugger;
   let currentLength = this.outEnds.length;
   let numNew = this.outCount - currentLength;
   let outEnds = this.outEnds;  
@@ -127,7 +124,6 @@ item.update = function () {
   for (i=0;i<ln;i++) {
     let end1 = outEnds[i];
     let arrowHead = arrowHeads[i];
-    debugger;
     let shaftEnd = this.solidHead ?end1.plus(this.direction.times((this.flip?-0.5:-0.5)*this.headLength)):end1;
     let shaft = shafts[i];
     if (this.flip) {
@@ -143,19 +139,13 @@ item.update = function () {
     shaft.__draw();
     arrowHead.headPoint.copyto(end1);
     arrowHead.direction.copyto(this.direction);
-    debugger;
     arrowHead.switchHeadsIfNeeded();
     arrowHead.update();
-    debugger;
   }
-  //this.head.headPoint.copyto(end1);
-  //this.head.direction.copyto(this.direction);
-  //this.head.update();
 }
 
 
 item.__controlPoints = function () {
-  debugger;
   let e0 = this.end0;
   this.joinX = this.e01 * this.elbowPlacement;
   let joinPoint = geom.Point.mk(this.end0.x+this.joinX,e0.y);
@@ -177,7 +167,6 @@ item.__updateControlPoint = function (idx,pos) {
   } else if (idx === 2) {
     this.end0.copyto(pos);
   } else if (idx == 1) {
-    debugger;
     let arrowHead = this.arrowHeads[0];
     let params = arrowHead.updateControlPoint(pos,true);
     let toAdjust = ui.whatToAdjust;
@@ -200,7 +189,6 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
-  debugger;
   let outEnd0 = this.outEnds[0];
   let outEnd1 = this.outEnds[1];
   let endIn = this.end0;
@@ -215,8 +203,6 @@ item.__setExtent = function (extent) {
 
 item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {
   let toRight = this.end0.x < this.outEnds[0].x;
-  console.log('toRight',toRight);
- // let direction = geom.Point.mk(toRight?-1:1,0);
   let tr = this.__getTranslation();
   let end,direction;
   if (whichEnd === 'in') {

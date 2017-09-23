@@ -36,9 +36,6 @@ item.labels.generator = function (data,index) {
   var  labelHeight,labelWidth,labelBBox,x,y;
   label.setText(data);
   labelBBox = label.__getBBox();
-  if (!labelBBox) {
-    debugger;
-  }
   labelWidth= labelBBox.width;
   labels.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
   labelHeight = label["font-size"];
@@ -53,41 +50,13 @@ item.labels.generator = function (data,index) {
   label.__show();
   return label;
 }
-/*
-item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
-  label.__editPanelName = 'This label';
-  var item = this.__parent;
-  var gap = item.labelGap;
-  var  labelHeight,labelWidth,labelBBox,x,y;
-  label.__show();
-  label.__data = data;
-  label.setText(data);
-  labelBBox = label.__getBBox();
-  if (!labelBBox) {
-    debugger;
-  }
-  labelWidth= labelBBox.width;
-  item.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
-  labelHeight = label["font-size"];
-  if (item.orientation === 'vertical') { // label's left is at zero in the vertical case
-    x = labelWidth/2;
-    y = indexInSeries * gap;
-  }  else {
-    x = indexInSeries * gap;
-    y =0;
-  }
-  label.__moveto(x,y);
-  label.__show();
-}
 
-*/
 
 item.update = function () {
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max;
-  debugger;
   if (!this.__data) return;
   if (!this.__element) return;
   // this is something that should not be inherited

@@ -108,8 +108,6 @@ item.__updatePrototype = function () {
   }
 }
 item.update = function () {
-  console.log('multInArrow Update');
-  debugger;
   let i;
   if (this.includeHead) {
     this.head.switchHeadsIfNeeded();
@@ -184,7 +182,6 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
-  debugger;
   let inEnd0 = this.inEnds[0];
   let inEnd1 = this.inEnds[1];
   if (!inEnd1) {
@@ -202,8 +199,6 @@ item.__setExtent = function (extent) {
 
 item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {
   let toRight = this.end1.x > this.inEnds[0].x;
-  console.log('toRight',toRight);
- // let direction = geom.Point.mk(toRight?-1:1,0);
   let tr = this.__getTranslation();
   let end,direction;
   if (whichEnd === 'out') {

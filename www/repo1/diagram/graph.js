@@ -280,7 +280,6 @@ item.findNearestVertex = function (pos,direction) {
 
 
 item.connectMultiIn = function (diagram,edge) {
-  debugger;
   let inEnds = edge.inEnds;  
   let inEnd0 = inEnds[0];
   let toRight = inEnd0.x < edge.end1.x;
@@ -347,7 +346,6 @@ item.connectMultiOut = function (diagram,edge) {
 item.__diagram = true;
 
 item.__actions = (item) => {
-  debugger;
   let  role = item.__role;
   switch (role) {
     case 'vertex':
@@ -372,7 +370,6 @@ item.connectAction = function (diagram,vertex) {
 
   }
   const selectOtherEnd= function () {
-    debugger;
     ui.disableTopbarButtons();
     ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond,
                                'Cancel Connect',cancelConnect);
@@ -399,8 +396,7 @@ item.connectAction = function (diagram,vertex) {
         firstVertexDiagram.connect(newEdge,1,itm,type1);
         firstVertexDiagram.__update();
         firstVertexDiagram.__draw();
-       ui.resumeActionPanelAfterSelect();
-       debugger;
+        ui.resumeActionPanelAfterSelect();
         ui.setActionPanelContents(itm);
         return;
       }
@@ -415,7 +411,6 @@ item.connectAction = function (diagram,vertex) {
 
 
 item.__delete = function (node) {
-  debugger;
   if (node.__role === 'vertex') {
     let nm = node.__name;
     pj.forEachTreeProperty(this.edges,function (edge) {

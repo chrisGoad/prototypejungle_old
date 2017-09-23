@@ -69,16 +69,12 @@ item.update = function () {
   path += p2str('L',elbowPoint0,' ');
   path += p2str('C',controlPoint0,',');
   path += p2str('',controlPoint1,',');
-  path += p2str('',elbowPoint1,' ');
-  
-  //path += p2str('L',elbowPoint1,' ');
+  path += p2str('',elbowPoint1,' '); 
   path += p2str('L',elbowPoint2,' ');
   path += p2str('C',controlPoint2,',');
   path += p2str('',controlPoint3,',');
   path += p2str('',elbowPoint3,' ');
- // path += p2str('L',elbowPoint3,' ');
   path += p2str('L',e1,' ');
-//  console.log('path',path);
   this.d = path;
   
 }
@@ -100,7 +96,6 @@ item.__controlPoints = function () {
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
-  console.log('IDX',idx);
   switch (idx) {
     case 0:
       this.end0.copyto( pos);

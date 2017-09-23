@@ -8,19 +8,11 @@ item.paddingLeft = 10;
 item.paddingRight = 10;
 item.vSpacing = 10;
 item.leafWidth = 30;
-//item.set('nodeP', pj.svg.Element.mk('<g/>'));
-//let textP = item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
-//debugger;
 let textP = ui.installPrototype('textbox',textboxPP);
 item.textP = textP;
 textP.__draggableInDiagram = true;
-debugger;
 let connectorP = ui.installPrototype('connector',connectorPP);
 item.connectorP = connectorP;
-//let conntectorP = 
-//item.nodeP.text = textP;
-//let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
-//let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
 textP.multiline = false;
 textP.__role = 'vertex';
 textP['font-size'] = 10;
@@ -44,6 +36,7 @@ connectorP.includeHead = false;
 // note we need to build nodes from installed prototypes to support the replace prototype machinery
 item.newNode = function (text) {
   let rs = pj.svg.Element.mk('<g/>');
+  ui.hide(rs,'__childBeenMoved');
   rs.set('text',textP.instantiate());
   rs.set('connector',connectorP.instantiate());
   rs.set('descendants',pj.Array.mk());
@@ -133,14 +126,11 @@ item.computeDimensions = function (node) {
 // origins of nodes are at left end and centered vertically
 
 item.setPositions = function (node) {
- // node.__moveto(pos);
- console.log('setPositions');
   let textBnds = node.text.__getBBox();
   let thisHere = this;
   if (!textBnds) {
     return;
   }
-    console.log('textbnds',textBnds.width);
   let connector = node.connector;
    //node.bracket.__setExtent(textBnds);
    node.text.__moveto(geom.Point.mk(this.paddingLeft + (textBnds.width)/2,0));
@@ -166,7 +156,6 @@ item.setPositions = function (node) {
         let n = d[i];
         thisHere.setPositions(n);
         let cpos = n.__getTranslation();
-        console.log('cpos',cpos.x,cpos.y);
         inEnds[i].copyto(cpos);
       }
     } else {
@@ -186,7 +175,6 @@ item.setPositions = function (node) {
 
 item.firstUpdate = true;
 item.update = function () {
-  console.log('UPDATING');
   if (this.rootNode && this.firstUpdate) {
     this.computeDimensions(this.rootNode);
     this.setPositions(this.rootNode);
@@ -265,7 +253,6 @@ item.addDescendant = function (diagram,text) {
   //node.connector.update();
   diagram.update();
   diagram.__draw();
-  debugger;
   svg.main.fitContentsIfNeeded();
 }
 
@@ -306,7 +293,6 @@ item.moveUp= function (diagram,text) {
 
 
 item.moveDown= function (diagram,text) {
-  debugger;
   item.moveUpOrDown(diagram,text,false);
 }
 

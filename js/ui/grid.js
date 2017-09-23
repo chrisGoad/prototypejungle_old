@@ -17,7 +17,6 @@ ui.adjustGridRect = function (bnds) { // assure that the corner is an even count
   let interval = pj.root.__grid.interval;
   let newCx = Math.round(corner.x/interval)*interval;
   let newCy = Math.round(corner.y/interval)*interval;
-  console.log('adjusted corner by ',newCx - corner.x);
   corner.x = newCx;
   corner.y = newCy;
 }
@@ -76,7 +75,6 @@ ui.adjustGrid = function () {
   let grid = pj.root.__grid;
   if (grid && grid.__visible()) {
     if (!ui.gridCoversSvg()) {
-      console.log('adjusting grid');
       ui.setGridRect();
     }
   }

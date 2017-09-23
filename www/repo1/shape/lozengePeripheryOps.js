@@ -21,9 +21,7 @@ item.sides = function () {
   return rs;
 }
   
-item.peripheryAtDirection = function(direction) {
-  debugger;
-  
+item.peripheryAtDirection = function(direction) {  
   var sides = this.sides();
   var dim = 2*Math.max(this.width,this.height);
   var center = geom.Point.mk(0,0);//this.__getTranslation();
@@ -43,7 +41,6 @@ item.peripheryAtDirection = function(direction) {
 
 
 item.alongPeriphery = function (edge,fraction) {
-  console.log('edge',edge,'fraction',fraction);
   var sides = this.sides();
   var side = sides[edge];
   return side.pointAlong(fraction).plus(this.__getTranslation());
@@ -56,7 +53,6 @@ item.installOps = function(where) {
 }
 return item;
 geom.Rectangle.alongPeriphery = function (edge,fraction) {
-  console.log('edge',edge,'fraction',fraction);
   var sides = this.sides();
   var side = sides[edge];
   return side.pointAlong(fraction);
@@ -64,7 +60,6 @@ geom.Rectangle.alongPeriphery = function (edge,fraction) {
   var segment0 = geom.LineSegment.mk(right,top);
   var ln = segment0.length();
   var fractionFromCorner = 0.5*this.cornerCurviness;
-  debugger;
   var segment1 = geom.LineSegment.mk(top,left);
   var segment2 = geom.LineSegment.mk(left,bottom);
   var segment3 = geom.LineSegment.mk(bottom,right);

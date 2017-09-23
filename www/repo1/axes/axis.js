@@ -80,7 +80,6 @@ item.firstLabelPos = undefined; // defined later; mentioned here so it can be fr
 
 
 item.update = function () {
-  debugger;
   var ui = pj.ui;
   var geom = pj.geom;  
 
@@ -210,7 +209,6 @@ item.update = function () {
   BigTickP = this.BigTickP;
 
   /* ADD THE TICKS */
-  debugger;
   ticks = pj.resetComputedArray(this,'ticks');
   if (this.showTicks) {
     //bigTicks = pj.resetComputedArray(this,'bigTicks');
@@ -296,7 +294,6 @@ item.update = function () {
   if (this.textOffset === undefined) {
     this.textOffset = horizontal?30:-15;
   }
-  debugger;
   labelElements = this.theLabels.__data;
   labelElements.length = 0;
   this.theLabels.orientation = this.orientation;

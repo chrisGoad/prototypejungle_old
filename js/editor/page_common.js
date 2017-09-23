@@ -31,7 +31,7 @@ function enableTreeClimbButtons() {
   ui.topBut.$show();
   ui.downBut.$show();
   enableButton1(ui.upBut,isp);
-  enableButton1(ui.topBut,isp);
+  //enableButton1(ui.topBut,isp);
   enableButton1(ui.downBut,isc);
 }
 

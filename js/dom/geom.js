@@ -700,7 +700,6 @@ geom.Rectangle.peripheryAtDirection = function(direction) {
     var side = sides[i];
     var intersection = line.intersect(sides[i]);
     if (intersection) {
-      //return intersection;
       var fractionAlong =  ((intersection.difference(side.end0)).length())/(side.length());
       return {intersection:intersection,side:i,sideFraction:fractionAlong};
     }
@@ -708,7 +707,6 @@ geom.Rectangle.peripheryAtDirection = function(direction) {
 }
 
 geom.Rectangle.alongPeriphery = function (edge,fraction) {
-  console.log('edge',edge,'fraction',fraction);
   var sides = this.sides();
   var side = sides[edge];
   return side.pointAlong(fraction);

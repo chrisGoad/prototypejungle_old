@@ -13,7 +13,6 @@ let item = pj.Object.mk();
 // later: multiedges
 
 item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionType1) {
-  debugger;
   let edgeConnectionType = this.__connectionType; // some edges, eg elbow edges, mandate a connection type.
   let tr = this.__getTranslation();
   let end0 = this.end0;
@@ -27,7 +26,6 @@ item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionT
     if ((connectionType === 'periphery') || (connectionType === 'EastWest')) {
       ppnt = vertex.peripheryAtDirection(direction);
       let dist = ppnt.intersection.distance(vertex.__getTranslation());
-      console.log('DIST',dist);
       end.copyto(ppnt.intersection.difference(tr));
     } else {
       let split = connectionType.split(',');

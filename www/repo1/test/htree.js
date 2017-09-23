@@ -3,7 +3,6 @@ var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
 //var tree = pj.root.set('__graph',treeP.instantiate());
 var tree =  item.set('tree',treeP.instantiate());
-debugger;
 tree.textP.width = 40;
 tree.textP.vPadding = 5;
 tree.leafWidth = 40;

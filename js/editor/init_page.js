@@ -37,7 +37,7 @@ ui.genMainPage = function (cb) {
   });
   if (ui.upBut) {
     disableButton(ui.upBut);
-    disableButton(ui.topBut);
+    enableButton(ui.topBut);
     disableButton(ui.downBut);
   }
   ui.genButtons(ui.ctopDiv.__element,{});

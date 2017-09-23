@@ -397,7 +397,6 @@ pj.setProperties(dd,aa,['a','b','p','f']);
 */
 // transfer properties from source. 
 pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
-  //Sconsole.log('dest name',dest.__name,'source name',source.__name,'dontcopy',dontCopy);
   if (!source) return;
   if (!dest) {
     pj.error('Bad arguments')
