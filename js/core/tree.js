@@ -992,18 +992,6 @@ pj.afterChar = function (string,chr,strict) {
 }
 
 
-pj.afterLastChar = function (string,chr,strict) {
-  let idx = string.lastIndexOf(chr);
-  if (idx < 0) return strict?undefined:string;
-  return string.substr(idx+1);
-}
-
-
-pj.beforeLastChar = function (string,chr,strict) {
-  let idx = string.lastIndexOf(chr);
-  if (idx < 0) return strict?undefined:string;
-  return string.substr(0,idx);
-}
 
 
 pj.beforeChar = function (string,chr,strict) {
@@ -1011,11 +999,6 @@ pj.beforeChar = function (string,chr,strict) {
   if (idx < 0) return strict?undefined:string;
   return string.substr(0,idx);
 }
-
-pj.pathExceptLast = function (string,chr) {
-  return pj.beforeLastChar(string,chr?chr:'/');
-}
-
 
   
 pj.stripInitialSlash = function (string) {
@@ -1029,10 +1012,6 @@ pj.addInitialSlash = function (string) {
   if (string==='') return string;
   if (string[0]==='/') return string;
   return '/'+string;
-}
-
-pj.pathLast = function (string) {
-  return pj.afterLastChar(string,'/');
 }
 
 pj.pathReplaceLast = function (string,rep,sep) {

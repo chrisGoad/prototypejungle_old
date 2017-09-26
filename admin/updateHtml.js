@@ -137,7 +137,7 @@ if (index) {
 }else {
   
 //  index = 1;
-  addHtml(['draw','drawd','code','coded','catalogEdit','404','svg','sign_in','account']);
+  addHtml(['draw','drawd','code','coded','catalog','404','svg','sign_in','account']);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","privacy","network"]);
   addIntroDocs(fts,['intro','insert','network_main','connect','prototypes','clone','diagrams','diagrams_main',"network",'details','cohorts','code_intro']);
 }

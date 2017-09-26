@@ -306,8 +306,29 @@ fb.deleteFromUiDirectory = function (path) {
 }
 
 
+
+fb.ownerOfUrl = function (url) {
+  var userName = fb.currentUserName();
+  if (!userName) {
+    return false;
+  }
+  var decodedUrl = pj.decodeUrl(url);
+  return decodedUrl[0] === userName;
+}
+
+fb.handleTwiddle = function (url) {
+  if (url && (url[0] === '~')) {
+    var userName = fb.currentUserName();
+    if (userName) {
+      return '('+userName+')'+ url.substring(1);
+    }
+  }
+  return url;
+}
+
 fb.deleteFromDatabase =  function (url,cb) {
-  if (!fb.currentUser) {
+  var userName = fb.currentUserName();
+  if (!userName) {
     cb?cb('notSignedIn'):null;
     return;
   }
@@ -315,7 +336,7 @@ fb.deleteFromDatabase =  function (url,cb) {
   var uid = decodedUrl[0];
   //var path = pj.stripInitialSlash(decodedUrl[1]);
   var path = decodedUrl[1];
-  if (uid !== fb.currentUid()) {
+  if (uid !== userName) {
     cb?cb('permissionDenied'):null;
     return;
   }

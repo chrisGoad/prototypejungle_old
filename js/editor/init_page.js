@@ -1,19 +1,32 @@
 
 
 
+
+ui.openCatalogEditor = function () {
+  var url = '/catalog.html?source='+ui.catalogUrl;
+  if (ui.mainUrl) {
+    url += '&view='+ui.mainUrl;
+  }
+  location.href = url;
+}
+
+
 ui.genButtons = function (container,options,cb) {
-  var addDiagrams = function () {
-    var diagramsButton =   ui.addButton(container,'Diagram','Make a New Diagram','/diagrams.html');
+  var addEditorButtons = function () {
+    //var diagramsButton =   ui.addButton(container,'Diagram','Make a New Diagram','/diagrams.html');
     if (ui.source) {
-      var structureEditorButton = ui.addButton(container,'editor','Edit Structure');
+      var structureEditorButton = ui.addButton(container,'structureEditor','Edit Structure');
       structureEditorButton.addEventListener('click',ui.openStructureEditor);
     }
+    var catalogEditorButton = ui.addButton(container,'catalogEditor','Catalog');
+    catalogEditorButton.addEventListener('click',ui.openCatalogEditor);
+
   }
   if (ui.whichPage === 'structure_editor') {
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    addDiagrams();
+    addEditorButtons();
   }
   ui.genStdButtons(container,cb);
 }
@@ -77,6 +90,7 @@ function processQuery(iq) {
   var intro = q.intro;
   ui.source = q.source;
   if (ui.source) {
+    ui.source = fb.handleTwiddle(ui.source);
     ui.sourceFile = pj.afterLastChar(ui.source,'/');
     ui.blankPage = ui.source === '/diagram/backGraph.js';
   } else {
@@ -85,15 +99,15 @@ function processQuery(iq) {
   if (q.fit) {
     ui.fitFactor = Number(q.fit);
   }
-  ui.dataUrl = q.data;
-  var catalog = q.catalog;
-  var catalogExtension = q.catalogExtension;
-  if (catalogExtension) {
-    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
-    ui.catalogExtensionUrl = catalogExtension;
-  } else {
-    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
+  //ui.dataUrl = q.data;
+  ui.catalogUrl = q.catalog;
+  if (ui.catalogUrl) {
+    ui.catalogUrl = fb.handleTwiddle(ui.catalogUrl);
   }
+  var catalogExtension = q.extension;
+  if (catalogExtension) {
+    ui.catalogExtensionUrl = fb.handleTwiddle(catalogExtension);
+  } 
   if (ui.docDiv) {
     if (intro) {
       ui.intro = true;
@@ -124,7 +138,23 @@ ui.initPage = function (o) {
     }
     initFsel();
     svg.fitStdExtent = (ui.whichPage === 'structure_editor') && !(ui.source);
-    ui.genMainPage(ui.afterPageGenerated);
+    if (ui.whichPage === 'code_editor') {
+      debugger;
+      ui.genMainPage(function () {
+          var userName = fb.currentUserName();
+          if (!ui.catalogUrl) {
+            ui.catalogUrl = userName?'('+userName+')/default.catalog':'(sys)/global.catalog';
+          }
+          ui.afterPageGenerated();
+          ui.catalogUrlEl.$html('<b>Catalog:</b> '+ui.catalogUrl);
+          ui.loadCatalog();
+      });
+    } else {
+      if (!ui.catalogUrl) {
+        ui.catalogUrl = '(sys)/global.catalog';
+      }
+      ui.genMainPage(ui.afterPageGenerated);
+    }
   });
 }
 

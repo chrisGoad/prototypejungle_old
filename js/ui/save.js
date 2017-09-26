@@ -1,14 +1,11 @@
 
 
-var s3SaveState;// retains state while waiting for the save to complete
-var s3SaveCallback;
-
 
 // This is one of the code files assembled into pjui.js. 
 
 pj.maxSaveLength = 200000;//50000; // this should match the limit in the storage rules for firebase
 
-ui.removeToken = function (url) { // the token is not needed, because our bucket gives open read access
+var removeToken = function (url) { // the token is not needed, because our bucket gives open read access
   var rs;
   var tokenP = url.indexOf('&token=');
   if (tokenP > -1) {
@@ -42,7 +39,7 @@ pj.saveString = function (path,str,cb) {
   var blob = new Blob([str]);
   var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
   uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
-    var url = ui.removeToken(uploadTask.snapshot.downloadURL);
+    var url = removeToken(uploadTask.snapshot.downloadURL);
     updateDirectory(url);
   });
 }

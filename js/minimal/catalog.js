@@ -108,6 +108,34 @@ pj.catalog.highlightElement = function (catalogState,el) {
   });
 }
 
+pj.catalog.selectEntry = function (catalogState,entry) {
+  var idx = entry.index;
+  catalogState.selectedIndex = idx;
+  var el = catalogState.elements[idx];
+  var tab = entry.tab;
+  if (tab) {
+    pj.catalog.selectTab(catalogState,tab);
+  }
+  pj.catalog.highlightElement(catalogState,el);
+}
+
+pj.catalog.findIndex = function (catalogState,fn) {
+  var catalog = catalogState.catalog;
+  var ln = catalog.length;
+  for (var i=0;i<ln;i++) {
+    var entry = catalog[i];
+    if (fn(entry)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+pj.catalog.findIndexWithUrl = function (catalogState,url) {
+  return pj.catalog.findIndex(catalogState,function (entry) {return entry.url === url});
+}
+
+
 pj.catalog.unselectElements = function (catalogState) {
   pj.catalog.highlightElement(catalogState);
 }
@@ -153,6 +181,8 @@ pj.catalog.show = function (catalogState,forInsertt) {
   var allEls = [];
   var mkClick = function (el,selected) {
     return function() {
+      debugger;
+      catalogState.selectedIndex = selected.index;
       pj.catalog.highlightElement(catalogState,el);
       whenClick(selected)
     }
@@ -261,8 +291,8 @@ pj.getCatalogs = function (url1,url2,cb) {
    } 
 }
      
- 
-pj.catalog.getAndShow = function (options) {
+
+pj.catalog.getCatalog = function (options) {
   var catalogUrl = options.catalogUrl;
   var extensionUrl = options.extensionUrl;
   var catalogState = {};
@@ -284,16 +314,26 @@ pj.catalog.getAndShow = function (options) {
     if (catalog) {
       catalogState.catalog = catalog;
       catalogState.json = catalogJSON;
-      showIt();
     } else {
      pj.error('missing catalog '+catalogUrl);
+     return;
     }
-    pj.catalog.show(catalogState);
+    //pj.catalog.show(catalogState);
     if (options.callback) {
       options.callback(undefined,catalogState);
     }
-    showIt();
   });
+}
+
+pj.catalog.getAndShow = function (options) {
+  var ocb = options.callback;
+  options.callback = function (erm,catalogState) {
+    pj.catalog.show(catalogState);
+    if (ocb) {
+      ocb(erm,catalogState);
+    }
+  }
+  pj.catalog.getCatalog(options);
 }
 
 

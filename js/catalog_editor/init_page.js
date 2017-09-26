@@ -62,20 +62,42 @@ ui.genButtons = function (container,options) {
 ui.initPage = function (o) {
   fb.setCurrentUser(function () {
     var q = ui.parseQuerystring();
-    var source = q.source;
-    if (source) {
-      ui.source = source;
+    if (q.source) {
+      ui.source = fb.handleTwiddle(q.source);
+    }
+    if (q.add) {
+      ui.addUrl = q.add;
+    }
+    if (q.view) {
+      ui.viewUrl = q.view;
+    }
+    if (q.catalog) {
+      ui.source = fb.handleTwiddle(q.catalog);
     }
     ui.initFsel();
     ui.genMainPage(function () {
       ui.layout();
-      ui.showCatalog(ui.source);
       setSaved(true);
-      setupYesNo();
+      setupYesNo();  
       $(window).resize(function() {
         ui.layout();
        });
+      if (!ui.source) {
+         var userName = fb.currentUserName();
+         ui.source = userName?'('+userName+')/default.catalog':'(sys)/global.catalog';
+      }
+       ui.showCatalog(ui.source,function () {
+        debugger;
+         if (ui.addUrl) {
+          ui.addNewEntry(ui.addUrl);
+         } else if (ui.viewUrl) {
+          ui.viewEntry(ui.viewUrl);
+          //code
+         }
+        ui.displayMessage(ui.catalogMsg,'Current catalog: '+pj.ui.source+'<br>(click on left panel to select)');
 
+         
+       });
     });
     
   });

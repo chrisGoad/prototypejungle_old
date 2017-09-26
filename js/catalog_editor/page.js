@@ -235,7 +235,7 @@ fsel.onSelect = function (n) {
   if (fsel.disabled[opt]) return;
   switch (opt) {
     case "new":
-      location.href = "/catalogEdit.html";
+      location.href = "/catalog.html";
       break;
     case "save":
       ui.resaveCatalog();
@@ -286,7 +286,7 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       cb(null,path);
       return;
     }
-    var loc = '/catalogEdit.html?source='+pjUrl;
+    var loc = '/catalog.html?source='+pjUrl;
     location.href = loc;
 
   },aspectRatio);
@@ -451,7 +451,7 @@ ui.browseUrl.$click(function () {
       });
   });
 
-ui.showCatalog = function (url) {
+ui.showCatalog = function (url,cb) {
   if (url) {
      var options = {role:null,tabsDiv:ui.catalogTab.__element,
                     cols:[ui.catalogCol1.__element,ui.catalogCol2.__element],catalogUrl:url,
@@ -459,12 +459,18 @@ ui.showCatalog = function (url) {
                     callback: function (err,catalogState) {
                          ui.catalogState = catalogState;
                         ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
+                        if (cb) {
+                          cb();
+                        }
                     }};
 
      pj.catalog.getAndShow(options);
   
   } else {
     ui.newCatalogState();
+    if (cb) {
+      cb();
+    }
   }
 }
 
@@ -474,7 +480,7 @@ ui.newCatalogState = function () {
                                         undefined,displayEntry);
   ui.catalogState.tabs = ['shape'];
   ui.entryInputs.tabOrder.$prop('value','shape');
-  addNewEntry();
+  ui.addNewEntry();
 }
 
 var refreshCatalog = function () {
@@ -496,10 +502,10 @@ ui.chooserReturn = function (v) {
       break;
    case 'open':
       if (v.deleteRequested) {
-        ui.deleteFromDatabase(v.path);
+        fb.deleteFromDatabase(v.path);
         return;
       }
-     location.href = '/catalogEdit.html?source='+v.path;
+     location.href = '/catalog.html?source='+v.path;
       break;
   case 'select':
     ui.selectedEntry[ui.nowBrowsing] = fpath+'.'+((ui.nowBrowsing==='svg')?'svg':'js');
@@ -546,6 +552,8 @@ var goCode = function () {
   var dst = '/code.html'+pj.catalog.httpGetString(ui.selectedEntry);
   location.href = dst;
 }
+
+setClickFunction(ui.catalogDiv,ui.hideFilePulldown);
 
 setClickFunction(ui.goCodeBut,goCode);
 
@@ -607,10 +615,15 @@ var fromBoolean = function (val) {
   return val?'true':'false';
 }
 
-var addNewEntry = function () {
- ui.displayMessage(ui.messageElement,'Saving...'); ui.displayMessage(ui.messageElement,'Saving...');  var newEntry = {};
+ui.addNewEntry = function (add) {
+  debugger;
+var newEntry = {};
   for (var p in newEntryTemplate) {
     newEntry[p]=newEntryTemplate[p];
+  }
+  if (add) {
+    newEntry.url = add;
+    newEntry.title = 'For '+add;
   }
   if (ui.catalogState.selectedTab) {
     newEntry.tab = ui.catalogState.selectedTab;
@@ -625,10 +638,21 @@ var addNewEntry = function () {
   pj.catalog.show(ui.catalogState);
   displayEntry(newEntry);
   refreshCatalog();
+  pj.catalog.selectEntry(newEntry);
   setSaved(false);
 }
 
-ui.newEntryBut.$click(addNewEntry);
+ui.viewEntry = function (url) {
+  var index = pj.catalog.findIndexWithUrl(ui.catalogState,url);
+  if (index) {
+    var entry = ui.catalogState.catalog[index];
+    pj.catalog.selectEntry(ui.catalogState,entry);
+    displayEntry(entry);
+  }
+}
+
+
+ui.newEntryBut.$click(function () {ui.addNewEntry()});
 
 pj.catalog.tabSelectCallbacks.push(function (tab) {
   var tabWithEntry = false;

@@ -12,26 +12,26 @@
  *  Here are the  properties of R  which represent the attributes of nodes N with codes C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
  *       as does N; however function values f are encoded by [f.toString()]
- *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
- *    to the code for the value of N.P, or to '<code> child' if the external object is a child of value(C) [since __parent links
- *    are not available for coding in the external object]
+ *  (2) R.children, an array. R.children[C]  is an object which maps each object-valued property P of N
+ *    to the code for the value of N.P
  *  (3) R.arrays.  An object where R.arrays[C] is defined when N is an array.  R.arrays[C] === length(N).
  *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
  *    of nodes in the chain. Each chain description ends  with the code for an external node.
  * (5) R.externals, an array which gives the meanings of the codes xN for externals.
- * (6) R.requires, an array of all the urls mentioned in R.externals (the files that must be loaded prior to interpretation of this serialization)
+ * (6) R.__requires, an array of all the urls mentioned in R.externals (the files that must be loaded prior to interpretation of this serialization)
  
  *  An external is described by string of one the forms:  [<built-in>]/<path> or [<url>]/<path>
  *
- *  The built-ins for the ProtoChart application are things like "geom", and "ui". For example, "/geom/Point" refers to
+ *  The built-ins for the PrototypeJungle application are things like "geom", and "ui". For example, "/geom/Point" refers to
  *  the  Point prototype as defined in pj.geom. Any prototype tree which contains Points will define a code 
  *  which is assigned  the value "/geom/Point" in R.externals.
  *
- *  For a separately loaded item, [url] denotes the URl from which it was loaded.
+ *  For a separately loaded item, [source] denotes the URl from which it was loaded.  URLs come in two forms: <path> (eg /shape/arrow.js),
+ *  and (username)<path> (eg (sys)/test/circle.js). The former denotes a path in prototypejungles own repository (https://prototypejungle/repo1),
+ and latter a path in the repository of the given user.
  *
  *  In either case,   <path> specifies the sequence of selections which yield the referred-to object when starting with the external object.
- *  For example, [htps://protochart/repo1/chart/column.js]/graph/axis denotes the object X.graph.axis, where X is the item that was loaded
- *  from https://protochart/repo1/chart.column.js. 
+ *  For example, [/shape/arrow.js]/head denotes the object X.head, where X is the item that was loaded from /shape/arrow.js 
  *  
  * R.chains[0][0] is the root of the serialization.
  * 

@@ -43,6 +43,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
      ui.codeMessage =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
+      ui.catalogUrlEl = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt">Catalog:</div>'),
       ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt"></div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.runCodeBut =html.Element.mk('<div style = "font-size:9pt" class="roundButton">Run</div>'),
@@ -159,7 +160,7 @@ var saveItem,resaveItem;
 var replaceRequireInMain = function (toReplace,replacement) {
   var code = pj.loadedScripts[ui.mainUrl];
   var newCode = code.replace(toReplace,replacement);
-  pj.loadedScripts[ui.mainUrl] = newCode;
+  pj.loadedScripts[ui.Url] = newCode;
   ui.changed[ui.mainUrl] = true;
   ui.fileModified = true;
   
@@ -191,7 +192,7 @@ ui.chooserReturn = function (v) {
       break;
     case 'open':
       if (v.deleteRequested) {
-        ui.deleteFromDatabase(v.path);
+        fb.deleteFromDatabase(v.path);
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
@@ -237,8 +238,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 var initFsel = function () {
- fsel.options = ["New","Open from file browser","Open from catalog","View Catalog"]; 
- fsel.optionIds = ["new","open","openCatalog","viewCatalog"];
+ fsel.options = ["New","Open from file browser","Open from catalog","Add to Catalog"];//"View Catalog"]; 
+ fsel.optionIds = ["new","open","openCatalog","addToCatalog"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -255,7 +256,7 @@ var setFselDisabled = function () {
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
-   fsel.disabled.new = !(ui.source);
+   fsel.disabled.addToCatalog = !(ui.mainUrl && fb.ownerOfUrl(ui.catalogUrl));
    fsel.disabled.open = !(fb.currentUser);
    fsel.updateDisabled();
 }
@@ -288,6 +289,15 @@ fsel.onSelect = function (n) {
   case "viewCatalog":
     popCatalog(true);
     break;
+  case "addToCatalog":
+    var idx = pj.catalog.findIndexWithUrl(ui.catalogState,ui.mainUrl);
+    if (idx>=0) {
+      ui.alert(ui.mainUrl+' is already in the catalog')
+    } else {
+      location.href = "/catalog.html?source="+ui.catalogUrl+"&add="+ui.mainUrl;
+    }
+    break;
+    
   }
 }
  
@@ -362,33 +372,49 @@ setClickFunction(ui.saveBut,resaveItem);
 
 var selectedForInsert,closeInsert;
 
-var popCatalog= function (forViewing) {
-  selectedForInsert = undefined;
-  ui.hideFilePulldown();
-  ui.panelMode = 'insert';
-  ui.layout();                     
+ui.loadCatalog = function (cb) {
   var options = {role:null,tabsDiv:ui.insertTab.__element,catalogUrl:ui.catalogUrl,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
                           //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
      callback:function (error,catState) {
        ui.catalogState = catState;
-      }};
+       if (cb) {
+         cb();
+       }
+      }
+  };
+  pj.catalog.getCatalog(options);
+}
+
+var popCatalog= function (forViewing) {
+  selectedForInsert = undefined;
+  ui.hideFilePulldown();
+  ui.panelMode = 'insert';
+  ui.layout();                     
+  /*var options = {role:null,tabsDiv:ui.insertTab.__element,catalogUrl:ui.catalogUrl,
+                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
+                          //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
+     callback:function (error,catState) {
+       ui.catalogState = catState;
+      }};*/
     if (forViewing) {
-      options.showUrl = true;
-      options.whenClick =function (selected) {
+      ui.catalogState.showUrl = true;
+      ui.catalogState.whenClick =function (selected) {
         pj.catalog.copyToClipboard(selected.url);
         return;
       };
       ui.insertMessage.$show();
     } else {
-       options.whenClick = function (selected) {
+       ui.catalogState.whenClick = function (selected) {
         var url = '/code.html'+pj.catalog.httpGetString(selected);//?source='+selected.url;
         location.href = url;
       };
       ui.insertMessage.$hide();
 
     }
-    pj.catalog.getAndShow(options);
+    pj.catalog.show(ui.catalogState);
+
+    //pj.catalog.getAndShow(options);
 }
 
 ui.changed = {};

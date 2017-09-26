@@ -32,7 +32,7 @@ fileLists['code_editor'] =    editorCommon.concat(["editor/install","code_editor
 fileLists['catalog_editor'] = editorCommon.concat(["catalog_editor/page","catalog_editor/init_page"]);
                                
 fileLists['minimal']  = ["core/pj","core/pageutils"];//,"minimal/catalog"];
-fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","ui/ui2","minimal/catalog","minimal/browser"];
+fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","ui/save","ui/ui2","minimal/catalog","minimal/browser"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);

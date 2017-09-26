@@ -263,6 +263,7 @@ ui.chooserReturn = function (v) {
       break;
     case 'open':
       if (v.deleteRequested) {
+        debugger;
         fb.deleteFromDatabase(v.path);
         return;
       }
@@ -273,7 +274,7 @@ ui.chooserReturn = function (v) {
      } else if ((ext === 'item')||(ext === 'js')) {
        dest = 'draw';
      } else if (ext === 'catalog') {
-       dest = 'catalogEdit';
+       dest = 'catalog';
      } // @todo add .json case
      location.href = '/'+dest+'.html?source='+v.path;
      break;

@@ -51,7 +51,11 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
 
 <div class="tableOfContents"> 
    <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
-   
+   <div class="contentsLine">Code Management</div>
+   <div style="padding-left:50px" class="contentsLine"><a href="#files">11. Files</a></div>
+        <div style="padding-left:50px" class="contentsLine"><a href="#catalogs">12. Catalogs</a></div>
+        <div style="padding-left:50px" class="contentsLine"><a href="#debuggers">16. Using Debuggers</a></div>
+
      <div class="contentsLine"><a href="#trees">2. Trees</a></div>
       <div class="contentsLine"><a href="#instantiation">3. Instantiation and Serialization</a></div>
    <div class="contentsLine"><a href="#nonews">4. No news</a></div>  
@@ -62,13 +66,11 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
     <div class="contentsLine"><a href="#controllers">8. Controllers</a></div>
        <div class="contentsLine"><a href="#diagrams">9. Diagrams</a></div> 
        <div class="contentsLine"><a href="#roles">10. Roles, Replacement, and Transferred Properties</a></div>
-       <div class="contentsLine"><a href="#files">11. Files</a></div>
-        <div class="contentsLine"><a href="#catalogs">12. Catalogs</a></div>
+       
        <div class="contentsLine"><a href="#visibility">13. Controlling Access to Properties</a></div>
         <!--<div class="contentsLine"><a href="#spreads">14. Spreads</a></div>-->
          <div class="contentsLine"><a href="#licensing">14. MIT Licence</a></div>
        <div class="contentsLine"><a href="#share">15. Sharing Your Work</a></div>
-          <div class="contentsLine"><a href="#debuggers">16. Using Debuggers</a></div>
        <div class="contentsLine"><a href="#API">17. API</a></div>
 
 
@@ -130,7 +132,83 @@ such as axes and legends.  The code for these appears in the current prototype r
 
 <!--Not much will be said about the editor in this document.-->
 
+<div class="section" id="files">11. Files</div>
 
+<p>PrototypeJungle supports a conventional sort of file system, implemented in the cloud via
+<a href="https://firebase.google.com/">Firebase</a>. Filenames typically
+look like this: <cw>(userName)/test/arcArrow.js</cw>.  PrototypeJungle utilizes
+the file extensions <cw>.js .svg, .catalog,</cw> and <cw>.item</cw>.
+
+An <cw>.item</cw> file is of the
+sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI.
+
+</p>
+<p> All three editors: the structure editor (/draw.html), the code editor (/code.html), and the catalog editor (/catalog.html),
+accept <cw>source=</cw> as an html GET argument.  So, for example, 
+</p>
+
+<precode>
+<a href="/code.html?source=(exampleUser)/shape/triangle.html">https://prototypejungle.org/code.html?source=(exampleUser)/shape/triangle.html
+</a></precode>
+
+<p>opens the code editor on the file  (exampleUser)/shape/triangle.html.</p>
+
+<div class="section" id="catalogs">12. Catalogs</div>
+<p>Catalogs are the visual lists of items from which elements are dragged in the structure editor during the insert and replace operations.  
+They are  the principal means by which visual elements implemented in code are made available in the structure editor. The code editor includes an option to add
+the current code file
+to the current catalog. An initial catalog, at the filename (username)/catalogs/default.catalog, is allocated for each PrototypeJungle user,
+and additional catalogs can be added at will. </p>
+
+<p>  Here is the catalog editor opened on the global catalog:</p>
+<p style="font-size:11pt">
+<a href = "/catalog.html?source=(sys)/global.catalog">https://prototypejungle.org/catalog.html?source=(sys)/global.catalog</a>
+</p>
+<p>
+A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
+and the .svg  file provides the associated image for the catalog.
+Entries are grouped by tab. Other information associated with an entry:</p>
+<ul>
+<li><b>tab</b>  The tab within which the entry will appear</li>
+<li><b>title</b> (optional) Text that will appear with the entry</li>
+<li><b>id</b> Inserted items will be assigned names of the form id&lt;number&gt;</li>
+<li><b>roles</b> A comma-separated list of <a href="#roles">roles</a>.</li>
+<li><b>scale</b> The svg image is scaled by this factor (should be &lt;= 1)</li>
+<li><b>svg</b> The image for the entry</li>
+<li><b>file</b> The definition for the entry (.js)</li>
+<li><b>settings</b> JSON for property values that should be assigned to the item when inserted. For example,
+<cw>{"fill":"red","stroke":"blue"}</cw> would assign initial colors. These property values override those assigned in the
+JavaScript definition of the item.</li>
+</ul>
+
+<p>
+For the structure editor, the default catalog is (sys)/global.catalog.
+Catalogs other than the default are invoked with the GET arguments <cw>catalog=</cw> or
+<cw>extension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
+default catalog is extended by the entries  in the specified catalog. For example:</p>
+<p style="font-size:11pt">
+<a href = "/draw.html?extension=(exampleUser)/catalog/default.catalog">https://prototypejungle.org/draw.html?extension=(exampleUserName)/catalog/example.catalog</a>
+</p>
+<p>
+will open the structure editor with the global catalog extended by (exampleUser)/catalog/default.catalog.
+ The catalog can be viewed at</p>
+<p>For the code and catalog editors, the default catalog is your own: (yourUserName)/default.catalog. The "catalog" GET argument can be
+used to specify a different catalog. </p>
+<p style="font-size:11pt">
+<a href = "/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog</a>
+</p>
+<p>The code editor also uses catalogs (it can open code files referenced in the catalog from the file menu), and
+respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
+</p>
+
+<div class="section" id="debuggers">16. Using Debuggers</div>
+
+ <p>Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor (and the structure editor).
+ However, the usual variants at https://prototypejungle.org/code.html and https://prototypejungle.org/draw.html catch errors, which is not what is
+ wanted in the context of debugging. The variants https://prototypejungle.org/coded.html and https://prototypejungle.org/drawd.html (accepting exactly the
+ same GET arguments) are provided in which errors are not caught.
+ </p>
+ 
 <div class="section" id="trees">2. Trees</div>
 
 <p> All prototype trees (aka "items") are trees: each non-atomic child 
@@ -568,59 +646,6 @@ these properties are transferred as well when elements within the diagram are re
 (generally these are properties which carry diagramatic aspects of the shape in question - such as connections
 in graphs).</p>
 
-<div class="section" id="files">11. Files</div>
-
-<p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via
-<a href="https://firebase.google.com/">Firebase</a>. Filenames typically
-look like this: <cw>(userName)/test/arcArrow.js</cw>.  PrototypeJungle utilizes
-the file extensions <cw>.js .svg, .catalog,</cw> and <cw>.item</cw>.
-
-An <cw>.item</cw> file is of the
-sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI.
-
-</p>
-
-
-<div class="section" id="catalogs">12. Catalogs</div>
-
-<p> A PrototypeJungle catalog is a visual list of items. When you click on "Insert", "Replace", or "Replace Prototype" in the structure editor, a catalog
-is displayed in the right hand panel, from which is selected the item to insert or replace. Any PrototypeJungle user can
-create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
-<p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=(sys)/global.catalog">https://prototypejungle.org/catalogEdit.html?source=(sys)/global.catalog</a>
-</p>
-<p>
-A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
-and the .svg  file provides the associated image for the catalog.
-Entries are grouped by tab. Other information associated with an entry:</p>
-<ul>
-<li><b>tab</b>  The tab within which the entry will appear</li>
-<li><b>title</b> (optional) Text that will appear with the entry</li>
-<li><b>id</b> Inserted items will be assigned names of the form id&lt;number&gt;</li>
-<li><b>roles</b> A comma-separated list of <a href="#roles">roles</a>.</li>
-<li><b>scale</b> The svg image is scaled by this factor (should be &lt;= 1)</li>
-<li><b>svg</b> The image for the entry</li>
-<li><b>file</b> The definition for the entry (.js)</li>
-<li><b>settings</b> JSON for property values that should be assigned to the item when inserted. For example,
-<cw>{"fill":"red","stroke":"blue"}</cw> would assign initial colors. These property values override those assigned in the
-JavaScript definition of the item.</li>
-</ul>
-
-<p>
-Catalogs other than the default are invoked with the GET arguments <cw>catalog=</cw> or
-<cw>catalogExtension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
-default catalog is extended by the entries  in the specified catalog. For example:</p>
-<p style="font-size:11pt">
-<a href = "/draw.html?catalog=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/draw.html?catalog=(exampleUserName)/catalog/example.catalog</a>
-</p>
-<p>
-will open the structure editor in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
-<p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog</a>
-</p>
-<p>The code editor also uses catalogs (it can open code files referenced in the catalog from the file menu), and
-respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
-</p>
 <div class="section" id="visibility">13. Controlling Access to Properties</div>
 
 <p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
@@ -743,14 +768,6 @@ will be credited using the name and profile link that you have entered on your
 account page.
 </p>
 
-<div class="section" id="debuggers">16. Using Debuggers</div>
-
- <p>Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor (and the structure editor).
- However, the usual variants at https://prototypejungle.org/code.html and https://prototypejungle.org/draw.html catch errors, which is not what is
- wanted in the context of debugging. The variants https://prototypejungle.org/coded.html and https://prototypejungle.org/drawd.html (accepting exactly the
- same GET arguments) are provided in which errors are not caught.
- </p>
- 
 <div class="section" id="API">17. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 

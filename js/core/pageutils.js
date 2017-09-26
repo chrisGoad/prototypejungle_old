@@ -22,6 +22,29 @@ pj.beginsWith = function (string,p) {
 }
 
 
+pj.beforeLastChar = function (string,chr,strict) {
+  let idx = string.lastIndexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(0,idx);
+}
+
+pj.pathExceptLast = function (string,chr) {
+  return pj.beforeLastChar(string,chr?chr:'/');
+}
+
+
+pj.afterLastChar = function (string,chr,strict) {
+  let idx = string.lastIndexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(idx+1);
+}
+
+
+pj.pathLast = function (string) {
+  return pj.afterLastChar(string,'/');
+}
+
+
 pj.ready = function (fn) {
   if (document.readyState != 'loading'){
     fn();

@@ -7,7 +7,7 @@ var signOut = function () {
   if (fb.currentUser) {
     var auth = firebase.auth();
     auth.signOut().then(function () {
-      location.href = "/draw.html";
+      location.href = "/index.html";
     });
   }
 }
@@ -95,6 +95,14 @@ var checkCount = function (cb) {
   });
 }
 
+var initialCatalog = '[]';//'[{"title":"","fitFactor":"0.5","id":"newEntry","tab":"shape","svg":"(sys)/forCatalog/newEntry.svg","index":0}]';
+
+var saveInitialCatalog = function (cb) {
+  debugger;
+  pj.saveString('/default.catalog',initialCatalog,cb);
+}
+  
+
 
 var saveAccount = function () {
   var ifOk = function (newCount) {
@@ -104,12 +112,14 @@ var saveAccount = function () {
         fb.account.creationDate = date.toString();
         fb.account.creationTime = date.getTime();
         fb.setAccountValues(undefined,fb.account,function () {
-          location.href = '/diagrams.html'
+          saveInitialCatalog(function () {
+            location.href = '/index.html';
+          });
         });
       });
     } else {
       fb.setAccountValues(undefined,fb.account,function () {
-          location.href = '/diagrams.html'
+          location.href = '/index.html'
         });
     }
   }
