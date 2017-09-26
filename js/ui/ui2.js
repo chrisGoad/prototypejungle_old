@@ -9,6 +9,8 @@ var signOut = function () {
     auth.signOut().then(function () {
       location.href = "/index.html";
     });
+  }  else {
+    location.href = "/index.html";
   }
 }
 

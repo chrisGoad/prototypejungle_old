@@ -51,27 +51,26 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
 
 <div class="tableOfContents"> 
    <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
-   <div class="contentsLine">Code Management</div>
-   <div style="padding-left:50px" class="contentsLine"><a href="#files">11. Files</a></div>
-        <div style="padding-left:50px" class="contentsLine"><a href="#catalogs">12. Catalogs</a></div>
-        <div style="padding-left:50px" class="contentsLine"><a href="#debuggers">16. Using Debuggers</a></div>
+   <div class="contentsLine">2. Code Management</div>
+   <div style="padding-left:50px" class="contentsLine"><a href="#files">2.1 Files</a></div>
+        <div style="padding-left:50px" class="contentsLine"><a href="#catalogs">2.2 Catalogs</a></div>
+        <div style="padding-left:50px" class="contentsLine"><a href="#debuggers">2.3 Using Debuggers</a></div>
 
-     <div class="contentsLine"><a href="#trees">2. Trees</a></div>
-      <div class="contentsLine"><a href="#instantiation">3. Instantiation and Serialization</a></div>
-   <div class="contentsLine"><a href="#nonews">4. No news</a></div>  
-  <div class="contentsLine"><a href="#svg">5. SVG</a></div>
-     <div class="contentsLine"><a href="#conventions">6. Naming Conventions</a></div>
+     <div class="contentsLine"><a href="#trees">3. Trees</a></div>
+      <div class="contentsLine"><a href="#instantiation">4. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">5. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">6. SVG</a></div>
+     <div class="contentsLine"><a href="#conventions">7. Naming Conventions</a></div>
 
-   <div class="contentsLine"><a href="#update">7. The Update Method</a></div>
-    <div class="contentsLine"><a href="#controllers">8. Controllers</a></div>
-       <div class="contentsLine"><a href="#diagrams">9. Diagrams</a></div> 
-       <div class="contentsLine"><a href="#roles">10. Roles, Replacement, and Transferred Properties</a></div>
+   <div class="contentsLine"><a href="#update">8. The Update Method</a></div>
+    <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
+       <div class="contentsLine"><a href="#diagrams">10. Diagrams</a></div> 
+       <div class="contentsLine"><a href="#roles">11. Roles, Replacement, and Transferred Properties</a></div>
        
-       <div class="contentsLine"><a href="#visibility">13. Controlling Access to Properties</a></div>
+       <div class="contentsLine"><a href="#visibility">12. Controlling Access to Properties</a></div>
         <!--<div class="contentsLine"><a href="#spreads">14. Spreads</a></div>-->
-         <div class="contentsLine"><a href="#licensing">14. MIT Licence</a></div>
-       <div class="contentsLine"><a href="#share">15. Sharing Your Work</a></div>
-       <div class="contentsLine"><a href="#API">17. API</a></div>
+         <div class="contentsLine"><a href="#licensing">13. MIT Licence</a></div>
+       <div class="contentsLine"><a href="#API">14. API</a></div>
 
 
 
@@ -132,12 +131,13 @@ such as axes and legends.  The code for these appears in the current prototype r
 
 <!--Not much will be said about the editor in this document.-->
 
-<div class="section" id="files">11. Files</div>
+<div class="section" id="files">2.1 Files</div>
 
 <p>PrototypeJungle supports a conventional sort of file system, implemented in the cloud via
-<a href="https://firebase.google.com/">Firebase</a>. Filenames typically
-look like this: <cw>(userName)/test/arcArrow.js</cw>.  PrototypeJungle utilizes
-the file extensions <cw>.js .svg, .catalog,</cw> and <cw>.item</cw>.
+<a href="https://firebase.google.com/">Firebase</a>. Filenames 
+look like this: <cw>(exampleUser)/shape/triangle.js</cw>, or this <cw>/shape/circle.js</cw>.  The latter kind of filename, without (userName), indicates
+a file that is built into the PrototypeJungle installation. The files that you create will always start with <cw>(yourUserName)/</cw>.
+PrototypeJungle uses the file extensions <cw>.js .svg, .catalog,</cw> and <cw>.item</cw>.
 
 An <cw>.item</cw> file is of the
 sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI.
@@ -148,16 +148,16 @@ accept <cw>source=</cw> as an html GET argument.  So, for example,
 </p>
 
 <precode>
-<a href="/code.html?source=(exampleUser)/shape/triangle.html">https://prototypejungle.org/code.html?source=(exampleUser)/shape/triangle.html
+<a href="/code.html?source=(exampleUser)/shape/triangle.js">https://prototypejungle.org/code.html?source=(exampleUser)/shape/triangle.js
 </a></precode>
 
 <p>opens the code editor on the file  (exampleUser)/shape/triangle.html.</p>
 
-<div class="section" id="catalogs">12. Catalogs</div>
+<div class="section" id="catalogs">2.2 Catalogs</div>
 <p>Catalogs are the visual lists of items from which elements are dragged in the structure editor during the insert and replace operations.  
 They are  the principal means by which visual elements implemented in code are made available in the structure editor. The code editor includes an option to add
 the current code file
-to the current catalog. An initial catalog, at the filename (username)/catalogs/default.catalog, is allocated for each PrototypeJungle user,
+to the current catalog. An initial catalog, at the filename <cw>(username)/default.catalog</cw>, is allocated for each PrototypeJungle user,
 and additional catalogs can be added at will. </p>
 
 <p>  Here is the catalog editor opened on the global catalog:</p>
@@ -182,26 +182,24 @@ JavaScript definition of the item.</li>
 </ul>
 
 <p>
-For the structure editor, the default catalog is (sys)/global.catalog.
+For the structure editor, the default catalog is <cw>(sys)/global.catalog</cw>.
 Catalogs other than the default are invoked with the GET arguments <cw>catalog=</cw> or
 <cw>extension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
-default catalog is extended by the entries  in the specified catalog. For example:</p>
+global catalog is extended by the entries  in the specified catalog. For example:</p>
 <p style="font-size:11pt">
-<a href = "/draw.html?extension=(exampleUser)/catalog/default.catalog">https://prototypejungle.org/draw.html?extension=(exampleUserName)/catalog/example.catalog</a>
+<a href = "/draw.html?extension=(exampleUser)/default.catalog">https://prototypejungle.org/draw.html?extension=(exampleUser)/default.catalog</a>
 </p>
 <p>
-will open the structure editor with the global catalog extended by (exampleUser)/catalog/default.catalog.
- The catalog can be viewed at</p>
+will open the structure editor with the global catalog extended by (exampleUser)/default.catalog (which contains the triangle shape).
+ </p>
 <p>For the code and catalog editors, the default catalog is your own: (yourUserName)/default.catalog. The "catalog" GET argument can be
 used to specify a different catalog. </p>
 <p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog</a>
-</p>
-<p>The code editor also uses catalogs (it can open code files referenced in the catalog from the file menu), and
-respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
+<a href = "/code.html?catalog=(sys)/global.catalog">https://prototypejungle.org/code.html?catalog=(sys)/global.catalog</a>
 </p>
 
-<div class="section" id="debuggers">16. Using Debuggers</div>
+
+<div class="section" id="debuggers">2.3 Using Debuggers</div>
 
  <p>Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor (and the structure editor).
  However, the usual variants at https://prototypejungle.org/code.html and https://prototypejungle.org/draw.html catch errors, which is not what is
@@ -209,7 +207,7 @@ respects the same GET arguments as the structure editor (that is, <cw>catalog=</
  same GET arguments) are provided in which errors are not caught.
  </p>
  
-<div class="section" id="trees">2. Trees</div>
+<div class="section" id="trees">3. Trees</div>
 
 <p> All prototype trees (aka "items") are trees: each non-atomic child 
 has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
@@ -341,7 +339,7 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">3. Instantiation and Serialization</div>
+<div class="section" id="instantiation">4. Instantiation and Serialization</div>
 <precode> 
 inode = node.instantiate();
 </precode>
@@ -357,7 +355,7 @@ s = pj.stringify(node);
 <p> as described <a href="/doc/tech.html#serialize">here</a>.</p>
 
 
-<div class="section" id="nonews">4. No news</div>
+<div class="section" id="nonews">5. No news</div>
 <p> Nodes are constructed with <cw>pj.Object.mk()</span> and <cw>pj.Array.mk()</span>, rather than via the use of a "new".
 The definition of the <cw>mk</cw> method for <cw>Object</cw> is:
 
@@ -400,7 +398,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <cw>X</span>, <cw>X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="svg">5.  SVG  </div>
+<div class="section" id="svg">6.  SVG  </div>
 
 <precode>
   svg.Element.mk(&lt;markup&gt;);
@@ -440,7 +438,7 @@ item.__setDomAttributes =  function (element) {
 
 <p>
 
-<div class="section" id="conventions">6.  Naming Conventions</div>
+<div class="section" id="conventions">7.  Naming Conventions</div>
 <p>Developers  perform their work by defining new properties and methods for <cw>pj.Object, pj.Array,</cw> and
 <cw>pj.svg.Element</cw>.
 Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
@@ -458,7 +456,7 @@ the SVG attributes from the markup are imported as properties of the item withou
 several of them
 (eg <cw>__setExtent</cw> to take a random example) have designated public purposes. </p>
 
-<div class="section" id="update">7.  The Update Method</div>
+<div class="section" id="update">8.  The Update Method</div>
 
 <p> In the direct version of the <a href="/code.html?source=/example/simpleDiagram.js">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
  varying parameters imposed from above by its use as a component, or by interactivity (see the <a href="#controllers">next section</a>). Implementing parametric
@@ -492,7 +490,7 @@ Update methods, can, of course, be invoked explicitly.  Each update method is re
 <a href="/draw.html?source=/example/simpleDiagramInteractive.js">https://prototypejungle.org/draw.html?source=/example/simpleDiagramInteractive.js</a>.
 Try dragging the circles.</p>
 
-<div class="section" id="controllers">8.  Controllers </div>
+<div class="section" id="controllers">9.  Controllers </div>
 <p>Notice that when you select a circle in the  <a href="/draw.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,
 a box with draggable handles appears
 which allows you to resize that circle or its prototype.
@@ -522,7 +520,7 @@ displayed with both a resize box, and the custom handles.
 </p>
 
 
-<div class="section" id="diagrams">9.  Diagrams</div>
+<div class="section" id="diagrams">10.  Diagrams</div>
 <p>
   A diagram is an item with three kinds of special behavior. As example, consider the
   <a href="/draw.html?source=/diagram/startTree.js&fit=0.35">tree</a>. 
@@ -626,7 +624,7 @@ diag.addDescendant = function (diagram,vertex) {
 </precode>
 
 
-<div class="section" id="roles">10.  Roles, Replacement, and Transferred Properties</div>
+<div class="section" id="roles">11.  Roles, Replacement, and Transferred Properties</div>
 
 <p>In most diagrams, the visible elements play varying roles. For example in graphs and trees,
 some shapes
@@ -646,7 +644,7 @@ these properties are transferred as well when elements within the diagram are re
 (generally these are properties which carry diagramatic aspects of the shape in question - such as connections
 in graphs).</p>
 
-<div class="section" id="visibility">13. Controlling Access to Properties</div>
+<div class="section" id="visibility">12. Controlling Access to Properties</div>
 
 <p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
 is that <i>all</i> properties appear, but  some of the properties might be irrelevant to the user. Consider the basic
@@ -730,7 +728,7 @@ item.vertices.bind = function () {
 <p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
 spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
 -->
-<div class="section" id="licensing">14. MIT License</div>
+<div class="section" id="licensing">13. MIT License</div>
 
 <p> PrototypeJungle aims to support open collaboration.
 All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
@@ -750,7 +748,7 @@ if you wrote the original version, or</p>
 if you are extending or modifying existing code, and to retain these comments from code that you modify.
 </p>
 
-
+<!--
 <div class="section" id="share">15. Sharing Your Work</div>
 
 <p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
@@ -767,8 +765,8 @@ All contributions (whether at the level of public.catalog or forGlobal.catalog)
 will be credited using the name and profile link that you have entered on your
 account page.
 </p>
-
-<div class="section" id="API">17. API </div>
+-->
+<div class="section" id="API">14. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 <p><i>(Partial listing - more to come)</i></p>

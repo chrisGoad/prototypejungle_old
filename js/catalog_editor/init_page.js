@@ -84,7 +84,7 @@ ui.initPage = function (o) {
        });
       if (!ui.source) {
          var userName = fb.currentUserName();
-         ui.source = userName?'('+userName+')/default.catalog':'(sys)/global.catalog';
+         ui.source = (userName && (userName !== 'sys'))?'('+userName+')/default.catalog':'(sys)/global.catalog';
       }
        ui.showCatalog(ui.source,function () {
         debugger;

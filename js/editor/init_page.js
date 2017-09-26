@@ -143,7 +143,7 @@ ui.initPage = function (o) {
       ui.genMainPage(function () {
           var userName = fb.currentUserName();
           if (!ui.catalogUrl) {
-            ui.catalogUrl = userName?'('+userName+')/default.catalog':'(sys)/global.catalog';
+            ui.catalogUrl = (userName && (userName !== 'sys'))?'('+userName+')/default.catalog':'(sys)/global.catalog';
           }
           ui.afterPageGenerated();
           ui.catalogUrlEl.$html('<b>Catalog:</b> '+ui.catalogUrl);

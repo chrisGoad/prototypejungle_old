@@ -31,29 +31,3 @@ pj.browser = function () {
   if (match) return genResult('IE');
   return undefined;
 }
-
-
-pj.supportedBrowser = function () {
-  var browserVersion = pj.browser();
-  var browser;
-  return true; // as of 3/17 release, don't attempt to discriminate between browsers, but leave code
-  if (!browserVersion) {
-    return false;
-  }
-  browser =  browserVersion.browser;
-  if ((browser === 'IE') && (browserVersion.version < 11)) {
-    return false;
-  }
-  if ((browser === 'Safari') && !ui.safariSupported) {
-    return false;
-  }
-  return true;
-}
-
-pj.checkBrowser = function () {
-  var br = pj.supportedBrowser();
-  if (!br) {
-    window.location.href = '/unsupportedbrowser.html';
-  }
-}
-
