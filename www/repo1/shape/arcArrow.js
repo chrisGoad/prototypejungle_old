@@ -122,6 +122,19 @@ item.pointAtAngle = function (angle,otherRadius) {
 
 }
 
+// used in updateConnectedEnds
+item.computeDirections= function () {
+  var e0 = this.end0,e1 = this.end1;
+  this.computeRadius();
+  this.computeCircleCenter();
+  var e02c = e0.difference(center);
+  var e12c = e1.difference(center);
+  var a0 = Math.atan2(e02c.y,e02c.x)+Math.PI/2;
+  var a1 = Math.atan2(e12c.y,e12c.x)+Math.PI/2;
+  this.tailDirection = geom.angleToDirection(a0).minus();
+  this.headDirection = geom.angleToDirection(a1);
+}
+
 item.computeEnds = function () {
   var e0 = this.end0,e1 = this.end1;
   this.computeRadius();
@@ -130,29 +143,18 @@ item.computeEnds = function () {
   var e12c = e1.difference(center);
   var a0 = Math.atan2(e02c.y,e02c.x);
   var a1 = Math.atan2(e12c.y,e12c.x);
-  if (0 && this.clockwise) {
-    var tmp = a1;
-    a1 = a0;
-    a0 = tmp;
-  }
-  var a0d = a0*toDeg;//debugging
-  var a1d = a1*toDeg;
   aTail = a0 - (this.clockwise?-1:1) * this.totalTailGap/radius;
   aHead = a1 + (this.clockwise?-1:1) * this.totalHeadGap/radius;
-  pj.aTaild = aTail*toDeg;
-  pj.aHeadd = aHead * toDeg;
+  //pj.aTaild = aTail*toDeg;
+  //pj.aHeadd = aHead * toDeg;
   tailPoint = this.pointAtAngle(aTail);//center.plus(tailVFC);
   headPoint = this.pointAtAngle(aHead);
   headSubtends = this.headLength/radius;
-  //headSubtends = 0;
   headCenterAngle = this.clockwise? aTail + 0.5*headSubtends: aHead + 0.5*headSubtends;
   headCenterAngle = aHead + (this.clockwise?-0.5:0.5)*headSubtends;
   shaftEnd = this.solidHead?this.pointAtAngle(headCenterAngle):headPoint;
-  return;
-  var e0 = this.end0,e1 = this.end1;
-  var d = e1.difference(e0).normalize();
-  return e1.difference(d.times(this.totalHeadGap));
 }
+
 /* aHead and aTail might be more that PI apart (eg -PI - small angle , and PI+small angle). For finding the middle
 on the correct side, we need to bring aTail  within PI of aHead*/
 var bringWithinPI = function (target,otherAngle) {
@@ -322,67 +324,6 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
-item.__updateControlPointtt = function (idx,pos) {
-  var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
-  if (idx > 1) {
-    if (idx === 2) {
-      end = this.end0;
-    } else {
-      end = this.end1;
-    }
-    end.copyto(pos);
-    event = pj.Event.mk('moveArrowEnd',end);
-    event.emit();
-    this.update();
-    this.__draw();
-    return;
-  }
-  
-  this.computeEnds();
-  if (idx===0) {
-     // adjust the head
-  
-    this.head.updateControlPoint(pos);
-    
-  } else {
-    // if this  owns radius, then this  should be adjusted regardless of ui.whatToAdjust
-    if (this.hasOwnProperty('radius')) {
-      toAdjust = this;
-    } else {
-      toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
-    }
-    this.computeRadius();
-    var middle = this.middle();
-    var v = middle.difference(center).normalize();
-    var dist = pos.distance(center);
-    var hwdist = halfwayPoint.distance(center);
-    if (dist < hwdist) {
-      toAdjust.clockwise = !this.clockwise;
-      this.update();
-      this.__updateControlPoint(pos,idx);
-      return;
-    }
-    var delta = dist - radius;
-    var newMiddle = middle.plus(v.times(delta));
-    var mx=newMiddle.x,my=newMiddle.y;
-    var vx=v.x,vy=v.y;
-    var cx=center.x,cy=center.y;
-    var hx=this.end0.x,hy=this.end0.y;
-    var ss = hx*hx + hy*hy - ( mx*mx + my*my);
-    var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
-    var newCenter = center.plus(v.times(t));
-    var nx = newCenter.x,ny = newCenter.y;
-    var maxRadius = 100;// a big number, is all
-    toAdjust.radius = Math.min(maxRadius,Math.max(0.5,(radius + delta- t)/length));
-  }
-  ui.adjustInheritors.forEach(function (x) {
-    x.update();
-    x.__draw();
-  });
-  return;
-}
-
-
 
 
 item.__setExtent = function (extent) {
@@ -397,16 +338,15 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   var tr = this.__getTranslation();
   var end0 = this.end0;
   var end1 = this.end1;
+  this.computeDirections();
   var vertex0pos = vertex0.__getTranslation();
   var vertex1pos = vertex1.__getTranslation();
-  var direction0 = vertex0pos.directionTo(vertex1pos);
-  var direction1 = direction0.minus();
   end0.copyto(vertex0pos);
   end1.copyto(vertex1pos);
-  var tailPeriphery = vertex0.peripheryAtDirection(direction1);
-  this.vertexTailGap = tailPeriphery.intersection.distance(vertex0.__getTranslation())
-  var headPeriphery = vertex1.peripheryAtDirection(direction0);
-  this.vertexHeadGap = headPeriphery.intersection.distance(vertex1.__getTranslation())
+  var tailPeriphery = vertex0.peripheryAtDirection(this.tailDirection);
+  this.vertexTailGap = tailPeriphery.intersection.distance(vertex0pos);
+  var headPeriphery = vertex1.peripheryAtDirection(this.headDirection);
+  this.vertexHeadGap = headPeriphery.intersection.distance(vertex1pos);
 }
  
 ui.hide(item,['head','shaft','includeEndControls']);

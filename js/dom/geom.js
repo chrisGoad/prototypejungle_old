@@ -174,6 +174,9 @@ geom.Point.minus = function () {
 geom.Point.dotp = function (p) {
   return this.x * p.x + this.y * p.y;
 }
+geom.angleToDirection = function (a) {
+  return geom.Point.mk(Math.cos(a),Math.sin(a));
+}
 
 geom.mkRadialPoint = function (r,a) {
   return geom.Point.mk(r*Math.cos(a),r*Math.sin(a));

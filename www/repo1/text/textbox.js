@@ -22,7 +22,6 @@ item.minHorizontalPadding = 5;// 10;
 item.textColor  = 'black';
 item.width = 100;
 item.height = 40;
-//item.__dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
 item.vPadding = 5;//20;
 //Use item.__setText method
 /*  end adjustable parameters */
@@ -46,7 +45,6 @@ item.initText = function () {
     this.set('text',
          svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black"  stroke-width="0" text-anchor="middle"/>'));
     this.text.__unselectable = true;
-    //this.text.center();
     pj.declareComputed(this.text);
   }
 
@@ -54,12 +52,7 @@ item.initText = function () {
 
 
 item.firstUpdate = true;
-item.update = function (fromSetExtent) {
-  console.log('Text Update');
-  //if (this.__hidden()) {
-  //  return;
-  //}
-  debugger;
+item.update = function (fromSetExtent) { 
   if (this.__dimension) {
     this.width = this.height = this.__dimension;
   }
@@ -69,19 +62,12 @@ item.update = function (fromSetExtent) {
     if (this.text) {
       this.text.__setIndex = 2;
     }
-    //if (this.__dimension) {
-    //  box.__dimension = this.__dimension;
-    //}
     if (this.boxProperties) {
       pj.setProperties(box,this,this.boxProperties);
     }
     box.fill = this.fill;
     box.stroke = this.stroke;
     box['stroke-width'] = this['stroke-width'];
-    //if (box.__dimension) {
-    //  this.height = this.width = box.__dimension;
-      //code
-    //}
     box.__show();
   } 
   if (!this.multiline) {
@@ -134,7 +120,7 @@ item.update = function (fromSetExtent) {
         this.height = textareaHeight + 2*this.vPadding;
       }
       var numLines = textarea.numLines;
-    } else if (1 ||  (this.firstUpdate|| (this.__data !== textarea.__getText()))) {
+    } else if (this.firstUpdate|| (this.__data !== textarea.__getText())) {
       textarea.width = this.width - 2*this.minHorizontalPadding;
       textarea.__setText(this.__data);
     } else {
@@ -158,8 +144,6 @@ item.update = function (fromSetExtent) {
 
     }
   }
-  //this.width = Math.max(minWd,this.width);
-  //this.height = Math.max(minHt,this.height);
   if (box) {
   if (this.__get('__dimension')) {
     box.__dimension = this.__dimension;
@@ -177,24 +161,9 @@ item.update = function (fromSetExtent) {
    } else {
      Object.getPrototypeOf(box).height = this.height;
    }
-  // box.width = this.width;
- //  box.height = this.height;
    box.update();
    box.__draw();
   }
-  if (0 && box) {
-    box.fill = this.boxFill;
-    box.stroke = this.boxStroke;
-    box['stroke-width'] = this['boxStrokeWidth'];
-    if (box.__dimension) {
-      box.__dimension = this.__dimension;
-    } else {
-      box.width = this.width;
-      box.height = this.height;
-      console.log('ht 3',this.width,this.height);
-    }
-  }
-
   this.firstUpdate = false;
 }
 
@@ -202,13 +171,7 @@ item.uiShowForBox = function () {
    ui.show(this,['fill','stroke','stroke-width','minHorizontalPadding']);
 }
 
-/*
-item.__getExtent = function () {
-  return pj.geom.Point.mk(
-          this.width,this.height);
 
-}
-*/
 item.setDimensionFromExtent = function (extent,nm) {
   var event,ext;
   if ((nm === 'c01') || (nm === 'c21')) {
@@ -219,16 +182,11 @@ item.setDimensionFromExtent = function (extent,nm) {
     ext = Math.max(extent.x,extent.y);
   }
   this.__dimension = ext;
-  //this.box.__dimension = ext;
-  //this.width = ext;
-  //this.height = ext;
 }
 
 
 item.__setExtent = function (extent,nm) {
   pj.log('textbox','setExtent',extent.x,extent.y,nm,this.width);
-  console.log('setExtent',extent.x,extent.y,nm,this.width);
-  debugger;
   if (this.box && this.box.__dimension) {
     this.setDimensionFromExtent(extent,nm);
   } else {
@@ -248,38 +206,20 @@ item.__reset = function () {
 
 item.__getText = function () {
   return this.__data;
-  if (this.multiline) {
-    return this.textarea.__getText();
-  } else {
-    return this.text.text;
-  }
 }
 
 
 item.__setText = function (txt) {
   this.__data = txt;
-  return;
-  if (this.multiline) {
-    this.textarea.__setText(txt);
-  } else {
-    if (!this.text) {
-      this.update();
-    }
-    this.text.text = txt;
-  }
 }
 
-
-//peripheryOps.installOps(item);
 
 /**
  * Set accessibility and notes for the UI
 */
 
 ui.hide(item,['vPadding','width','textarea','text','height','box','textareaa','firstUpdate']);
-//ui.hide(item,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
 
-//item.__setFieldType('bold','boolean'); //putBack when bold is fixed for exporting svg
 item.__setFieldType('textColor','svg.Rgb');
 item.__setFieldType('fill','svg.Rgb');
 item.__setFieldType('stroke','svg.Rgb');
