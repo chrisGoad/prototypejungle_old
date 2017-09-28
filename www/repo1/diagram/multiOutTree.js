@@ -1,7 +1,6 @@
 'use strict';
 pj.require('/text/textbox.js','/shape/rectangle.js','/shape/multiInArrow.js',function (textboxPP,rectanglePP,connectorPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
-//ar item = graphP.instantiate();
 let item = pj.svg.Element.mk('<g/>');
 
 item.paddingLeft = 10;
@@ -20,33 +19,30 @@ textP.lineSep = 1;
 textP.width = 15;
 textP.height = 10;
 textP.vPadding = 0;
-//item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
 
-/*
-item.nodeP.set('connector',connectorPP.instantiate().__hide());
-item.nodeP.set('descendants',pj.Array.mk());
-*/
 connectorP.width = 50;
 connectorP['stroke-width'] = 2;
 connectorP.pointsTo = 'left';
 connectorP.includeHead = false;
 
 
-//item.nodeP.connector.__setExtent(geom.Point.mk(10,50));
 // note we need to build nodes from installed prototypes to support the replace prototype machinery
 item.newNode = function (text) {
+  let textProto;
   let rs = pj.svg.Element.mk('<g/>');
   ui.hide(rs,'__childBeenMoved');
-  rs.set('text',textP.instantiate());
+  if (this.rootNode) {
+    textProto = Object.getPrototypeOf(this.rootNode.text)
+  } else {
+    textProto = textP;
+  }
+  rs.set('text',textProto.instantiate());
   rs.set('connector',connectorP.instantiate());
   rs.set('descendants',pj.Array.mk());
   return rs;
 }
 item.addChild = function (parent,text) {
-  //let rs =  this.nodeP.instantiate();
   let rs = this.newNode();
-  //rs.set('bracket',this.bracketP.instantiate());
-  //rs.set('descendants',pj.Array.mk());
   rs.text.width = this.leafWidth;
   rs.text.__show();
   rs.text.__setText(text);
@@ -101,15 +97,12 @@ item.computeDimensions = function (node) {
                 thisHere.computeDimensions(n);
                 totalHeight += n.height + thisHere.vSpacing;
                 maxWidth = Math.max(n.width,maxWidth)
-              });//  node.forEach(d.computeRelPositions)?
+              });
     node.height = totalHeight - this.vSpacing; // vertical spacing not needed at top or bottom
     node.width = textBnds.width + this.paddingLeft + this.paddingRight + node.connector.width + maxWidth;
     let inEnds = node.connector.inEnds;
     let ln = inEnds.length;
     if  (ln > d.length) {
-       //for (let i=d.length;i<ln;i++) {
-      //  inEnds.pop();
-     // }
      inEnds.length = d.length;
       node.connector.inCount = d.length;
     } else {
@@ -132,23 +125,11 @@ item.setPositions = function (node) {
     return;
   }
   let connector = node.connector;
-   //node.bracket.__setExtent(textBnds);
    node.text.__moveto(geom.Point.mk(this.paddingLeft + (textBnds.width)/2,0));
    connector.end1.copyto(geom.Point.mk(this.paddingLeft + textBnds.width + this.paddingRight,0));
-  //node.connector.__moveto(geom.Point.mk(this.paddingLeft + textBnds.width + this.paddingRight + node.connector.width/2,0));
   let leftx = this.paddingLeft + textBnds.width + this.paddingRight +  node.connector.width;
   let inEnds = connector.inEnds;
- /* outEnds[0].copyto(geom.Point.mk(leftx,0));
-  outEnds[1].copyto(geom.Point.mk(leftx,30));
-   if (outEnds.length > 2) {
-       outEnds[2].copyto(geom.Point.mk(leftx,60));
-
-   }
-  connector.update();
-*/
- let wd = node.connector.width;
-  
- // node.connector.__setExtent(geom.Point.mk(wd,node.height));
+  let wd = node.connector.width;
   let d = node.descendants;
   if (d.length > 0) {
     if (node.__childBeenMoved) { // leave children where they are
@@ -179,7 +160,6 @@ item.update = function () {
     this.computeDimensions(this.rootNode);
     this.setPositions(this.rootNode);
     if (this.rootNode.__element) {
-      //this.firstUpdate = false;
     }
   }
 }
@@ -193,14 +173,6 @@ var vertexInstanceTransferFunction = function (dest,src) {
     }
   }
 }
-
-//item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
-/*
- item.set('__diagramTransferredProperties',graphP.__diagramTransferredProperties.concat(pj.lift(
-                ['incomingEdge','parentVertex','descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
-item.__diagramTransferredProperties.__const = true;
-*/
-
 
 
 
@@ -241,11 +213,7 @@ item.__dragStep = function (text,pos) {
   inEnds[idx].copyto(localPos);
   parent.connector.update();
 }
-/*
-item.__dragStart = function () {
-  this.computeRelativePositions();
-}
-*/
+
 
 item.addDescendant = function (diagram,text) {
   let node = text.__parent;
@@ -318,18 +286,7 @@ item.__actions = function (item) {
   }
 }
 
-/*
-item.__actions = function (item) {
-  if (item.__role === 'vertex') {
-    return [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
-                            {title:'Reposition Subtree',action:'reposition'}];
-  }
-}
-*/
 item.__diagram = true;
-
-//item.graph.__activeTop = false;
-//item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;
 });

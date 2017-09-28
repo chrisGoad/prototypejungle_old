@@ -7,7 +7,6 @@
 pj.require(function () {
 var svg = pj.svg,ui = pj.ui,geom = pj.geom;
 var item = pj.svg.Element.mk('<g/>');
-//item.extentEvent = pj.Event.mk('extentChange');
 
 /* adjustable parameters */
 item.width = 50;
@@ -27,13 +26,6 @@ item.set('textP', svg.Element.mk('<text font-size="18" font-family="Verdana" fon
 item.set("words",pj.Spread.mk());
 item.textP.__unselectable = true;
 item.words.__unselectable = true;
-/*
-item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
-     text.__editPanelName = 'This word';
-     text.__show();
-     text.setText(data);
-  }
-  */
 
 item.words.generator = function (data) {
   var rs = this.__parent.textP.instantiate().__show();
@@ -104,10 +96,6 @@ item.arrangeWords = function (text) { //,inewLines) {
   this.displayWords(text);
    var words = this.words;
    words.update();
-   //var ins = words.inSync();
-   //if ((ins === 'nomarks') || !ins) {
-   // words.update();
-  //}
   this.computeWidths();
   this.lineWidths = [];
   var newLines = (this.lines)?inewLines:true;
@@ -282,15 +270,8 @@ item.update = function (top) {
     this.__moveto(tr.x,newY);
   }
   this.__draw();
-  //this.extentEvent.node = this;
-  //this.extentEvent.emit();
 }
 
-item.__getExtent = function () {
-  return pj.geom.Point.mk(
-          this.width,this.height);
-
-}
 
 item.__setExtent = function (extent,nm) {
   if (nm === 'c12') {

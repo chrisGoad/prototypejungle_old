@@ -14,7 +14,6 @@ item.width = 45;
 item.height = 30;
 item.uiShowForBox();
 peripheryOps.installOps(item);
-
 return item;
 });
 

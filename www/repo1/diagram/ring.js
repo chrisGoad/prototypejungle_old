@@ -13,15 +13,10 @@ item.clockwise = false;
 
 item.__adjustable = true;
 item.__draggable = true;
-//item.graph.set('__data',Object.create(dataP));//.instantiate());
 let arrowP = pj.ui.installPrototype('arcArrow',arrowPP);
-//var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
 item.graph.edgeP = arrowP;
 let vertexP = pj.ui.installPrototype('textrect',vertexPP);
-//var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
 item.graph.vertexP = vertexP;
-//vertexP.width = 40;
-//vertexP.height = 30;
 arrowP.labelSep = 15;
 arrowP.radius = 0.93;
 arrowP.clockwise = true;
@@ -113,7 +108,6 @@ item.graph.setRingCount = function (graph,value) {
  
 }
 
-//item.graph.__activeTop = true;
 item.graph.__topActions = [{id:'count',title:'Count',type:"numericInput",
                            action:"setRingCount",value:(graph) => graph.__parent.count}];
 item.__setFieldType('clockwise','boolean');

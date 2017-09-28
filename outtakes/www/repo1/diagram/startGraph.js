@@ -1,5 +1,5 @@
 'use strict';
-pj.require('/diagram/graph.js',function (graphP) {
+OBSOLETE pj.require('/diagram/graph.js',function (graphP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item =  svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());

@@ -29,7 +29,6 @@
   
   
 ui.genButtons = function (container,options) {
-  ui.addButton(container,'stateEditor','Draw','/draw.html');
   ui.addButton(container,'codeEditor','Code','/code.html');
   ui.genStdButtons(container);
 }
