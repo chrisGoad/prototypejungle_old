@@ -2,7 +2,7 @@
 var bkColor = "white";
 var docDiv;
 var minWidth = 1000;
-var flatInputFont = "8pt arial";
+var flatInputFont = "11pt arial";
 var uiDiv,dataDiv,topbarDiv,obDivTitle;
 var msgPadding = "5pt";
 var inspectDom = false;
@@ -18,7 +18,7 @@ var mkEntryField = function (title,id,browseId,isBoolean) {
   var width = (id === 'tabOrder')?'80px':'60px';
   var children = [
       html.Element.mk('<span style="padding-left:5px;float:left;width:'+width+'">'+title+'</span>'),
-      ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
+      ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:11pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
   ]; 
   if (browseId) {
       ui[browseId] =  html.Element.mk('<div class="roundButton">Browse...</div>');
@@ -69,7 +69,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
     ui.editEntryContainer =  html.Element.mk('<div id="editEntryContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
      ui.catalogError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
-     ui.catalogTabOrder =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt"></div>').__addChildren([
+     ui.catalogTabOrder =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:11pt"></div>').__addChildren([
          mkEntryField('Tab Order','tabOrder')
     ]),
      ui.catalogMsg =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt">Current Catalog:</div>'),

@@ -1,6 +1,5 @@
 
   
-// This is one of the code files assembled into pjdom.js. 
 
   // turning DOM object into JSON trees
 // from https://developer.mozilla.org/en-US/docs/JXON

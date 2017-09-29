@@ -12,7 +12,7 @@ body {
   background-color:#444444;
   margin-left:10px;
   cursor:pointer;
-  font:11pt arial;
+  font:12pt arial;
 }
 
 .button:hover {
@@ -30,7 +30,7 @@ body {
   background-color:#ffffff;
   margin-left:10px;
   cursor:pointer;
-  font:10pt arial;
+  font:12pt arial;
 }
 
 .roundButton:hover {
@@ -56,7 +56,7 @@ body {
   text-decoration:underline;
   margin-left:5px;
   cursor:pointer;
-  font:10pt arial;
+  font:11pt arial;
 }
 
 
@@ -73,7 +73,7 @@ body {
   text-decoration:underline;
   margin-left:5px;
   cursor:pointer;
-  font:10pt arial;
+  font:13pt arial;
 }
 
 
@@ -89,7 +89,7 @@ body {
   text-align:center;
   text-decoration:underline;
   cursor:pointer;
-  font:10pt arial;
+  font:11pt arial;
   width:100%;
   padding-top:10px;
   padding-bottom:10px;
@@ -110,7 +110,7 @@ body {
 .colUbutton.moreLeft {
   text-align:left;
   padding-left:40px;
-  font:8pt arial;
+  font:10pt arial;
 
 }
 .smallButton {
@@ -240,7 +240,7 @@ body {
 
 .mainTitle {
   text-align:left;
-  font:bold 12pt arial;
+  font:bold 13pt arial;
   cursor:pointer;
   color:black;
   padding-left:10px;
@@ -251,7 +251,7 @@ body {
 
 .pageTitle {
   text-align:left;
-  font:bold 12pt arial;
+  font:bold 13pt arial;
   margin-bottom:20px;
 }
 
@@ -286,7 +286,7 @@ body {
 }
 .embed {
   width:400px;
-  font-size:10pt;
+  font-size:13pt;
   margin-bottom:20px;
   margin-left:10px;
 }
@@ -301,9 +301,16 @@ body {
   margin:0;
   padding:0;
   color:#000000;
-  font:9pt courier;
+  font:12pt courier;
 }
 
+.smallcode {
+  display:inline;
+  margin:0;
+  padding:0;
+  color:#000000;
+  font:9pt courier;
+}
 p {
   padding:0;
   margin-top:5;
@@ -313,18 +320,18 @@ pre {
   padding:0;
   margin:0;
    color:#000000;
-  font:9pt courier;
+  font:12pt courier;
 }
 
 .codeWord {
-  font:9pt courier;
+  font:12pt courier;
   font-weight:100;
   color:#000000;
   /*text-decoration:underline;*/
 }
 
 .section {
-  font-size:12pt;
+  font-size:14pt;
   font-weight:800;
   padding-top:20px;
   padding-bottom:10px;
@@ -355,7 +362,7 @@ pre {
 }
 .loggedIn {
   margin-left:5px;
-  font-size:8pt;
+  font-size:10pt;
 }
 
 #buttons {
@@ -424,6 +431,8 @@ pre {
 .pulldownEntry {
   padding-left:5px;
   padding-right:5px;
+  padding-top:5px;
+  font-size:12pt;
 }
 .pulldownEntry:hover {
   background-color:#dddddd;
@@ -498,7 +507,6 @@ pre {
     vertical-align:top;
     width:220px;
     font:9pt courier;
-
 }
 
 
@@ -506,7 +514,7 @@ pre {
     display:inline-block;
     vertical-align:top;
     width:400px;
-    margin-left:50px;
+    margin-left:70px;
 }
 
 .introP {

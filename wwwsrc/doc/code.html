@@ -161,11 +161,11 @@ to the current catalog. An initial catalog, at the filename <cw>(username)/defau
 and additional catalogs can be added at will. </p>
 
 <p>  Here is the catalog editor opened on the global catalog:</p>
-<p style="font-size:11pt">
+<p style="font-size:13pt">
 <a href = "/catalog.html?source=(sys)/global.catalog">https://prototypejungle.org/catalog.html?source=(sys)/global.catalog</a>
 </p>
 <p>
-A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
+A catalog entry associates a .js  file with an .svg file. The .js file contains the definition of the item,
 and the .svg  file provides the associated image for the catalog.
 Entries are grouped by tab. Other information associated with an entry:</p>
 <ul>
@@ -186,15 +186,15 @@ For the structure editor, the default catalog is <cw>(sys)/global.catalog</cw>.
 Catalogs other than the default are invoked with the GET arguments <cw>catalog=</cw> or
 <cw>extension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
 global catalog is extended by the entries  in the specified catalog. For example:</p>
-<p style="font-size:11pt">
+<p style="font-size:13pt">
 <a href = "/draw.html?extension=(exampleUser)/default.catalog">https://prototypejungle.org/draw.html?extension=(exampleUser)/default.catalog</a>
 </p>
 <p>
 will open the structure editor with the global catalog extended by (exampleUser)/default.catalog (which contains the triangle shape).
  </p>
 <p>For the code and catalog editors, the default catalog is your own: (yourUserName)/default.catalog. The "catalog" GET argument can be
-used to specify a different catalog. </p>
-<p style="font-size:11pt">
+used to specify a different catalog, for example: </p>
+<p style="font-size:13pt">
 <a href = "/code.html?catalog=(sys)/global.catalog">https://prototypejungle.org/code.html?catalog=(sys)/global.catalog</a>
 </p>
 
@@ -258,7 +258,7 @@ pj.lift(obj);
 </code></pre>
 
 
-<p>takes an "ordinary" Javascript tree such as one expressable in JavaScript object notation,
+<p>takes an "ordinary" JavaScript tree such as one expressable in JSON,
 and turns it into the PrototypeJungle kind of tree. 
 For example: </p>
 <precode>
@@ -354,7 +354,7 @@ data and functions from <cw>node</cw> via prototypical inheritance. (Details
 s = pj.stringify(node);
 </precode>
 
-<p> as described <a href="/doc/tech.html#serialize">here</a>.</p>
+<p> as described <a href="/doc/tech.html#serialization">here</a>.</p>
 
 
 <div class="section" id="nonews">5. No news</div>
@@ -412,7 +412,7 @@ as an SVG element is as specified by the markup. At this stage, only some of the
 </p>
 <p> Here is an example: </p>
 
-<precode>
+<smallcode>
 var circle = svg.Element.mk('&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;');
 </precode>
 
@@ -422,8 +422,8 @@ affect it.  See the <a href="#API">API section</a> for details. As in SVG, the t
 visible tree is held in <cw>pj.root</cw>.</p>
 
 <p>An <cw>svg.Element</cw> is displayed by construction of an associated element in the SVG Dom. Each <cw>svg.Element</cw> has
-a standard list  of properties that are transferred from the item to the Dom, by setting attributes in the Dom from the values of the properties of the item
-of the same name. This default behavior can be extended by defining the <cw>__setDomAttributesProperty</cw> method,
+a standard list  of properties that are transferred from the item to the Dom, by setting attributes in the Dom from the values of the item's properties 
+of the same name. This default behavior can be extended by defining the <cw>__setDomAttributes</cw> method,
 which, if present, will be called after the standard transfer of properties.
   Here is its definition for the
 <a href="http://127.0.0.1:3000/code.html?source=/shape/rectangle.js">rectangle component</a>, which assures that the rectangle is centered
@@ -466,8 +466,8 @@ reconfiguration is accomplished by defining an update method for the item. Consi
 example:</p>
 
 <precode>
-  item.set('p1', geom.Point.mk(-50,0));// make positions of circles properties of the component
-  item.set('p2',geom.Point.mk(50,0));
+  item.set('p1', geom.Point.mk(-50,0));// make positions of circles properties
+  item.set('p2',geom.Point.mk(50,0));  // of the component
   item.update = function () {
     var p1=this.p1,p2 = this.p2;
     this.circle1.__moveto(p1);
@@ -505,18 +505,22 @@ where extent is a <cw>geom:Point</cw> , should be defined, and <cw>item.__adjust
 represents the new extent that the  item should take on.
 If these steps are taken,  a resizing box with its
 handles will appear in the UI whenever the item or its instances are selected.
-See the <a href="/code.html?source=/shape/circle.js">circle code</a> for a simple example.
+See the <a href="/code.html?source=/shape/rectangle.js">rectangle code</a> for a simple example.
+(This is the rectangle viewed in the code editor;
+to see the resizer at work click "Edit Structure" in the top bar, or insert a rectangle into a
+<a href="/draw.html?source=/diagram/backGraph.js">network diagram</a>.)
+
 </p>
 
   
 <p>To define a custom control, the two methods needed are <cw>__controlPoints()</cw>, and <cw>__updateControlPoint(index,pos)</cw>.
-<cw>__controlPoints</cw> should return a <cw>pj.Array</cw> of <cw>geom.Point</cw> (s). When the item is selected, yellow handles will appear
+The <cw>__controlPoints</cw> method should return a <cw>pj.Array</cw> of <cw>geom.Point</cw> (s). When the item is selected, yellow handles will appear
 at the  positions returned by <cw>__controlPoints</cw> (the points should be given relative to the item's own origin). Then, when the handles are dragged,
  <cw>__updateControlPoint(index,pos)</cw> is called at each moment of dragging, with index set to the index
 of the point which generated the handle being dragged, and <cw>pos</cw>  to its new position. It is the responsibility of
 <cw>__updateControlPoint</cw> to update and redisplay the item as appropriate given the new  handle position.
 The <a href="/draw.html?source=/shape/roundedRectangle.js">rounded rectangle</a>
-provides an example  - click on it to adjust the rounding (see the <a href="/code.html?source=/shape/roundedRectangle.js">code</a> here.)</p>
+provides an example  - click on the yellow square to adjust the rounding (see the <a href="/code.html?source=/shape/roundedRectangle.js">code</a> here.)</p>
 <p>If all three methods are defined and <cw>__adjustable</cw> is set, as is the case for the rounded rectangle, the item will be
 displayed with both a resize box, and the custom handles.
 </p>
@@ -534,9 +538,9 @@ the right relationships between edges (arrows) and nodes (circles) are maintaine
 </p>
 <p>
 2) If a node is <b>deleted</b> it takes its subtree with it.</p>
-<p> 3) When any node of the tree is selected, the <b>action panel</b> on the left side of the screen
-is extended with the items: add child,
-connect and reposition subtree. Try adding a few children, dragging them around, and then reposition some subtrees.
+<p> 3) When any node of the tree is selected, the action panel on the left side of the screen
+is extended with the items: <b>Add Child</b>,
+<b>Connect</b> and <b>Reposition Subtree</b>. Try adding a few children, dragging them around, and then reposition some subtrees.
 (Repositioning 
 will bring the depending subtree into a standard configuation, overriding previous drags).</p>
 <p>
@@ -587,21 +591,19 @@ item.__dragStep = function (vertex,pos) {
 <precode>
 P.__draggableInDiagram = true;
 </precode>
-<p> is needed. If P is the prototype of the draggable elements, all will inherit this property, yielding the desired effect.</p>
-
-<p>The __draggable
-<p> In the case of trees, only nodes/vertices, not arrows, have this property. Trees inherit from graphs, and it is in the graph code
+<p> is needed. If P is the prototype of the draggable elements, all will inherit this property, yielding the desired effect.
+In the case of trees, only nodes/vertices, not arrows, have this property. Trees inherit from graphs, and it is in the graph code
 that draggability is asserted for nodes.</p>
 <p>
-This is how it works: when a node x in the tree is dragged, the __dragStart method of the containing diagram (in this
+This is how it works: when a node <cw>x</cw> in the tree is dragged, the <cw>__dragStart</cw> method of the containing diagram (in this
 case the tree) is called at the beginning of the drag. Subsequently at each small step of dragging,
-the __dragStep method is called with two arguments: x, and its new position. In the tree case, __dragStep is so
-defined that  the subtree beneath the dragged node is moved along with it - this is what positionvertices does.
+the <cw>__dragStep</cw> method is called with two arguments: <cw>x</cw>, and its new position. In the tree case, <cw>__dragStep</cw> is so
+defined that  the subtree beneath the dragged node is moved along with it - this is what <cw>positionvertices</cw> does.
 </p>
 <p>
-2) diag.__delete works in a similar fashion. If __delete is defined for the diagram,
-then when any item x in the diagram is deleted, this method is called with x as argument. In the tree case,
-the subtree depending from x is deleted (as you will see from the code).
+2) <cw>diag.__delete</cw> works in a similar fashion. If <cw>__delete</cw> is defined for the diagram,
+then when any item <cw>x</cw> in the diagram is deleted, this method is called with <cw>x</cw> as argument. In the tree case,
+the subtree depending from <cw>x</cw> is deleted (as you will see from the code).
 </p>
 <p>
 3) The additional menu items for the left panel are defined as follows for the tree:
@@ -617,7 +619,7 @@ item.__actions = function (item) {
 }
 </precode>
 <p>
-As you can see, __actions returns a list of objects each with title and method name. When an item in the diagram
+As you can see, <cw>__actions</cw> returns a list of objects each with title and method name. When an item in the diagram
 is selected, titles appear in the left panel. Each associated method name should be defined as indicated by the
 example:
 </p>
@@ -639,9 +641,9 @@ item.__role = &lt;roleName&gt;
 <p>When replacing an element in a diagram via "replace" or "replace prototype" in the top bar,  only shapes whose role matches the role
 of the replaced element are presented as possibilities (via a highlight of the candidate shape as
 the mouse rolls over it).  The <a href="#catalogs">catalog</a> assigns the list of possible roles. </p>
-<p>For any item, item.__transferredProperties, if present, tells what properties to transfer from the shape to its
+<p>For any item, <cw>item.__transferredProperties</cw>, if present, tells what properties to transfer from the shape to its
 replacement.</p>
-<p> A diagram might define diag.__diagramTransferredProperties.  When a shape is replaced within the diagram,
+<p> A diagram might define <cw>diag.__diagramTransferredProperties</cw>.  When a shape is replaced within the diagram,
 these properties are transferred as well when elements within the diagram are replaced
 (generally these are properties which carry diagramatic aspects of the shape in question - such as connections
 in graphs).</p>
@@ -653,7 +655,7 @@ is that <i>all</i> properties appear, but  some of the properties might be irrel
 <a href="/draw.html?source=/shape/arrow.js">arrow</a> (click on the arrow to see its visible properties).
 The <a href="/code.html?source=/shape/arrow.js">code</a> which implements it contains this line near the bottom:
 
-<pre><code>
+<smallcode>
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
 </precode>
 
@@ -736,7 +738,7 @@ spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spr
 All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
 site,
 is covered by the <a href="https://opensource.org/licenses/MIT">MIT license</a>, which means that the code can be freely shared and modified. See our
-<a href="/doc/toc.html">terms and conditions</a> for details.
+<a href="/doc/toc.html">terms and conditions</a> for details.<!--
 We encourage you to include comments in your code of the form:</p>
 <precode>
 // contributed by:&lt;name&gt; user name: &lt;userName&gt;
@@ -744,12 +746,12 @@ We encourage you to include comments in your code of the form:</p>
 <p>
 if you wrote the original version, or</p>
 <precode>
-// with contributions by &lt;name&gt; user id: &lt;userName&gt;
+// with contributions by &lt;name&gt; user name: &lt;userName&gt;
 </precode>
 <p>
 if you are extending or modifying existing code, and to retain these comments from code that you modify.
 </p>
-
+-->
 <!--
 <div class="section" id="share">15. Sharing Your Work</div>
 
@@ -830,7 +832,7 @@ is described in more detail elsewhere in this document, a <a href="">link</a> is
  <div class="apiCallDf">Returns an array of the direct properties of <cw>nd</span> which are edges of the prototype tree.
  </div>
 </div>
-
+<!--
 <div class="apiCall">
   <div class="apiCallNm">pj.declareComputed(nd:Object)</div>
  <div class="apiCallDf">Declare that <cw>nd</span> is generated by computation within an update method. The effect of this
@@ -839,6 +841,7 @@ so  <cw>nd</span>  will be recomputed on restore. Computed content can be modifi
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state. </div>
 </div>
+-->
 <!--
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.__setData(data:pj.Array)</div>

@@ -1,5 +1,4 @@
 
-// This is one of the code files assembled into pjchooser.js. 
 var mpg; // main page
 var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
 

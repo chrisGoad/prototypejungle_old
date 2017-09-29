@@ -1,6 +1,5 @@
 
   
-// This is one of the code files assembled into pjui.js.
 
 var treePadding = 0;
 var bkColor = "white";

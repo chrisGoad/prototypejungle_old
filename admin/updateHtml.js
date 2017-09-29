@@ -41,15 +41,15 @@ var buttonStyle = index?'indexUbutton':'ubutton';
 //`<body style="background-color:rgb(30,30,30)">
 
 var boilerplate1 =
-`<body style="background-color:white">
+`<body style="background-color:white;font-size:14pt">
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
         (index?'\n':'<a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n')+
 `         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
-         <div id = "topbarInner" style="position:relative;float:right;top12px">
-            ${diagrams?'':'<a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>'}
-           <a href="/code.html" class="${buttonStyle}">Code</a> 
+         <div id = "topbarInner" style="position:relative;float:right;top12px">`+
+            (diagrams?'':`<a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>`)+
+           `<a href="/code.html" class="${buttonStyle}">Code</a> 
           <a href="/doc/choosedoc.html" class="${buttonStyle}">Docs</a> 
            <a href="/doc/about.html" class="${buttonStyle}">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="${buttonStyle}">GitHub</a>
@@ -80,6 +80,7 @@ function insertBoilerplate(s,scripts) {
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
   var irs = doSubstitution(irs,'</cw>','</span>');
   var irs = doSubstitution(irs,'<precode>','<pre><code>');
+  var irs = doSubstitution(irs,'<smallcode>','<pre><code style="font-size:9pt">');
   var irs = doSubstitution(irs,'</precode>','</code></pre>');
   return doSubstitution(irs,'endplate',endplate,1);
 }
@@ -138,8 +139,8 @@ if (index) {
   
 //  index = 1;
   addHtml(['draw','drawd','code','coded','catalog','404','svg','sign_in','account']);
-  addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","privacy","network"]);
-  addIntroDocs(fts,['intro','insert','network_main','connect','prototypes','clone','diagrams','diagrams_main',"network",'details','cohorts','code_intro']);
+  addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","privacy","network","toc"]);
+  addIntroDocs(fts,['intro','insert','network_main','connect','prototypes','textbox','clone','diagrams','diagrams_main',"network",'details','cohorts','code_intro']);
 }
 
   

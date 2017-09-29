@@ -1,6 +1,5 @@
 
   
-// This is one of the code files assembled into pjui.js. 
 
   
 // some state of an item is not suitable for saving (eg all of the dom links). This sta

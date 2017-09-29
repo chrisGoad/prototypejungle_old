@@ -33,11 +33,20 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
     this.arrow2.update();
   }
   item.__diagram = true;
+  
+  item.__dragStart = function () {
+    // not needed for this example, but included for illustration
+  }
+
   item.__dragStep = function (node,pos) {
     var p = (node.__name === 'circle1')?this.p1:this.p2;
     p.copyto(pos);
     this.update();
     this.__draw();
   }
+  
+  item.circle1.__draggableInDiagram = true;
+  item.circle2.__draggableInDiagram = true;
+  
   return item;
 });

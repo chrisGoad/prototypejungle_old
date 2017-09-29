@@ -3,7 +3,6 @@
 // These are utilites supporting the work - each shape out in the prototypejungle store has its own control methods.
 
  
-// This is one of the code files assembled into pjui.js.
 
 var proportion; // y/x
 var controlled;

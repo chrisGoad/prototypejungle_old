@@ -260,9 +260,9 @@ var mouseDownListener = function (root,e) {
       return;
 
   }
-  //var inserting = ui.nowInserting || ui.nowCloning;
   if (ui.nowCloning) {
-    ui.finalizeInsert(clickedPoint,svg.main.contents.transform.scale);
+    var clonePos = ui.snapMode?ui.snapPointToGrid(clickedPoint):clickedPoint;
+    ui.finalizeInsert(clonePos,svg.main.contents.transform.scale);
     return;
   }
   root.clickedPoint = clickedPoint;// in coordinates of content

@@ -1,5 +1,4 @@
 
-// This is one of the code files assembled into pjdom.js. 
 
 
 var dom = pj.set("dom",pj.Object.mk());

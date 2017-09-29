@@ -1,5 +1,4 @@
 
-// This is one of the code files assembled into pjui.js. 
 
 // <Section> browser ====================================================
 

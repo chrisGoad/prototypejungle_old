@@ -31,19 +31,7 @@ item.__setDomAttributes =  function (element) {
   element.setAttribute('rx',radius);
   element.setAttribute('ry',radius);
 }
-/*
-//item.__domMap =
-  {transfers:svg.commonTransfers.concat(['width','height']),
-   mapping:
-     function (itm,element) {
-       element.setAttribute('x',-0.5*itm.width);
-       element.setAttribute('y',-0.5*itm.height);
-       element.setAttribute('rx',itm.cornerRadius);
-       element.setAttribute('ry',itm.cornerRadius);
 
-    }
-}
-*/
 item.update = function () {}
 
 
@@ -79,34 +67,6 @@ item.__updateControlPoint = function (idx,pos) {
 peripheryOps.installOps(item);
 ui.setTransferredProperties(item,ui.stdTransferredProperties);
 
-/*
-// support for graph operations
-// in the coordinates of the parent
-item.toGeomRectangle = function () {
-  var center = this.__getTranslation();
-  var corner = geom.Point.mk(center.x - 0.5*this.width,center.y - 0.5*this.height);
-  var extent = this.__getExtent();
-  return geom.Rectangle.mk(corner,extent);
-}
-
-
-
-item.peripheryAtDirection = function(direction)  {
-  var rectangle = this.toGeomRectangle();
-  return rectangle.peripheryAtDirection(direction);
-}
-
-
-item.alongPeriphery = function (edge,fraction) {
-  var rectangle = this.toGeomRectangle();
-  return rectangle.alongPeriphery(edge,fraction);
-}
-/*
-item.periphery = function(direction)  {
-  var rectangle = this.toGeomRectangle();
-  return rectangle.peripheryPoint(direction);
-}
-*/
   
 return item;
 });
