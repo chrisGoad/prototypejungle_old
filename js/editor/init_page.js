@@ -29,7 +29,7 @@ ui.genButtons = function (container,options,cb) {
      if (ui.source === '/diagram/startTree.js') {
       ui.addButton(container,'question','?','/draw.html?source='+ui.source+'&intro=intro&fit=0.35');
     }
-    var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
+    var codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
     addEditorButtons();

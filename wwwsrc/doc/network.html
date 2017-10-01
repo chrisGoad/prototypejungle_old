@@ -3,13 +3,13 @@
 <div class="pageTitle">Build an Adjustable Network Diagram with Code</div>
 
 
-<p>This simple diagram <span style="position:relative;top:5px"><img height="20px" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"> </a> </span> is implemented by the following code:</p>
+<p>This simple diagram <span style="position:relative;top:5px"><img height="20" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"> </span> is implemented by the following code:</p>
 
 <precode>
 
 pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
   var geom = pj.geom,svg = pj.svg,ui = pj.ui;
-  var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
+  var item = svg.Element.mk('&lt;g&gt;');// the root of the diagram we are assembling
   var graph = item.set('graph',graphP.instantiate());
   var circleP = graph.installAsVertexPrototype(circlePP);
   var arrowP = graph.installAsEdgePrototype(arrowPP);
@@ -60,6 +60,7 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
     pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) { ...
 
  </precode>
+ <p>
  binds the variables <cw>graphP</cw>, <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/diagram/graph.js'</span>, <cw>'/shape/circle.js'</span>, and
  <cw>'/shape/arcArrow.js'</span>, respectively. Moving on:</p>
 

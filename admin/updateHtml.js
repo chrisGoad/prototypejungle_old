@@ -49,7 +49,7 @@ var boilerplate1 =
 `         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
          <div id = "topbarInner" style="position:relative;float:right;top12px">`+
             (diagrams?'':`<a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>`)+
-           `<a href="/code.html" class="${buttonStyle}">Code</a> 
+           `<a href="/code.html" class="${buttonStyle}">Code Editor</a> 
           <a href="/doc/choosedoc.html" class="${buttonStyle}">Docs</a> 
            <a href="/doc/about.html" class="${buttonStyle}">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="${buttonStyle}">GitHub</a>

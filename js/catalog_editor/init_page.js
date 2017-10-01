@@ -29,7 +29,7 @@
   
   
 ui.genButtons = function (container,options) {
-  ui.addButton(container,'codeEditor','Code','/code.html');
+  ui.addButton(container,'codeEditor','Code Editor','/code.html');
   ui.genStdButtons(container);
 }
   

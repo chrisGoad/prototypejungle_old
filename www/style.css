@@ -465,6 +465,20 @@ pre {
   margin-left:20px;
 }
 
+.choosedocIndent1 {
+    padding-left:40px;
+    padding-bottom:5px;
+}
+.choosedocIndent2 {
+    padding-left:60px;
+    padding-bottom:5px;
+}
+
+  .diagramsMainLink {
+    padding:10px;
+    padding-bottom:0px;
+  }
+ 
 .chooserItem {
   cursor:pointer;
 }
