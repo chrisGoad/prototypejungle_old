@@ -189,7 +189,6 @@ item.arrangeWords = function (text) { //,inewLines) {
           ct.__draw();
         }
       }
-      console.log('newHt',newHt);
       return pj.geom.Point.mk(newWd,newHt)
      
     }

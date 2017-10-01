@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require(function () {
+pj.require('/shape/circlePeripheryOps.js',function (peripheryOps) {
 
 var geom = pj.geom,svg = pj.svg,ui = pj.ui;
 
@@ -11,6 +11,7 @@ var item = svg.Element.mk('<g/>');
 item.__dimension = 50;
 item.numTurns = 0.75;
 item.numSpokes = 3;
+item.stroke = 'transparent';
 item.fill = "black";
 item.widthAtEndFactor = 0.02;
 item.widthAtStartFactor = 0.04;// as factor of dimension
@@ -97,12 +98,9 @@ item.update = function () {
   }
 }
 
-
-item.__getExtent = function () {
-  var dim = this.__dimension;
-  return geom.Point.mk(dim,dim);
-}
-
+// used to compute where connections (eg arrows) terminate on this shape's periphery
+peripheryOps.installOps(item);
+ui.setTransferredProperties(item,ui.stdTransferredProperties);
 
 item.__setExtent = function (extent,nm) {
   var ext;

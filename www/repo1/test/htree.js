@@ -111,7 +111,6 @@ let ddata =
   ]}
 ]};
 
-debugger;
 tree.buildFromData(data);
 return item;
 tree.setRootText('foob');

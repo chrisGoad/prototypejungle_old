@@ -45,7 +45,7 @@ var boilerplate1 =
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
-        (index?'\n':'<a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n')+
+        (index?'\n':`<a href="/"><span style="position:relative;top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n`)+
 `         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
          <div id = "topbarInner" style="position:relative;float:right;top12px">`+
             (diagrams?'':`<a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>`)+
@@ -75,7 +75,7 @@ function doSubstitution(s,what,value,withDoubleBracket) {
 }
 
 function insertBoilerplate(s,scripts) {
-  var irs = doSubstitution(s,'boilerplate',boilerplate0+scripts+boilerplate1,1);
+  var irs = doSubstitution(s,'boilerplate',boilerplate0+boilerplate1+scripts,1);
   var irs = doSubstitution(irs,'min',minimize?'min.':'',1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
   var irs = doSubstitution(irs,'</cw>','</span>');

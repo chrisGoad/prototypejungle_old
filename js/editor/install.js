@@ -61,10 +61,9 @@ ui.svgInstall = function () {
   if (ui.main && !atTopLevel) {
     pj.root.set('main',ui.main);
   }
-  if (pj.root.__grid ||ui.enableTheGrid) {
+  if ((pj.root.__grid ||ui.enableTheGrid) && ui.enableGrid) {
     ui.enableGrid();
   }
-  //ui.addGrid(10);
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {

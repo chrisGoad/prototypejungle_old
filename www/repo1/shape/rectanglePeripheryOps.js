@@ -9,7 +9,6 @@ var  item = pj.Object.mk();
 // support for graph operations
 // in the coordinates of the parent
 item.toGeomRectangle = function () {
-  console.log('wh',this.width,this.height);
   var center = this.__getTranslation();
   var corner = geom.Point.mk(center.x - 0.5*this.width,center.y - 0.5*this.height);
   var extent = this.__getExtent();
