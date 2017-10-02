@@ -1,8 +1,10 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 // For monitoring.
 pj.instantiateCount = 0;
 pj.internalChainCount = 0;
-    
+  
 
 
 let internalChain;

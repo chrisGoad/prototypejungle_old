@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 /* a trivial exception setup.  System is meant to indicate which general system generated the error
  * (eg instantiate, install, externalize, or  what not.

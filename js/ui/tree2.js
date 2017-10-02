@@ -1,7 +1,6 @@
 
   
   
-// This is one of the code files assembled into pjui.js.
    
 // for widgetlines whose forNode is an Array, check that counts match up on node and widget
 

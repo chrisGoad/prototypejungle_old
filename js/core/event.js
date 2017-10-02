@@ -1,4 +1,5 @@
-
+// Copyright 2017 Chris Goad
+// License: MIT
 
 /* a simple event system
  *

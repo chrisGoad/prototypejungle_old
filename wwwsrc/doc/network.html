@@ -3,11 +3,16 @@
 <div class="pageTitle">Build an Adjustable Network Diagram with Code</div>
 
 
+{{networkNote}}
+
+
 <p>This simple diagram <span style="position:relative;top:5px"><img height="20" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"> </span> is implemented by the following code:</p>
 
-<precode>
 
-pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+ 
+<precode>
+pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',
+function (graphP,circlePP,arrowPP) {
   var geom = pj.geom,svg = pj.svg,ui = pj.ui;
   var item = svg.Element.mk('&lt;g&gt;');// the root of the diagram we are assembling
   var graph = item.set('graph',graphP.instantiate());
@@ -45,8 +50,9 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
  
  <p>Now, lets walk through the code.</p>
  
-  <smallcode>
-    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+  <precode>
+    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',
+    function (graphP,circlePP,arrowPP) {
 </precode>
   <p>
 <i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>.
@@ -122,16 +128,20 @@ of  the graph component, defined externally to the PrototypeJungle platform.</p>
   updated with dragging of the circles - the graph component handles that. This more direct approach is presented here to give a better feeling
   for how to build things outside of the context of particular diagrams. The approach involves these alternative snippets of code for introducing the circles and arrows:</p>
   <precode>
-  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
+  var circleP = item.set('circleP',circlePP.instantiate());
   item.set('circle1',circleP.instantiate()).__show();
   item.set('circle2',circleP.instantiate()).__show();
   </precode>
   and
   <precode>
-  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
+  var arrowP = item.set('arrowP',arrowPP.instantiate());
   item.set('arrow1',arrowP.instantiate()).__show();
   item.set('arrow2',arrowP.instantiate()).__show();
   </precode>
+  
+  <p>The <cw>__show()</cw>s are needed because 
+   items in the catalog  are initially hidden by convention, as they normally
+   serve as prototypes, which should be invisible.</p>
   
   <p> Since there is no autopositioning of the arrows, we also need: </p>
    <precode>
@@ -143,8 +153,6 @@ of  the graph component, defined externally to the PrototypeJungle platform.</p>
    
    <p>This variant of the code can be found <a href="/code.html?source=/example/simpleDiagram.js">here</a>.</p>
  
-  <p>For a full explanation of coding in PrototypeJungle, which will enable you to define your own visual elements and diagram types, see the
-  <a href="/doc/code.html">coding guide</a>.
   
 
 

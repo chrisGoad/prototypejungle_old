@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 // minimal utilities needed for a PrototypeJungle web page (used in the minimal and firebase_only modules)
 

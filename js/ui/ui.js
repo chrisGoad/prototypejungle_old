@@ -10,7 +10,6 @@ var svg = pj.svg;
 var html = pj.html;
 var fb = pj.fb;
 
-// This is one of the code files assembled into pjui.js. 
 
 pj.defineFieldAnnotation("Note");
 

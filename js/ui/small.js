@@ -4,7 +4,6 @@
 (function (pj) {
   
 
-// This is one of the code files assembled into pjtopbar.js. "start extract" and "end extract" indicate the part used in the assembly
 
 //start extract
 

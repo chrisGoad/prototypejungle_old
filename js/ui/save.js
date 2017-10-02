@@ -1,7 +1,6 @@
 
 
 
-// This is one of the code files assembled into pjui.js. 
 
 pj.maxSaveLength = 200000;//50000; // this should match the limit in the storage rules for firebase
 

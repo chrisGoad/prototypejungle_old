@@ -8,7 +8,6 @@
   //stubs
   ui.hide = function () {}
 
-   // This is one of the code files assembled into pjview.js. 
 
 /*
  * Prototypejungle items can be embedded in pages via iframes. These functions provide support

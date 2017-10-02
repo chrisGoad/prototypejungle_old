@@ -474,7 +474,27 @@ var initialCode =
              "  item.set('circle',pj.svg.Element.mk(\n  '"+  
                        '<circle fill="blue" stroke="black" stroke-width="2" r="20"/>'+"'));\n" +
              "  return item;\n})" ;
-               
+ var initialCode =
+ `// sample code - a randomly chosen snippet; click "Run" to see its output
+ pj.require('/shape/shadedCircle.js',function (circlePP,arrowPP) {
+  var geom = pj.geom, svg = pj.svg;
+  var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
+  // the circle prototype
+  var circleP = item.set('circleP',circlePP.instantiate());
+  circleP.r = 16;
+  circleP.innerFill = 'blue';
+  circleP.stroke = 'red';
+  // instantiate it twice
+  item.set('circle1',circleP.instantiate()).__show();
+  item.set('circle2',circleP.instantiate()).__show();
+  item.set('circle3',circleP.instantiate()).__show();
+  item.circle1.__moveto(geom.Point.mk(-40,0));
+  item.circle2.__moveto(geom.Point.mk(0,0));
+  item.circle3.__moveto(geom.Point.mk(40,0));
+  item.circle2.r = 10;
+  return item;
+})`;
+
 ui.viewSource = function () {
   ui.panelMode = 'code';
   ui.layout();
@@ -485,7 +505,6 @@ ui.viewSource = function () {
   if (!ui.mainUrl) {
      ui.editor.setValue(initialCode);//rs
      disableButton(ui.saveBut);
-    return;
   }
   var urlEls = [];
   ui.codeUrls.$empty();

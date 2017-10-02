@@ -1,8 +1,10 @@
+// Copyright 2017 Chris Goad
+// License: MIT
+
 // tree operations
 
 
 pj.__builtIn = 1;
-
 
 // constructors for nodes 
 

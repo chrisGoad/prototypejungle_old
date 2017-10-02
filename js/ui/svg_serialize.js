@@ -1,7 +1,6 @@
 
 
   
-// This is one of the code files assembled into pjui.js.
 
 // svg serialization:for writing out the svg dom as a string, so that it can be shown independent of prototypejungle
 /* Example use:

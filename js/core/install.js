@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 /* This installs components implemented by js scripts. The scripts should have the form
  * pj.require(file1,file2...fileN,function (v1,v2... vn)){...return value});. Such code builds an item, and returns it, utilizing

@@ -69,13 +69,15 @@ var endplate =
 
 
 
+
 function doSubstitution(s,what,value,withDoubleBracket) {
     var rge = withDoubleBracket?new RegExp('\{\{'+what+'\}\}','g'):new RegExp(what,'g');
     return s.replace(rge,value);
 }
 
-function insertBoilerplate(s,scripts) {
+function insertBoilerplate(s,scripts,networkNote) {
   var irs = doSubstitution(s,'boilerplate',boilerplate0+boilerplate1+scripts,1);
+  var irs = doSubstitution(irs,'networkNote',networkNote,1);
   var irs = doSubstitution(irs,'min',minimize?'min.':'',1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
   var irs = doSubstitution(irs,'</cw>','</span>');
@@ -88,14 +90,25 @@ function insertBoilerplate(s,scripts) {
   
   var needsSignInScripts = {sign_in:1,account:1,index:1,svg:1};
   
+  var theNetworkNote = '<p style="padding-left:50px;padding-right:50px;font-size:12pt">(For a full explanation of coding in PrototypeJungle, '+
+  'which will enable you to define your own visual elements and diagram types, see the '+
+  '<a href="/doc/code.html">coding guide</a> after reading this).</p>';
+  
   var addHtml1 = function(fl) {
     console.log('read',fl);
     var scripts = needsSignInScripts[fl]?signInScripts:minimalScripts;
     var ffl = fl+'.html';
     var ivl = fs.readFileSync('wwwsrc/'+ffl).toString();
-    var vl = insertBoilerplate(ivl,scripts);
+    var vl = insertBoilerplate(ivl,scripts,'');
     console.log('writing',ffl);
     fs.writeFileSync('www/'+ffl,vl);
+    if (ffl === 'doc/network.html') {// write out the slight variant for the network page
+      var vl = insertBoilerplate(ivl,scripts,theNetworkNote);
+      ffl = fl+"v.html";
+      console.log('writing',ffl);
+      fs.writeFileSync('www/'+ffl,vl);
+    
+    }
     return;
   }
   

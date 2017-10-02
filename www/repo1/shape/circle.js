@@ -46,6 +46,7 @@ item.__setExtent = function (extent,nm) {
   this.__dimension = ext;
 }
 
+item.__hide(); // items start out hidden by convention, because they usually serve as prototypes
 
 return item;
 });

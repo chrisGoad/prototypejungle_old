@@ -15,11 +15,18 @@ item.outerFill = 'black';
 item.innerFill = 'red';
 /* end adjustable parameters */
 
+
+
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
-//item.__svgClickable = true;
 
+
+// r can also be used for radius
+Object.defineProperty(item, 'r', { set: function(x) {this.__dimension = 2 * x; } });
+
+
+ui.hide(item,['r']);
 var  gradient = svg.Element.mk('<radialGradient/>');
 var stop1,stop2,stop3;
 
@@ -76,6 +83,6 @@ item.__setFieldType('outerFill','svg.Rgb');
 item.__setFieldType('innerFill','svg.Rgb');
 
 ui.hide(item,['__contents','defs']);
-
+item.__hide(); // items start out hidden by convention, because they usually serve as prototypes
 return item;
 });

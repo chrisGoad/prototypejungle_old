@@ -1,7 +1,5 @@
 
   
-// This is one of the code files assembled into pjdom.js. 
-
 if (pj.set) {
   var fb = pj.set("fb",pj.Object.mk());
 } else {

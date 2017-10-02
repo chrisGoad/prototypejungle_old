@@ -1,7 +1,4 @@
 
-// This is one of the code files assembled into pjui.js. 
-
-
 // html components for the UI : pulldown (select), and tab; some utilities too
 dom.Select = pj.Object.mk();
 

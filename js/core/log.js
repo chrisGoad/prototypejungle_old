@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 pj.activeConsoleTags = ['error'];//,'drag','util','tree'];
 

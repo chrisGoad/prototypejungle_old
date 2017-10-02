@@ -355,7 +355,7 @@ ui.hide(item,['head0','head1','LineP','end0','end1']);
 item.__setFieldType('solidHead','boolean');
 item.__setFieldType('clockwise','boolean');
 
-
+item.__hide(); // items start out hidden by convention, because they usually serve as prototypes
 
 return item;
 });

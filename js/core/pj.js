@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 window.prototypeJungle =  (function () {
 /* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), 
  * and leaves which are of primitive type (numbers,boolean,null,strings), or are functions.

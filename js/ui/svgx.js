@@ -1,6 +1,5 @@
 
   
-// This is one of the code files assembled into pjui.js.
 
 // properties of a node relevant to mouse control. __draggable,__unselectable,__adjustPrototype
 

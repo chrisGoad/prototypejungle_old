@@ -1,4 +1,5 @@
-
+// Copyright 2017 Chris Goad
+// License: MIT
 
 /* A normal setup for managing pj items,  is for there to be a current item which
  * is being manipulated in a running state, a state which contains various other items installed from external sources.

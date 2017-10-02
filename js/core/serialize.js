@@ -1,3 +1,5 @@
+// Copyright 2017 Chris Goad
+// License: MIT
 
 /* Serialization of prototype trees.
  * Technique: each node in the JavaScript graph constituting the prototype tree is assigned a code (either a number or string). 
