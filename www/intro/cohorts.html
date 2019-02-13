@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+</head>
+<body style="margin:11px;background-color:white;font-size:12pt">
+<script type="text/javascript" src="/intro/pages.js"></script>
+
+
+<div style="padding:0px;margin:0px">
+
+<p><b>Cohorts</b> </p><p>Occasionally,  it is convenient to modify the prototype structure of a diagram. 
+ Here is a tree diagram produced with
+the help of this kind of manipulation: </p>
+
+<p>  A cohort is a set of items
+that have the same prototype. For example, all of the circles to the right belong to one cohort, while
+the squares belong to two (the upper squares to one cohort, and the lower squares to another).
+You can verify this by selecting one of the circles or squares, clicking "Cohorts..." in the left panel to open up the cohort options,
+and then licking
+"Show Cohort". </p>
+
+<p>If you click "Split cohort" after selecting a circle, the items in the cohort of that circle will be highlighted.
+By clicking on a series of these highlighted items, you define a new cohort, with its own new prototype, that is
+split off from the original.</p><p> <b>Exercise:</b> Try this, and then verify that the split-off cohort does in fact have its own prototype.
+</p>
+
+<p>If you select a circle, and then click "Add to cohort", you may thereafter click on arbitrary items outside of the
+the circle's cohort, and as you click them, these items will be added one by one to the circle's cohort. This means that the
+added items are, as it were, spliced onto the circle's prototype - that is, they now inherit from the circle's prototype.
+Of course, when this happens, the added items become circles  - but tranfer over what ever properties they may have
+had in their former life. </p><p> <b>Exercise:</b> Try adding a few squares to a circle's cohort.
+</p>
+
+
+
+<p>
+<button  onclick="gotoPage('clone')">Prev</button> 
+</p>
+
+</div>
+
+
+</body>
+</html>

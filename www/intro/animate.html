@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<html>
+<body>
+<script>
+
+let imgDiv;
+
+
+var setFrame = function (fl) {
+  let furl = surl+fl+'?alt=media';
+  img.src= furl;
+}
+
+let frames = ['exercise0.svg','exercise1.svg','exercise2.svg','exercise3.svg','exerciseCompleted.svg'];
+
+
+let fnum = 3;
+var cnum = 0;
+
+let animate = function() {
+  let ln = frames.length;
+  if (cnum >=ln) {
+    cnum  = 0;
+  }
+  setFrame(frames[cnum]);
+  cnum++;
+  setTimeout(animate,cnum===ln?1500:500);
+  
+}
+window.addEventListener("DOMContentLoaded",function () {
+  imgDiv = document.getElementById('img');
+  animate();
+ //setFrame('exercise1.svg')
+});
+
+var surl = 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/JHtAs2VsGjYCqJmOo39SexGq2Fx1%2Fintro%2F';
+
+</script>
+ 
+
+<div id="main">
+   
+   <img id='img' style="border:thin solid black" width="700" />
+</div>
+
+
+
+  </div>
+</div>
+</body>
+</html>

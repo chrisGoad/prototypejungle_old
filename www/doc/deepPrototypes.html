@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An Open Repository of Prototype Structures for the Visual Domain">
+<title>ProtoPedia</title>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<link rel="stylesheet" type="text/css"  href="spectrum.css"/>
+<link rel="icon" href="/images/favicon.ico?v18" />
+</head>
+<body style="background-color:white;font-size:14pt">
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:0px"><a href="/"><span style="position:relative;top:-10px" class="mainTitle">ProtoPedia </span></a>
+         <img style ="position:relative;border:none;top:0px;left:20px;" alt="images/logo_alt.html" src="/images/logo3.svg"  width="60" height="25"/>
+         <div id = "topbarInner" style="position:relative;float:right;top:0px">
+                     <a href="/draw.html?source=(sys)/forMainPage/spiralLogo6.item&intro=tutorial_index&fit=0.7" class="ubutton">Tutorial</a>
+ <a href="/draw.html" class="ubutton">Draw</a> 
+          <a href="/code.html" class="ubutton">Code Editor</a> 
+            <a href="/text.html" class="ubutton">Text Editor</a> 
+         <a href="/doc/code.html" class="ubutton">Coding Guide</a> 
+          <a href="/doc/about.html" class="ubutton">About</a>
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+         </div> 
+    </div>
+  </div>
+  <div id="innerContainer" style="margin-top:10px">
+   
+
+<!-- when fixing this doc for releaf, search for "PUTBACK" in this doc -->
+<div style="text-align:center;font-size:14pt;padding-top:0px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
+<!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
+
+
+<p>In normal JavaScript usage, the instantiation of a prototype 
+(creation of a new object which inherits from the prototype) is a one-level operation, implemented by
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
+or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
+However, instantiation can be extended to hierarchical structures,
+so that trees of arbitrary depth serve as templates from which instances can be spawned at one blow.
+It is adequate that the
+structures in question be heirarchical (tree-like) in their object-own-property aspect;
+internal prototype chains in the templates can be propoageted smoothly to instances if a little care is taken.
+ Here's an example of such a structure: </p>
+
+
+<img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
+      style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
+
+<p>Such trees will be referred to as "deep prototypes".
+Serialization can be implemented by assigning numeric codes to the nodes  of the tree,
+and then building a JSON-compatible description of the graph, including prototype chains and functions. </p>
+<p>
+ Together,
+these capabilities  yield  a component system in which applications are built by instantiation and assembly
+from stored elements. After instantiation, the components, being prototypes, are still
+"<span style="color:red;text-decoration:underline">live</span>" - that is,
+any adjustments are inherited by instances. </p>
+
+<p>The assemblies have a uniform structure which mates
+well to a user interface in which prototype structure is exposed.
+<i>This yields applications of high adjustability</i> (the purpose of the enterprise). </p>
+
+The idea has been worked out in detail for a particular use-case: diagrams.
+Here the components are visual elements (arrows, boxes, labels, and the like), and assemblies thereof
+(i.e. diagrams and their parts). Deep prototypes fit the application well, due to the repetitive use of
+common elements in diagrams, which is captured by repeated instantiation of common prototypes.
+After instantiation the prototypes are still �live�?�?that is, any adjustments are inherited by instances?�?
+this is the point of prototypes. Furthermore, an unusually close integration of coding and UI work becomes possible:
+parts retain their UI-adjustability when assembled by code, and the deep prototype formalism enables
+UI-access to the structure of assemblies, whatever their origin. See https://protopedia.org (all of the code involved is freely available under the MIT license).
+<p>Here is a diagram illustrating the component structure: </p>
+
+<img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
+      style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
+
+<p style="margin-top:-30px">
+ The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
+ (the black and green subgraph).
+ <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
+<a href="/doc/tech.html#definition">Here</a> is a precise description</p>
+
+<!--
+<p>Complete application objects (eg charts) are themselves prototype trees, and as such have
+a uniform structure which mates well with a uniform user interface. An initial stab at such an interface is the UI
+seen in  the above example.-->
+<!--However, the prototype-chain aspect is not relevant in every case to end-users.
+A minor variant  of the inspector allows hiding of this aspect when irrelevant, or providing explanatory text
+when it is. Click here to see the variant.--></p>
+<!-- PUTBACK
+<p>JavaScript libraries supporting the technology are available at this site (see the
+<a href="doc/code.html">Coding Guide</a>), and all aspects of the implementation
+are open source (at <a href="https://github.com/chrisGoad/protopedia/tree/r3">GitHub</a> under the MIT License).</p>-->
+<!--
+<p> An open drawing and charting application, in which visual elements and chart types could be
+contributed by any web developer anywhere, is a possible application of the technology, which is at the proof-of-concept stage.</p>
+-->
+
+<div class="section" id="footnotes">Footnotes</div>
+
+<p id="footnote1" style="font-size:small">1. Precisely stated: a red arrow runs from node a to
+node b if Object.getPrototypeOf(a) === b. A black arrow runs from  a  to b  if a.P === b for some own property P of a.</p>
+</div>
+  </div>
+</div>
+</body>
+</html>
+

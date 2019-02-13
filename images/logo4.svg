@@ -1,0 +1,47 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style = "background:white" viewBox="0 0 400 400">
+<g id="outerG" transform = "translate(260 260)scale(2)">
+<g id="prototypes" >
+
+</g>
+<g id="circle" transform="translate(-90 0)">
+<g id="circle_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="black" stroke-width="0" fill="red" r="14.551598392421628" id="outline"></circle>
+</g>
+<g id="circle1" transform="translate(-30 0.5621072694119796)">
+<g id="circle1_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="black" stroke-width="0" fill="green" r="14.551598392421628" id="outline"></circle>
+</g>
+<g id="circle2" transform="translate(30 -0.5621072694119796)">
+<g id="circle2_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="black" stroke-width="0" fill="blue" r="14.551598392421628" id="outline"></circle>
+</g>
+<g id="circle3" transform="translate(-30 -60)">
+<g id="circle3_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="black" stroke-width="0" fill="black" r="14.551598392421628" id="outline"></circle>
+</g>
+<g id="arrow" transform="translate(-150 -90)">
+<path visibility="inherit" stroke-width="0" fill="black" d="M 73.00599889730677 69.01735980410123 L 80.98264019589877 76.99400110269323 L 70.2895339003846 79.7104660996154 L 73.00599889730677 69.01735980410123 " id="head"></path><line visibility="inherit" stroke="black" stroke-width="4" stroke-linecap="round" x1="109.7104660996154" y1="40.2895339003846" x2="73.64192672349368" y2="76.35807327650632" id="shaft"></line>
+</g>
+<g id="arrow1" transform="translate(-60 -30)">
+<path visibility="inherit" stroke-width="0" fill="black" d="M 24.359662846672922 6.528510083304164 L 35.64033715332708 6.528510083304164 L 30 16.01050887699035 L 24.359662846672922 6.528510083304164 " id="head"></path><line visibility="inherit" stroke="black" stroke-width="4" stroke-linecap="round" x1="30" y1="-15.448401607578376" x2="30" y2="11.269509480147256" id="shaft"></line>
+</g>
+<g id="arrow2" transform="translate(30 -30)">
+<path visibility="inherit" stroke-width="0" fill="black" d="M -21.043616924524848 16.530786794664863 L -13.104603793595679 8.516694000109666 L -10.337844764933735 19.19689759386132 L -21.043616924524848 16.530786794664863 " id="head"></path><line visibility="inherit" stroke="black" stroke-width="4" stroke-linecap="round" x1="-49.662155235066265" y1="-19.759004863273297" x2="-13.705977561996999" y2="15.860318995624292" id="shaft"></line>
+</g>
+<g id="square" transform="translate(-30 -30)">
+<rect visibility="inherit" stroke="black" stroke-width="4" fill="transparent" width="160" height="160" x="-80" y="-80" id="outline"></rect>
+</g>
+<g id="__resizeBoxes" transform="translate(-30 -30)">
+
+</g>
+
+</g>
+</svg>

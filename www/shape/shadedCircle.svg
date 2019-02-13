@@ -1,0 +1,8 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" style = "background:white" viewBox="0 0 400 444.44444444444446">
+<g id="outerG" transform = "translate(200 222.22222222222223)scale(3.6)">
+<g>
+<defs gradient="[object Object]" id="defs"><radialGradient visibility="inherit" id="g1"><stop visibility="inherit" offset="0%" stop-opacity="0" id="stop0"></stop><stop visibility="inherit" offset="60%" stop-opacity="0" id="stop1" stop-color="red"></stop><stop visibility="inherit" offset="100%" stop-opacity="0.5" id="stop2" stop-color="black"></stop></radialGradient></defs><circle visibility="inherit" id="__contents" fill="url(#g1)" r="50"></circle>
+</g>
+
+</g>
+</svg>

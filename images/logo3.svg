@@ -1,0 +1,44 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style = "background:transparent" viewBox="0 0 400 259.405257611215">
+<g id="outerG" transform = "translate(200.21581806058333 137.3352410137435)scale(2.136210907474444)">
+<g id="prototypes" >
+
+</g>
+<g id="circle" transform="translate(-0.6130653419984313 -37.145934894082075)">
+<g id="circle_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="transparent" stroke-width="0" fill="rgb(0, 60, 0)" r="15" id="outline"></circle>
+</g>
+<g id="__resizeBoxes" transform="translate(59.7979525862069 29.797952586206897)">
+
+</g>
+<g id="circle1" transform="translate(-60 30)">
+<g id="circle1_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="transparent" stroke-width="0" fill="red" r="15" id="outline"></circle>
+</g>
+<g id="circle2" transform="translate(0 30)">
+<g id="circle2_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="transparent" stroke-width="0" fill="green" r="15" id="outline"></circle>
+</g>
+<g id="circle3" transform="translate(59.7979525862069 29.797952586206897)">
+<g id="circle3_connectedEdges" >
+
+</g>
+<circle visibility="inherit" stroke="transparent" stroke-width="0" fill="blue" r="15" id="outline"></circle>
+</g>
+<g id="arrow" transform="translate(62.21312225842085 -22.500003752161245)">
+<path visibility="inherit" stroke-width="0" fill="rgb(0, 60, 0)" d="M -68.30376857400208 26.837064591075187 L -56.592075083222106 26.73013282541236 L -62.35007167859859 37.500628936646 L -68.30376857400208 26.837064591075187 " id="head"></path><line visibility="inherit" stroke="rgb(0, 60, 0)" stroke-width="4" stroke-linecap="round" x1="-62.689238180241546" y1="0.3534436735944162" x2="-62.39899675360534" y2="32.142113822444884" id="shaft"></line>
+</g>
+<g id="arrow1" transform="translate(30.245909143666754 -13.278692276751409)">
+<path visibility="inherit" stroke-width="0" fill="rgb(0, 60, 0)" d="M -77.59457549068718 20.1350932539526 L -68.8214530506328 27.89444383736485 L -80.30837040793979 32.04279783634631 L -77.59457549068718 20.1350932539526 " id="head"></path><line visibility="inherit" stroke="rgb(0, 60, 0)" stroke-width="4" stroke-linecap="round" x1="-40.796513221392146" y1="-12.631348176925565" x2="-76.75819233929988" y2="28.028783191002518" id="shaft"></line>
+</g>
+<g id="arrow2" transform="translate(35.778696028912655 -12.663938178390753)">
+<path visibility="inherit" stroke-width="0" fill="rgb(0, 60, 0)" d="M 2.4421575645651297 27.292473571274897 L 11.13731421576767 19.44585330293426 L 13.969949979000091 31.325848501052945 L 2.4421575645651297 27.292473571274897 " id="head"></path><line visibility="inherit" stroke="rgb(0, 60, 0)" stroke-width="4" stroke-linecap="round" x1="-26.342454792616934" y1="-13.34595445214662" x2="10.379842934583246" y2="27.347505969078764" id="shaft"></line>
+</g>
+
+</g>
+</svg>

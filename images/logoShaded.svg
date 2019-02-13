@@ -1,0 +1,71 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style = "background:white" viewBox="0 0 400 400.0000711228448">
+<g id="outerG" transform = "translate(-932.648941905438 -680.9491734814205)scale(4.194996081131252)">
+<g>
+<g>
+<g transform="translate(270 180)">
+<g>
+<defs gradient="[object Object]" id="defs"><radialGradient visibility="inherit" id="g9"><stop visibility="inherit" offset="0%" stop-opacity="0" id="stop0"></stop><stop visibility="inherit" offset="60%" stop-color="red" stop-opacity="0" id="stop1"></stop><stop visibility="inherit" offset="100%" stop-color="black" stop-opacity="0.5" id="stop2"></stop></radialGradient></defs><circle visibility="inherit" fill="url(#g9)" r="12.908271292944477" id="__contents"></circle>
+</g>
+<text visibility="inherit" stroke-width="0" fill="black" y="3.3333333333333335" font-family="arial" font-size="10" text-anchor="middle" id="singleLine"></text>
+</g>
+<g transform="translate(300 210)">
+<g>
+<defs gradient="[object Object]" id="defs"><radialGradient visibility="inherit" id="g11"><stop visibility="inherit" offset="0%" stop-opacity="0" id="stop0"></stop><stop visibility="inherit" offset="60%" stop-color="red" stop-opacity="0" id="stop1"></stop><stop visibility="inherit" offset="100%" stop-color="black" stop-opacity="0.5" id="stop2"></stop></radialGradient></defs><circle visibility="inherit" fill="url(#g11)" r="12.908271292944477" id="__contents"></circle>
+</g>
+<text visibility="inherit" stroke-width="0" fill="black" y="3.3333333333333335" font-family="arial" font-size="10" text-anchor="middle" id="singleLine"></text>
+</g>
+<g transform="translate(270 240)">
+<g>
+<defs gradient="[object Object]" id="defs"><radialGradient visibility="inherit" id="g13"><stop visibility="inherit" offset="0%" stop-opacity="0" id="stop0"></stop><stop visibility="inherit" offset="60%" stop-color="red" stop-opacity="0" id="stop1"></stop><stop visibility="inherit" offset="100%" stop-color="black" stop-opacity="0.5" id="stop2"></stop></radialGradient></defs><circle visibility="inherit" fill="url(#g13)" r="12.908271292944477" id="__contents"></circle>
+</g>
+<text visibility="inherit" stroke-width="0" fill="black" y="3.3333333333333335" font-family="arial" font-size="10" text-anchor="middle" id="singleLine"></text>
+</g>
+<g transform="translate(240 210)">
+<g>
+<defs gradient="[object Object]" id="defs"><radialGradient visibility="inherit" id="g15"><stop visibility="inherit" offset="0%" stop-opacity="0" id="stop0"></stop><stop visibility="inherit" offset="60%" stop-color="red" stop-opacity="0" id="stop1"></stop><stop visibility="inherit" offset="100%" stop-color="black" stop-opacity="0.5" id="stop2"></stop></radialGradient></defs><circle visibility="inherit" fill="url(#g15)" r="12.908271292944477" id="__contents"></circle>
+</g>
+<text visibility="inherit" stroke-width="0" fill="black" y="3.3333333333333335" font-family="arial" font-size="10" text-anchor="middle" id="singleLine"></text>
+</g>
+
+</g>
+<g>
+<g transform="translate(0 0)">
+<path visibility="inherit" stroke="black" stroke-opacity="1" stroke-width="2" stroke-linecap="round" fill="none" d="M 257.7440482696765 183.79689694806282 A 33.941125496954285 33.941125496954285 1 0 0 246.00129940515663 194.16864062042282" id="shaft"></path><g>
+<path visibility="inherit" stroke-width="0" fill="black" d="M 245.47502400189373 188.64044447234488 L 251.81061635820723 193.11025784249222 L 243.7968969480628 197.74404826967654 L 245.47502400189373 188.64044447234488 " id="head"></path>
+</g>
+
+</g>
+<g transform="translate(0 0)">
+<path visibility="inherit" stroke="black" stroke-opacity="1" stroke-width="2" stroke-linecap="round" fill="none" d="M 243.7968969480628 222.25595173032346 A 33.941125496954285 33.941125496954285 1 0 0 254.16864062042276 233.99870059484334" id="shaft"></path><g>
+<path visibility="inherit" stroke-width="0" fill="black" d="M 248.64044447234485 234.52497599810624 L 253.1102578424922 228.18938364179274 L 257.7440482696765 236.20310305193718 L 248.64044447234485 234.52497599810624 " id="head"></path>
+</g>
+
+</g>
+<g transform="translate(0 0)">
+<path visibility="inherit" stroke="black" stroke-opacity="1" stroke-width="2" stroke-linecap="round" fill="none" d="M 282.2559517303235 236.2031030519372 A 33.941125496954285 33.941125496954285 1 0 0 293.9987005948434 225.83135937957718" id="shaft"></path><g>
+<path visibility="inherit" stroke-width="0" fill="black" d="M 294.5249759981063 231.35955552765512 L 288.18938364179274 226.88974215750778 L 296.2031030519372 222.25595173032346 L 294.5249759981063 231.35955552765512 " id="head"></path>
+</g>
+
+</g>
+<g transform="translate(0 0)">
+<path visibility="inherit" stroke="black" stroke-opacity="1" stroke-width="2" stroke-linecap="round" fill="none" d="M 296.2031030519372 197.74404826967654 A 33.941125496954285 33.941125496954285 1 0 0 285.83135937957724 186.00129940515666" id="shaft"></path><g>
+<path visibility="inherit" stroke-width="0" fill="black" d="M 291.3595555276552 185.4750240018937 L 286.88974215750784 191.81061635820726 L 282.2559517303235 183.7968969480628 L 291.3595555276552 185.4750240018937 " id="head"></path>
+</g>
+
+</g>
+
+</g>
+<g>
+
+</g>
+<g>
+
+</g>
+
+</g>
+<g>
+
+</g>
+
+</g>
+</svg>

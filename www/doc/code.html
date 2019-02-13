@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An Open Repository of Prototype Structures for the Visual Domain">
+<title>ProtoPedia</title>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<link rel="stylesheet" type="text/css"  href="spectrum.css"/>
+<link rel="icon" href="/images/favicon.ico?v18" />
+</head>
+<body style="background-color:white;font-size:14pt">
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:0px"><a href="/"><span style="position:relative;top:-10px" class="mainTitle">ProtoPedia </span></a>
+         <img style ="position:relative;border:none;top:0px;left:20px;" alt="images/logo_alt.html" src="/images/logo3.svg"  width="60" height="25"/>
+         <div id = "topbarInner" style="position:relative;float:right;top:0px">
+                     <a href="/draw.html?source=(sys)/forMainPage/spiralLogo6.item&intro=tutorial_index&fit=0.7" class="ubutton">Tutorial</a>
+ <a href="/draw.html" class="ubutton">Draw</a> 
+          <a href="/code.html" class="ubutton">Code Editor</a> 
+            <a href="/text.html" class="ubutton">Text Editor</a> 
+         <a href="/doc/code.html" class="ubutton">Coding Guide</a> 
+          <a href="/doc/about.html" class="ubutton">About</a>
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+         </div> 
+    </div>
+  </div>
+  <div id="innerContainer" style="margin-top:10px">
+   
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
+<script>
+var documentReady = 0;
+var initPage = function () {
+    $('#openTreeDetails').click(function () {
+        $('#treeDetails').show();
+    });
+     $('#closeTreeDetails').click(function () {
+        $('#treeDetails').hide();
+    });
+       $('#openInstantiateDetails').click(function () {
+        $('#instantiateDetails').show();
+    });
+    $('#closeInstantiateDetails').click(function () {
+        $('#instantiateDetails').hide();
+    });
+}
+
+
+$('document').ready(function () {
+  documentReady = 1;
+  initPage();
+});
+</script>
+
+
+
+
+<div class="pageTitle">Coding Guide</div>
+<p> ProtoPedia users can (1) build compound items such as diagrams with code, but can also (2) code their own visual elements and kits, and
+place them in their catalog directories where  they become available in ProtoPedia's UI, and can be shared with other users. In addition, the
+<a href="https://github.com/chrisGoad/prototypetrees">core technology</a> is openly available under the MIT Licence for use in any application (3). This document provides the information needed for all three
+activities.</p>
+
+<p>
+Sections 4 - 10 describe how to work with <a href="https://medium.com/dailyjs/prototype-trees-as-javascript-components-fad6c8fb4454">prototype trees</a>,
+the material from which all ProtoPedia elements (referred to as "items") are made. These are the sections that are relevant
+to use of this  core technology outside of the ProtoPedia context.   Also, the first three modules of the <a href="#API">API section</a> document core technology.<!--
+This is a general purpose
+JavaScript component technology hosted at protopedia.org. Deep prototypes are the material from which all ProtoPedia elements are made.-->
+</p>
+
+
+<div class="tableOfContents"> 
+    <div class="contentsLine"><a href="#sampleCode">1. Sample Code</a></div>
+  <div class="contentsLine"><a href="#codeWork">2. Working With Code</a></div>
+        <div style="padding-left:50px" class="contentsLine"><a href="#codeEditor">2.1 The Code Editor</a></div>
+        <!-- <div style="padding-left:50px" class="contentsLine"><a href="#ownServer">2.2 Using Your Own Server</a></div>-->
+        <div style="padding-left:50px" class="contentsLine"><a href="#debuggers">2.2 Debuggers</a></div>
+
+   <div class="contentsLine"><a href="#catalogs">3. Catalogs</a></div>
+     <div class="contentsLine"><a href="#require">4. Require</a></div>
+
+     <div class="contentsLine"><a href="#trees">5. Trees</a></div>
+      <div class="contentsLine"><a href="#instantiation">6. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">7. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">8. SVG</a></div>
+      <div class="contentsLine"><a href="#installPrototype">9. Installing Prototypes</a></div>
+           <div class="contentsLine"><a href="#update">10. The Update Method</a></div>
+
+     <div class="contentsLine"><a href="#visualElement">11. Defining a Visual Element</a></div>
+     <div class="contentsLine"><a href="#buildFromData">12. Building an Item from Data</a></div>
+
+         <div class="contentsLine"><a href="#graph">13. The Graph</a></div>
+     <div class="contentsLine"><a href="#kits">14. Kits</a></div>
+           <div class="contentsLine"><a href="#controllers">15. Custom Controls</a></div>
+
+       <div class="contentsLine"><a href="#roles">16. Roles, Replacement, and Transferred Properties</a></div>
+       
+       <div class="contentsLine"><a href="#visibility">17. Controlling Display of Properties</a></div>
+                <div class="contentsLine"><a href="#access">18. Access to Content</a></div>
+
+        <!--<div class="contentsLine"><a href="#spreads">14. Spreads</a></div>-->
+       <div class="contentsLine"><a href="#API">19. API</a></div>
+
+
+
+</div>
+
+<!--
+<p>
+
+Items can also be displayed outside of the editor, as illustrated in the file
+<a href="https://protopedia.org/repo1/example/standalone.html">https://protopedia.org/repo1/example/standalone.html</a>.
+Use your browser's <i>view source</i>  to see how this works.
+<a href="https://protopedia.org/repo1/example/standalone2.html">https://protopedia.org/repo1/example/standalone2.html</a>, is similar
+but builds the item inline rather than requiring it from simple_diagram.js.
+The second variant is available at
+<a href = "https://jsfiddle.net/tasp1umh/">jsfiddle</a></p>
+<p>
+ProtoPedia also has a viewer:<br/> <a href="https://protopedia.org/view.html?source=https://protopedia.org/repo1/example/simple_diagram.js">
+https://protopedia.org/draw.html?source=https://protopedia.org/repo1/example/simple_diagram.js</a>
+</p>
+-->
+
+
+
+<div class="section" id="sampleCode">1. Sample code</div>
+<p> Before wading into the details, you might like to look at some code. Samples 2,3,4 illustrate how new visual elements 
+are built. </p>
+<ol>
+  
+  
+<li style="padding:10px"><a href="/code.html?source=/example/simpleDiagramAsGraph.js">A simple diagram.</a></li>
+
+<li style="padding:10px"><a href="/code.html?source=/shape/rectangle.js">An element: rectangle</a></li>
+
+<li style="padding:10px"><a href="/code.html?source=/example/fromData.js">Building an item from data</a></li>
+
+<li style="padding:10px"><a href="/code.html?source=/kit/ring.js">A kit: ring</a></li>
+
+<!--
+<li style="padding:10px"><a href="/code.html?source=/text/rectangleWithTextSample.js">Rectangle with text</a></li>
+
+<li style="padding:10px"><a href="/code.html?source=/line/line.js">Line</a></li>
+-->
+</ol>
+
+<p>The following link provides access to the code which implements  ProtoPedia's visual elements:</p>
+
+<p><a href="/catalog.html">https://protopedia.org/catalog.html</a></p>
+
+<p> Select the item of interest in the catalog, and then click the "Open Code" button.</p>
+<div class="section" id="codeWork">2. Working with code</div>
+<!--
+<p>There are two approaches. You can either use ProtoPedia's code editor, or serve code  from your own server and use whatever tools you prefer
+for code editing and management. The former method allows you to get started immediately, and like
+<a href = "https://jsfiddle.net">JsFiddle</a>, supports very quick looks at the effects of
+code changes. For extensive projects, the latter method is preferable - for one thing, integration with source control is not supported by the code editor.
+</p>
+-->
+
+
+<p id="codeEditor"><b>2.1 The Code Editor</b><p>
+
+<p>
+
+<p>The editor enables you to edit <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code</a> in one window,
+re-run  it at will, and see the results in the graphics panel immediately.
+If you click on the name of the source file, or on one of the dependencies, an ordinary text editor is popped on the file in question.</p>
+
+<p>If you have signed in, the <span class="codeWord">save as</span> button will be active. 
+Each signed in user is allocated a file system, where files are named according to the scheme</p>
+<p style="padding:5px"></p>
+<p style="padding:5px"></p><pre class="code">
+(username)/whatever.js
+</pre>
+
+<p>This is where the code editor saves files.  You can open the main drawing program (also called the "structure editor") on <span class="codeWord">whatever</span>  via :</p>
+
+<p style="padding:5px"></p><pre class="code">
+https://protopedia.org/draw.html?source=(username)/whatever.js
+
+</pre>
+<!--
+<p id="ownServer"><b>2.2 Using Your Own Server:</b><p>
+
+<p>If you don't already have a server environment, there are many free ones to choose from. You might consider <a href="https:firebase.google.com">Firebase</a>, which is
+the infrastructure that ProtoPedia employs.   Then,</p>
+
+<p style="padding:5px"></p><pre class="code">
+https://protopedia.org/draw.html?source=https://your_server/your_file.js
+</pre>
+
+<p>will launch protopedia on your content. (If you use Firebalse, then <span class="codeWord">your_server</span> can be the local variant:
+<span class="codeWord">http://127.0.0.1:3000</span>,
+allowing immediate feedback for code changes). <span class="codeWord">your_file.js</span> might look something like</p>
+
+<p style="padding:5px"></p><pre class="code">
+core.require('/your_other_file.js',function (item) {
+....
+});
+</pre>
+
+
+<p>As usual, the filenames for <a href = "#require">core.require</a> will be interpreted relative to the containing file, so that the above is equivalent to</p>
+
+<p style="padding:5px"></p><pre class="code">
+core.require('https://your_server/your_other_file.js',function (item) {
+....
+});
+</pre>
+-->
+
+<div class="section" id="debuggers">2.2 Debuggers</div>
+
+ <p>Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with ProtoPedia.
+ However, the usual variants at <span class="codeWord">https://protopedia.org/code.html</span> and <span class="codeWord">https://protopedia.org/draw.html</span> catch errors, which is not what is
+ wanted in the context of debugging. The variants <span class="codeWord">https://protopedia.org/coded.html</span> and <span class="codeWord">https://protopedia.org/drawd.html</span> (accepting exactly the
+ same GET arguments) are provided in which errors are not caught.
+ </p>
+ 
+
+<div class="section" id="catalogs">3. Catalogs</div>
+<p>Catalogs are the visual lists of items from which elements are dragged in the structure editor during the
+insert and swap operations.  
+They are  the principal means by which visual elements implemented in code are made available in the structure editor,
+and shared among the users of ProtoPedia.
+</p>
+
+<p> You can create your own catalog by saving visual elements at  locations of the form of the form <i>/catalog/&lt;whatever&gt;</i>.
+Then, after such a save, the next time you start up the structure editor, you will see your new element under the tab <i>&lt;whatever&gt;</i>,
+where it can be used in insertions and swaps.</p>
+
+<div class="section" id="require">4. Require</div>
+
+<p>Components are accessed and defined via <span class="codeWord">core.require</span>. Here is an example:</p>
+
+<p style="padding:5px"></p><pre class="code">
+ core.require('/shape/circle.js','/arrow/arcArrow.js',
+  function (circlePP,arrowPP) {
+    let item = svg.Element.mk('&lt;g/&gt;');
+    ...
+    return item;
+  }
+)
+</pre>
+<p>
+This binds the variables  <span class="codeWord">circlePP</span> and  <span class="codeWord">arrowPP</span> to the components defined in
+ '/shape/circle.js', and '/shape/arcArrow.js', respectively, and then calls the
+function (ie the last argument to <span class="codeWord">core.require</span>). The value returned by the function is the newly built component.
+
+</p>
+
+
+<div class="section" id="trees">5. Trees</div>
+
+<p>Now to the nitty-gritty: the structure of ProtoPedia's data, and the operations which provide access to it.</p>
+<p> All prototype trees (aka "items") are trees: each non-atomic child 
+has a unique parent. (Formally, if <span class="codeWord">parent.prop === child</span>, and <span class="codeWord">prop</span> is an own property of <span class="codeWord">parent</span>,
+there is no <span class="codeWord">parent2</span> with <span class="codeWord">parent2 !== parent</span>, and
+with <span class="codeWord">parent2.prop2 === child</span> for own property <span class="codeWord">prop2</span> of <span class="codeWord">parent2</span>). 
+ The internal nodes in items  inherit from prototypes <span class="codeWord">core.ArrayNode</span>
+for sequential, zero-based arrays, and <span class="codeWord">core.ObjectNode</span>  for objects which are not arrays.  
+
+</p>
+
+<p style="padding:5px"></p><pre class="code">  
+core.ObjectNode.mk();
+</pre>
+
+<p> creates a  new <span class="codeWord">Object</span>, and</p> 
+<p style="padding:5px"></p><pre class="code">
+core.ArrayNode.mk();
+</pre>
+<p> a new <span class="codeWord">Array</span>.</p>
+<p> 
+<p style="padding:5px"></p><pre class="code">
+object.set('name',child);
+</pre>
+
+<p>assigns <span class="codeWord">child</span> as a child of 
+<span class="codeWord">object</span> with name <span class="codeWord">name</span>.
+If <span class="codeWord">child</span> is an Object or Array, this results in setting special properties:
+<span class="codeWord">child.__parent === object</span>, and <span class="codeWord">child.__name === 'name'</span>.</p>
+
+<p>
+ <p style="padding:5px"></p><pre class="code">
+object.add(child);
+ </pre>
+</p>
+<p>also assigns <span class="codeWord">child</span> as a child of <span class="codeWord">object</span>, but automatically assigns its name.</p>
+
+<p> For an Array,</p>
+<p style="padding:5px"></p><pre class="code">
+array.push(child);
+</pre>
+
+<p>pushes <span class="codeWord">child</span> onto the end of  <span class="codeWord">array</span>,
+and assigns <span class="codeWord">array</span> as the parent of <span class="codeWord">child</span>. That is,
+<span class="code">array[array.length-1] === child</span>, and if <span class="codeWord">child</span> is an Object or Array,
+and <span class="code">child.__parent === array</span>. Also, <span class="code">child.__name === array.length-1</span>.
+Arrays are always sequential and zero-based.
+</p>
+
+
+
+<pre id="lift"><code>
+core.lift(obj);
+</code></pre>
+
+
+<p>takes an "ordinary" JavaScript tree such as one expressable in JSON,
+and turns it into the ProtoPedia kind of tree. 
+For example: </p>
+<p style="padding:5px"></p><pre class="code">
+core.lift({a:2,b:["a",4]});
+</pre>
+
+<p> will produce a Object/Array tree with matching structure.  </p>
+
+
+<p>Click <span class="clickable" id="openTreeDetails">here</span> for an example of tree construction and manipulation.</p>
+<div id="treeDetails" class="techDetails">
+<div class="close" id="closeTreeDetails">X</div>
+
+
+
+<p style="padding:5px"></p><pre class="code">
+var root = core.ObjectNode.mk();
+var aa = core.ObjectNode.mk();
+var bb = core.ObjectNode.mk();
+
+root.set("a",aa); // adds aa as a child named "a" of root
+root.set("b",bb);
+
+// __name and __parent "glue the tree together".
+bb.__name;
+==>b
+bb.__parent === root;
+==>true
+
+// let's add some atomic data 
+aa.x = 5;  // set is not needed for atomic data or functions
+aa.f = function (x) {return x*x;}
+
+// now for an Array
+var cc = core.ArrayNode.mk();
+bb.set("c",cc);
+
+cc.push(core.ObjectNode.mk().set("z",45));
+cc.push(5);
+
+</code>
+</pre>
+<p>this yields:</p>
+<p style="padding:5px"></p><pre class="code">
+          --root--
+        /          \
+       a            b
+      / \            \
+     x   f            c
+    /     \            \
+   5    function      [ *, 5]
+                       /
+                      z
+                     /
+                    45
+   
+
+</code>
+</pre>
+<p> where * is an Object</p>
+
+<p>
+This could also be built with
+</p>
+
+<p style="padding:5px"></p><pre class="code"> 
+var root = core.lift({a:{x:5},b:{c:[{z:45},5]}})
+root.a.f = function (x) {return x*x};
+</pre>
+
+
+<p>There is nothing wrong with having properties of Objects that reference
+nodes in the tree  other than children,  as in </p> 
+
+<p style="padding:5px"></p><pre class="code">
+a.xx = b; 
+</pre>
+ 
+<p>in the above example.Then xx is a cross-tree reference.</p>
+<p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
+</div>
+
+<div class="section" id="instantiation">6. Instantiation and Serialization</div>
+<p style="padding:5px"></p><pre class="code"> 
+inode = node.instantiate();
+</pre>
+
+<p> builds an instantiation of <span class="codeWord">node</span>; a tree which has the same structure as <span class="codeWord">node</span>, but inherits primitive
+data and functions from <span class="codeWord">node</span> via prototypical inheritance. (Details
+<a href="/doc/tech.html#instantiate">here</a>)</p>
+<p id="serialization">Serialization is performed by: 
+<p style="padding:5px"></p><pre class="code"> 
+s = core.stringify(node);
+</pre>
+
+<p> as described <a href="/doc/tech.html#serialization">here</a>.</p>
+
+
+<div class="section" id="nonews">7. No news</div>
+<p> Nodes are constructed with <span class="codeWord">core.ObjectNode.mk()</span> and <span class="codeWord">core.ArrayNode.mk()</span>, rather than via the use of a "new".
+The definition of the <span class="codeWord">mk</span> method for <span class="codeWord">Object</span> is:
+
+<p style="padding:5px"></p><pre class="code">
+core.ObjectNode.mk = function () {
+  return Object.create(core.ObjectNode);
+}
+</pre>
+
+
+<p>Recall that <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>(X) creates a new object with X as prototype.
+</p>
+
+
+<p><span class="codeWord">Object</span> is introduced simply with:</p>
+
+<p style="padding:5px"></p><pre class="code">
+core.ObjectNode = {};
+</pre>
+
+<p>and <span class="codeWord">Array</span>  with:</p>
+
+
+<p style="padding:5px"></p><pre class="code">
+core.ArrayNode = [];
+</pre>
+
+<p>
+<span class="codeWord">core.ObjectNode</span> itself serves as the prototype for instances.  In the more conventional pattern, <span class="codeWord">core.ObjectNode</span> would be a function, and
+the prototype property of that function, not <span class="codeWord">Object</span> itself, would be the  prototype for the instances generated via the new operator
+(note that if <span class="codeWord">F = function (){}, new F()</span> is equivalent
+to <span class="codeWord">Object.create(F.prototype)</span>)
+</p>
+<p>
+The <span class="codeWord"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">
+function, function.prototype, new</a></span> &nbsp; pattern has been available in JavaScript all along,
+whereas the  more direct <span class="codeWord">Object.create</span> was introduced more recent years (in version 1.8.5 to be exact). ProtoPedia
+employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
+simplifying effect on the entire ProtoPedia code base. </p>
+
+<p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
+
+<div class="section" id="svg">8.  SVG  </div>
+
+<p style="padding:5px"></p><pre class="code">
+  svg.Element.mk(&lt;markup&gt;);
+</pre>
+<p>creates an object that inherits from the prototype <span class="codeWord">svg.Element</span>, which in turn
+inherits from <span class="codeWord">core.ObjectNode</span>. Its  content
+as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
+<span class="codeWord">clipPath, circle,  g, line, linearGradient, path, polygon, polyline,  rect, radialGradient,  stop,  text, </span> and <span class="codeWord">tspan</span>.
+</p>
+<p> Here is an example: </p>
+
+<pre style="font-size:11pt">
+var circle = svg.Element.mk(<br/>'&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;'<br/>);
+</pre>
+
+<p>Each <span class="codeWord">svg.Element</span> may have an associated coordinate system/transform. The methods <span class="codeWord">getTransform</span>, and <span class="codeWord">setTransform</span> access this,
+and operations such as <span class="codeWord">moveto</span>
+affect it.  See the <a href="#API">API section</a> for details. As in SVG, the transforms represent coordinate systems relative to parents. </p>
+<p>At any given time, the  root of the tree being displayed by ProtoPedia
+is held in  <span style="color:red">core.root</span>.</p>
+
+<p id="setDomAttribute">An <span class="codeWord">svg.Element</span>   is displayed by construction of an associated element in the SVG DOM.
+The method <span class="codeWord">Element.setDomAttribute(attr,vl)</span> sets the given attribute of the DOM element asscociated with <span class="codeWord">this</span> to the given
+value. See the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute">SVG documentation</a> for the available attributes.
+Use of the <span class="codeWord">setDomAttribute</span> method is only occasionally necessary, because
+each <span class="codeWord">svg.Element</span> has
+a standard list  of properties (eg <span class="codeWord">stroke</span> and <span class="codeWord">fill</span>) that are automatically transferred from the item to the DOM, by setting attributes in the DOM from the values of the item's properties 
+of the same name.</p>
+
+<p>
+<!--
+<div class="section" id="conventions">7.  Naming Conventions</div>
+<p>Developers  perform their work by defining new properties and methods for <span class="codeWord">core.ObjectNode, core.ArrayNode,</span> and
+<span class="codeWord">core.svg.Element</span>.
+Thus, the issue arises of avoiding name collisions with methods on these types that ProtoPedia
+itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
+ProtoPedia uses names that start with a double underbar (__). So, name collisions
+can be avoided if developers never use double-underbar prefixes for the  properties and methods that they
+introduce for their own purposes.
+Of course, the
+few basic methods should not be trampled on either, but it is a very short list, namely:
+<span class="codeWord">instantiate, mk, name, parent, remove,</span> and <span class="codeWord">set</span>. <a href="#update"> <span class="codeWord">update</span></a> is also reserved for a  special purpose (see the next section).
+Finally, when an item is created via <span class="codeWord">svg.Element.mk(&lt;markup&gt;)</span>,
+the SVG attributes from the markup are imported as properties of the item without changing names (that is, no underbars are introduced).</p>
+
+<p>It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
+several of them
+(eg <span class="codeWord">__setExtent</span> to take a random example) have designated public purposes. </p>
+-->
+
+<div class="section" id="installPrototype">9. Installing Prototypes</div>
+
+<p>Consider this snippet of code, which can be found at <a href="/code.html?source=/example/two_circles.js">/example/two_circles.js</a></p>
+
+<p style="padding:5px"></p><pre class="code">  
+core.require('/shape/circle.js',
+function (circlePP) {
+  let item = svg.Element.mk('&lt;g/&gt;');
+  let circleP = core.installPrototype(circlePP); 
+  // set the parameters of the circle prototype
+  circleP.r = 12;
+  circleP.fill = 'blue';
+  let circle1 = item.add(circleP.instantiate()).show();
+  let circle2 = item.add(circleP.instantiate()).show();
+  circle1.moveto(Point.mk(-50,0));
+  circle2.moveto(Point.mk(50,0));
+  return item;
+  });
+</pre>
+
+<p>Consider the state of ProtoPedia (that is, of core.root) invoked as follows</p>
+<p><a href="/draw.html?source=/example/two_circles.js">/draw.html?source=/example/two_circles.js</a></p>
+
+
+<p></p>Here is what  it looks like:</p>
+  <img width="500" style="padding-left:-20px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/JHtAs2VsGjYCqJmOo39SexGq2Fx1%2FforMainPage%2FinstalledPrototypes3.svg?alt=media"/>
+
+<p>circlePP is an external component. core.installPrototype instantiates that external component, and adds its
+instantiation in a standard place   thereby giving us an internal version circleP of
+the external component circlePP. That "standard place" is core.root.prototypes. installPrototype(circlePP) is nearly equivalent to</p>
+<p style="padding:5px"></p><pre class="code">
+  let circleP = core.root.prototypes.add(circlePP.instantiate().hide());
+</pre>
+<p> but leaves out the step of automatically adding the object core.root.prototypes if it is missing.</p>
+The useful consequence is that any edits to the properties of
+circleP, being internal to the state, will be retained when the item is saved.
+</p>
+
+<div class="section" id="update">10.  The Update Method</div>
+
+<p> In  the <a href="/code.html?source=/example/simpleDiagramAsGraph.js">introductory example</a>, interactivity is implemented "under the hood"  via 
+the ProtoPedia's <a href="#graph">graph</a> machinery. <a href="/code.html?source=/example/simpleDiagram.js">Here is a variant</a> which has the same behavior, 
+ut it is implemented more directly with no dependencies on graph connections.
+</p>
+
+<p style="padding:5px"></p><pre class="code">
+ 
+  
+  item.update = function () {
+    let p1=this.p1,p2 = this.p2;
+    this.circle1.moveto(p1);
+    this.circle2.moveto(p2);
+    this.arrow1.setEnds(p1,p2);
+    this.arrow2.setEnds(p2,p1);
+    this.arrow1.update();
+    this.arrow2.update();
+  }
+</pre>
+
+<p>
+This method moves <span class="codeWord">circle1</span> and <span class="codeWord">circle2</span> to <span class="codeWord">this.p1</span> and <span class="codeWord">this.p2</span>, respectively, and then causes the arrows to point at the circles.
+Updates are triggered automatically at load time, and in any circumstance of change.
+By "a circumstance of change" is meant one in which the implementation detects a potentially relevant event
+(eg editing properties in the right panel).
+Update methods, can, of course, be invoked explicitly.  Each update method is responsible for triggering updates of its descendants
+(the automatic updater traverses the tree looking for update methods, but when such a method is found, it does not descend the tree further).
+</p>
+<p>The code for the variant includes support for dragging in the method <span class="codeWord">dragStep</span>, which will be expla.ined in a
+<a href="#kits">moment</a>. </p>
+
+<p id="initialize">The method </p>
+<p style="padding:5px"></p><pre class="code">
+ item.initialize = function () {
+   ...
+ }
+</pre>
+<p>may be defined as well. If defined, this method is called once when the item in question is added, whether via code (core.requires), or the user interface.</p>
+
+<div class="section" id="visualElement">11.  Defining a Visual Element</div>
+
+<p>In order to support resizing,  an item that is intended to play the role of a visual element appearing in a catalog should follow this rule: It should define
+the parameters <span class="codeWord">width</span> and <span class="codeWord">height</span>, and  its <span class="codeWord">update</span> method should adjust
+the item's SVG content  to reflect these dimensions. The figure should be
+centered on the local origin.  Examples are</p>
+
+<p style="padding:5px"></p><pre class="code">
+<a href="/code.html?source=/shape/rectangle.js">/shape/rectangle.js</a>
+</pre>
+
+<p>and</p>
+
+<p style="padding:5px"></p><pre class="code">
+<a href="/code.html?source=/shape/lozenge.js">/shape/lozenge.js</a>
+</pre>
+</span>
+<p>
+In cases where the
+<span class="codeWord">width</span> and <span class="codeWord">height</span> are always identical,
+the parameter  <span class="codeWord">dimension</span> should be used instead of  <span class="codeWord">width</span> and  <span class="codeWord">height</span>, as in</p>
+
+<p style="padding:5px"></p><pre class="code">
+<a href="/code.html?source=/shape/circle.js">/shape/circle.js</a>
+</pre>
+
+
+<p>The following lines should be included if the item you are defining is to be draggable and resizable:</p>
+<p style="padding:5px"></p><pre class="code">
+ item.resizable = true;
+ item.draggable = true;
+</pre>
+<p>To make use of a new visual element, its implementation should be stored in your catalog directory. How this is done is explained in an earlier section.</p>
+ </p>
+<div class="section" id="buildFromData">12.  Building an Item from Data</div>
+
+In the standard catalog, there are several items that are defined from data, such as graphs, trees, and rings. Any user can edit or re-source the data,
+and  rebuild the item to reflect the edit. Working with data
+is explained in the <a href="/draw.html?source=(sys)/intro/graph.item&fit=0.8&intro=data">tutorial</a>.
+ </p>
+
+<p>You can define your own items built from data. How this is done is illustrated by </p>
+
+<p style="padding:5px"></p><pre class="code">
+ <a href="/code.html?source=/example/fromData.js">/code.html?source=/example/fromData.js</a>
+</pre>
+<p>Here is an extract of the code:</p>
+<p style="padding:5px"></p><pre class="code">
+core.require('/container/circle.js',function (circlePP) {
+
+let item = svg.Element.mk('<g/>');
+let dataString = '["a","b","c"]';
+item.separation = 50;
+
+item.buildFromData = function (data) {
+  ... some code  ...
+}
+
+item.initialize = function () {
+  this.circleP = core.installPrototype(circlePP);
+  let data = item.initializeData(dataString);
+  this.buildFromData(data);
+}
+
+return item;
+});
+</pre>
+
+<p>An item becomes  buildable from data whenever you define a method on it called "buildFromData". In this simple example, the data is an array of strings,
+and buildFromData constructs one circle for each
+string in the array,  and labels the circle with that string. Please have a look at the full code.</p>
+
+<p>Data-built items must also supply initial data, given as a JSON string. The method initializeData (predefined) installs that initial data.</p>
+
+<p> Just as with visual elements, data-built items should be stored in your /catalog directory. That's it! </p>
+<div class="section" id="graph">13.  The Graph</div>
+
+<p> "Graph"  here is meant in its <a href="https://en.wikipedia.org/wiki/Graph_theory">mathematical sense</a>: a set of vertices with edges connecting them, the
+<a href="/code.html?source=/diagram/cayleyD3.js">Cayley D3 graph</a>, for example.  Any of the elementary items under the "shapes" tab of the standard catalog can serve
+as vertices. The "connectors" tab contains various kinds of edges.  </p>
+<p>ProtoPedia supplies
+  operations for manipulating the graph structure that pertains to the vertex and edge items. The last lines of the
+<a href="/code.html?source=/example/simpleDiagramAsGraph.js">introductory code sample</a>
+illustrate one of those operations. The full list can be found in the <a href="#graphApi">graph</a> section of the API. </p>
+     
+    <p>The implementation of each kind of edge must  store its ends in  properties named <span class="codeWord">end0</span>, and <span class="codeWord">end1</span></p>
+
+   <p> At the end of the definition of a visual element, this incantation  should appear:</p>
+ 
+<p style="padding:5px"></p><pre class="code">    
+  graph.installEdgeOps(item);
+</pre> 
+
+  <!-- <p>See <a href="/code.html?source=/connector/line.js">https://protopedia.org/code.html?source=/shape/line.js</a> for a  definition
+   of a line as a fully functioning edge: it supports controllers for dragging the ends of the line around, and also supports establishing and
+   maintaining connections to vertices.</p>-->
+    
+<p> Just as a visual element requires some special treatment to function as an edge, the same is true if it is to function as a vertex, though in
+many cases, only a single line of additional code is required. This is the case for rectangles. The line which allows a rectangle to function as
+a vertex is:</p>
+
+<p style="padding:5px"></p><pre class="code">
+graph.installRectanglePeripheryOps(item);
+</pre>
+
+<p>Here is the <a href="/code.html?source=/shape/rectangle.js">implementation</a> of the rectangle element. The periphery operations in question are methods that allow computation of where a ray to the
+center of the element will intersect its periphery.  The  other available primitives of this kind are:
+
+
+<p style="padding:5px"></p><pre class="code">
+graph.installCirclePeripheryOps(item);
+</pre>
+
+<p> and </p>
+
+
+<p style="padding:5px"></p><pre class="code">
+graph.installLozengePeripheryOps(item);
+</pre>
+
+<p> Here is the underlying  <a href="https://github.com/chrisGoad/protopedia/blob/master/js/graph/periphery_ops.js">code</a> at GitHub.
+</p>
+<div class="section" id="kits">14.  Kits</div>
+<p>
+  A kit is an item which incorporates specialized methods for 1) dragging and  2) deletion.
+  A kit may also implement 
+  3) menu buttons for manipulating the kit. Consider the <a href="/draw.html?source=(sys)/intro/tree3.item&fit=0.8&intro=kit">tree kit</a>, for example. It defines specialized dragging
+  (where subtrees travel with their roots), deletion (in which subtrees are deleted along with their roots), and several menu buttons including
+  adding a node as child or sibling, and repositioning a subtree).</p>
+
+<p>1) Dragging.
+</p>
+
+<p> The relevant code for trees is :</p>
+<p style="padding:5px"></p><pre class="code">
+kit.isKit = true;
+
+kit.dragStep = function (vertex,pos) {
+ let localPos = this.vertices.toLocalCoords(pos,true);
+ vertex.moveto(localPos);
+ /* move all the descendants of vertex to the relative
+    positions they had prior to the move of vertex
+ */
+ this.positionvertices(vertex);
+ graph.graphUpdate();
+}
+
+kit.dragStart = function () {
+  this.computeRelativePositions();
+}
+
+
+
+</pre>
+<p>This code appears in <a href="/kit/arrowTree.js">/kit/arrowTree.js</a></p>
+<p>In the construction of a tree from data (buildFromData) we have the line:</p>
+
+<p style="padding:5px"></p><pre class="code">
+  vertexP.draggableInKit = true;
+</pre>
+<p> vertexP is the prototype for nodes in the tree.</p>
+<p> Whenever a node  defined as draggableInKit is dragged, the dragStep method of the diagram is invoked for each increment of dragging
+the node. Since the prototype vertexP of the vertices is defined as draggable, this property is inherited
+by the instances. If present, the dragStart method is called with the initial position at the start of the drag. </p>
+
+
+
+
+<p>
+2) Deletion. <span class="codeWord">kit.__delete(x)</span> works in a similar fashion to allow deletion to be handled in a special way suitable to the kit.
+If the <span class="codeWord">__delete</span> method is defined for the kit,
+then when any item <span class="codeWord">x</span> within the kit is deleted, this method is called with <span class="codeWord">x</span> as argument. In the tree case,
+the subtree depending from <span class="codeWord">x</span> is deleted (as you will see from the code).
+</p>
+<p>
+3) Menu buttons. The additional menu buttons for the left panel are defined as follows for the tree:
+</p>
+<p style="padding:5px"></p><pre class="code">
+  
+kit.actions = function (node) {
+  let rs = [];
+  if (!node) return;
+  if (node.role === 'vertex') {
+     rs.push({title:'Select Whole Tree',action:'selectTree'},
+               {title:'Add Child',action:'addChild'});
+    if (node.parentVertex) {
+      rs.push({title:'Add Sibling',action:'addSibling'});
+    }
+    rs.push({title:'Reposition Subtree',action:'reposition'});
+  }
+  if (node === this) {
+    rs.push({title:'Reposition Tree',action:'repositionTree'});
+  }
+  return rs;
+}
+
+
+</pre>
+<p>
+As you can see, <span class="codeWord">actions</span> returns a list of objects each with title and method name. When an item in the kit
+is selected, titles appear in the left panel. Each associated method name should be defined as indicated by the
+example:
+</p>
+
+<p style="padding:5px"></p><pre class="code">
+ 
+kit.addChild = function (vertex) {
+  this.addDescendant(vertex,0);
+  vertex.__select('svg');
+}
+</pre>
+
+
+
+
+<div class="section" id="controllers">15.  Custom Controls </div>
+<p>Notice that when you select <a href="/draw.html?source=(sys)/example/arrow.item&fit=0.3">an arrow</a>, little yellow boxes appear
+by which you can drag its head and tail around, and resize the head. These little yellow boxes are called "custom controls"</p>
+
+ 
+<p>To define a custom control, the two methods needed are <span class="codeWord">controlPoints()</span>, and <span class="codeWord">updateControlPoint(index,pos)</span>.
+The <span class="codeWord">controlPoints</span> method should return a <span class="codeWord">core.ArrayNode</span> of <span class="codeWord">geom.Point</span> (s). When the item is selected, yellow handles will appear
+at the  positions returned by <span class="codeWord">controlPoints</span> (the points should be given relative to the item's own origin). Then, when the handles are dragged,
+ <span class="codeWord">updateControlPoint(index,pos)</span> is called at each moment of dragging, with index set to the index
+of the point which generated the handle being dragged, and <span class="codeWord">pos</span>  to its new position. It is the responsibility of
+<span class="codeWord">updateControlPoint</span> to update and redisplay the item as appropriate given the new  handle position.
+The <a href="/code.html?source=/shape/roundedRectangle.js">rounded rectangle</a>
+provides an example  - click on the yellow square to adjust the rounding
+</p>
+<p>If all three methods are defined and <span class="codeWord">adjustable</span> is set, as is the case for the rounded rectangle, the item will be
+displayed with both a resize box, and the custom handles.
+</p>
+
+
+<div class="section" id="roles">16.  Roles, Replacement, and the  Transfer State Method</div>
+
+<p>In many items, the visible elements play varying roles. For example in graphs and trees,
+some shapes
+play the role of nodes/vertices, and some of edges. A role is assigned  in code via:</p>
+
+<p style="padding:5px"></p><pre class="code">
+item.role = &lt;roleName&gt;
+</pre>
+
+<p>When replacing an element in a diagram via "swap" or "swap prototype" in the top bar,  only shapes whose role matches the role
+of the replaced element are presented as possibilities (via a highlight of the candidate shape as
+the mouse rolls over it).   </p>
+<p id="transferState">For any item dest, the method <span class="codeWord">dest.transferState(src, own)</span>, if present, transfers state from 
+ the replaced shape (src) to its replacement (dest). The own argument indicates whether only own properties should be transfered, or
+ whether the operation should be applied to the relevant inherited properties as well.
+ 
+ A common defintion of transferred state for basic shapes such as circles and rectangles is:
+ 
+ <pre style="font-size:11pt"> 
+
+//own = consider only the own properties of src
+item.transferState = function (src,own) { 
+  core.setProperties(this,src,ui.stdTransferredProperties,own);
+}
+ </pre>
+ 
+ ui.stdProperties is defined in the ui module as :
+ <pre style="font-size:11pt">
+ const stdTransferredProperties = ['stroke','stroke-width','fill','unselectable',
+   'adjustable','draggable','draggableInKit','role','text','includeEndControls'];
+ </pre>
+ 
+ 
+<p> A kit might define <span class="codeWord">kit.transferElementState(dest,src,own)</span>.  When a shape S is replaced by R within a kit,
+this kit.transferElementState(R,S,own) is called as well as R.transferState(S,own).
+As an example, transferElementState transfers  information about the descendant relation in the case of tree kits.
+The own flag is set or not according to whether a prototype,
+or an instance is being swapped.</p>
+
+<div class="section" id="visibility">17. Controlling Display of Properties</div>
+
+<p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel.
+If a property name begins with a double underbar (eg "__name"), it is not shown, and you can use this convention to hide
+properties from the user's view. But you can also employ <span class="codeWord">ui.hide</span> as exemplified by
+the following line from the implementation
+of the
+<a href="/draw.html?source=/shape/arrow.js">arrow</a> </p>
+
+<pre style="font-size:11pt">
+ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
+</pre>
+
+<p>The subsequent line:</p>
+
+<p style="padding:5px"></p><pre class="code" id="setFieldType">
+item.setFieldType('solidHead','boolean');
+</pre>
+<p>
+causes the <span class="codeWord">solidHead</span> property to be displayed with a true/false selection box.
+Similarly, in the  implementation of the <a href="/code.html?source=/shape/shadedCircle.js">shadedCircle</a> , the line</p>
+
+<p style="padding:5px"></p><pre class="code" id="setFieldType">
+item.setFieldType('outerFill','svg.Rgb');
+</pre>
+<p>
+causes the <span class="codeWord">outerFill</span> property to be displayed with the <a href="https://bgrins.github.io/spectrum/">Spectrum color picker</a>. By default,this chooser is deployed for
+all fields named <span class="codeWord">fill</span> or <span class="codeWord">stroke</span>.</p>
+
+<p>By default, the values of properties are editable in the property panel. But with</p>
+
+
+<p style="padding:5px"></p><pre class="code" id="uifreeze">
+ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup>]);
+</pre>
+
+<p> the given properties are presented in non-editable form.</p>
+
+
+<!--
+<div class="section" id="spreads">14. Spreads</div>
+
+<p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data,  with
+one item per datum. Such items are conventionally called "marks" in infographic applications. An example is the
+<a href="/draw.html?source=/forCatalog/graph.js">graph diagram</a>, in which
+the incoming data consists of vertices and edges. Circles are generated for the former, and arrows for the latter. Spreads are not a core
+feature of ProtoPedia  but rather a coding assist for certain kinds of applications.</p>
+
+<p>
+A spread is constructed with:</p>
+<p style="padding:5px"></p><pre class="code">
+core.Spread.mk(prototype);
+</pre>
+<p>
+The data associated
+with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
+datum. Then a user-supplied method, <span class="codeWord">bind</span> adjusts each instantiation as appropriate for its datum.
+  (That is, each spread has its own method for binding, but the update method is common to all).
+In a graph diagram, the vertices and edges are represented as spreads.
+The data  for the vertices
+is a sequence of labeled positions, and the data for the edges is a sequence of to-from designations. See this
+<a href="/repo1/data/sampleGraph.js">sample data file</a> - a require of the above mentioned
+<a href="/draw.html?source=/forCatalog/graph.js">diagram</a>.</p>
+
+<p> Here is the relevant code  in <a href="/repo1/diagram/graph.js">graph.js</a> for the spread of vertices:</p>
+
+<p style="padding:5px"></p><pre class="code">
+  
+item.set('vertices',core.Spread.mk(item.circleP));
+  
+item.vertices.bind = function () {
+  var data = this.__data;
+  var n = data.length;
+  for (var i=0;i&lt;n;i++) {
+    var circle =  this.selectMark(i);
+    circle.vertexId = data[i].id;
+    circle.update();
+    circle.__moveto(geom.toPoint(data[i].position));
+  }
+}
+ 
+</pre>
+
+<p>The update method for spreads assumes that its data (a <span class="codeWord">core.ArrayNode</span>) has been placed in its <span class="codeWord">__data</span> field.  Note that bind utilizes the
+spread method <span class="codeWord">selectMark(n)</span> to select the nth  instantiation of the spread's prototype.</p>
+-->
+<div class="section" id="access">18. Access to Content</div>
+
+<p> 
+The content that you create on ProtoPedia is public in the partial sense that anyone who knows the URL of the content has read access to it.
+This allows you to share content  with others by giving them URLs. There is no directory service which would allow discovery by other means.
+However you should not regard the content as private, either, since guesses (possibly mechanized) are always possible.
+ProtoPedia content is somewhat like the content in public repositories on <a href="https://github.com">GitHub</a>, but without any directory service. As at GitHub, you are encouraged to
+express your desires about sharing your content via a <b>license.txt</b> file at top level.
+
+</p>
+<p>
+Private content will be supported in the future.
+</p>
+<!--
+We encourage you to include comments in your code of the form:</p>
+<p style="padding:5px"></p><pre class="code">
+// contributed by:&lt;name&gt; user name: &lt;userName&gt;
+</pre>
+<p>
+if you wrote the original version, or</p>
+<p style="padding:5px"></p><pre class="code">
+// with contributions by &lt;name&gt; user name: &lt;userName&gt;
+</pre>
+<p>
+if you are extending or modifying existing code, and to retain these comments from code that you modify.
+</p>
+-->
+<!--
+<div class="section" id="share">15. Sharing Your Work</div>
+
+<p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
+Its listing will allow public use of its elements, and public access to the underlying code.</p>
+
+<p>If you'd like to contribute one or more elements  to ProtoPedia's
+<a href = "/catalogEdit.html?source=(sys)/global.catalog">global catalog</a>, create a catalog of them 
+under the name "forGlobal.catalog", and send an email about this to prototypejungle@gmail.com mentioning your user id
+(from your accounts page). 
+</p>
+
+<p style="padding-bottom:30px">
+All contributions (whether at the level of public.catalog or forGlobal.catalog)
+will be credited using the name and profile link that you have entered on your
+account page.
+</p>
+-->
+<div class="section" id="API">19. API </div>
+<!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
+
+<p><i>(Partial listing - more to come)</i></p>
+
+<p>The <span class="codeWord">core, geom,</span> and <span class="codeWord">svg</span> modules are core technology from the
+<a href="https://github.com/chrisGoad/prototypetrees">prototypetrees repository</a>.</p>
+<p>Calls are given in the form <span class="codeWord">f(arg1:type1,arg2:type2...)</span> where types are: <span class="codeWord">boolean, number,string, Node (core.ArrayNode or core.ObjectNode) </span> or <span class="codeWord">any</span> When a call
+is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p><p>Defaults for property values are given
+in parentheses just after the name of the property. </p>
+
+<div class="apiSection">Core</div>
+ <div style="padding-top:20px">Properties</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.role:string</div>
+ <div class="apiCallDf"><a href="#roles">Link</a>.</div>
+</div>
+
+ <div style="padding-top:20px">Methods</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.mk()</div><div class="apiCallDf">Constructor for core.ObjectNode</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">core.ArrayNode.mk()</div>
+  <div class="apiCallDf">Constructor for core.ArrayNode</div>
+</div>
+<!--<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.addListener( nm:string; fn:function)</div>
+ <div class="apiCallDf">Used in ProtoPedia's simple event system. Documention pending.</div>
+</div>-->
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.set(nm:string,vl:any)</div>
+ <div class="apiCallDf">Assign <span class="codeWord">vl</span> as the child of <code>this</code> with name <span class="codeWord">nm</span></div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.add(vl:any)</div>
+ <div class="apiCallDf">Assign vl as the child of <code>this</code>, with an automatically assigned name.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.remove(vl:Node)</div>
+ <div class="apiCallDf">Remove <code>this</code> from the tree in which it appears.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.instantiate()</div>
+ <div class="apiCallDf2"><a href="#instantiation">Link</a>.</div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.copy()</div>
+ <div class="apiCallDf"><a href="/ops.html#copy">Illustrated here</a>.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.separate()</div>
+ <div class="apiCallDf"><a href="/ops.html#separate">Illustrated here</a>.</div>
+</div>
+
+<!--
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.swapPrototype()</div>
+ <div class="apiCallDf"><a href="/ops.html#separate">Illustrated here</a>.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.swapThisPrototype()</div>
+ <div class="apiCallDf"><a href="/ops.html#separate">Illustrated here</a>.</div>
+</div>
+
+-->
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.transferState(src:node,own:boolean)</div>
+ <div class="apiCallDf2"><a href="#transferState">Link</a>.</div>
+</div>
+
+<div class="apiCall">
+ <div class="apiCallNm">core.ObjectNode.setFieldType(type:string)</div><div class="apiCallDf2"><a href="#setFieldType">Link</a></div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">core.stringify(v:node)</div>
+ <div class="apiCallDf2"><a href="#serialization">Link</a>.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.installPrototype(v:node)</div>
+ <div class="apiCallDf2"><a href="#installPrototype">Link</a>.</div>
+</div>
+
+<!--
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.setData()</div>
+ <div class="apiCallDf"><a href="#setData">Link</a>.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.outerUpdate()</div>
+ <div class="apiCallDf"> Documention pending.</div>
+</div>-->
+<div class="apiCall">
+  <div class="apiCallNm">core.lift(o)</div>
+ <div class="apiCallDf2"><a href="#lift">Link</a>.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.setProperties(dest:node,src:node,<br/>props:arrayOf(string))</div>
+ <div class="apiCallDf">For each property p in props, set dest[p] = src[p]</div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.treeProperties( nd:Node, includeLeaves:boolean)</div>
+ <div class="apiCallDf">Returns an array of the direct properties of <span class="codeWord">nd</span> which are edges of the prototype tree (explained <a href="#trees">above</a>).
+ </div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">core.forEachTreeProperty(node:node,<br/>fn:function,includeLeaves:boolean)</div>
+ <div class="apiCallDf">An aid to traversing prototype trees. <!--A tree property of a node is one whose value is either a child in the sense
+ explained <a href="#trees">above</a>, or an atomic value (leaf).--> <span class="codeWord">forEachTreeProperty</span> applies the function <span class="codeWord">fn</span> to each of node's tree properties.
+ <span class="codeWord">fn</span> should take inputs of the form <span class="codeWord">(child,property,node)</span>,
+ where <span class="codeWord">node</span> is the value passed to <span class="codeWord">forEachTreeProperty</span>, and <span class="codeWord">child=node[property]</div>
+</div>
+
+<!--
+<div class="apiCall">
+  <div class="apiCallNm">core.declareComputed(nd:Object)</div>
+ <div class="apiCallDf">Declare that <span class="codeWord">nd</span> is generated by computation within an update method. The effect of this
+is to delete  <span class="codeWord">nd</span>  when the item is saved; updates are always run as the part of the restore process,
+so  <span class="codeWord">nd</span>  will be recomputed on restore. Computed content can be modified in the structure editor,  and these modifications will be retained through subsequent
+updates, saves, and restores. The implementation keeps track of modifications, 
+and, whenever an update is done, reapplies the modifications to the updated state. </div>
+</div>
+-->
+<!--
+<div class="apiCall">
+  <div class="apiCallNm">core.ObjectNode.__setData(data:core.ArrayNode)</div>
+ <div class="apiCallDf">This is a simple utility for <a href="#spreads">spreads</a>. Its implementation is just:
+ <span class="codeWord">{this.__data=data;this.update();}</span>
+ </div>
+</div>
+-->
+
+
+<div id = "apiGeom" class="apiSection">geom</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.mk(x:number,y:number):<br/>geom.Point</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.plus(p:geom.Point):<br/>geom.Point</div><div class="apiCallDf">Adds point p to this (vector addition)</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.minus():geom.Point</div><div class="apiCallDf"><span class='codeWord'> = geom.Point.mk(-this.x,-this.y)</span></div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.difference(p:geom.Point):<br/>geom.Point</div><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.times(v:number):geom.Point</div><div class="apiCallDf">Scales the point by v</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.toPoint(v:any):geom.Point</div><div class="apiCallDf">Creates a <span class="codeWord">geom.Point</span>  from several kinds of input. If <span class="codeWord">v</span>
+  is an array <span class="codeWord">[a,b]</span> it returns a point with coordinates <span class="codeWord">{x:a,y:b}</span>; if <span class="codeWord">v</span> is a number, a point  with coordinates
+  <span class="codeWord">{x:v,y:0}</span>,
+  if v is a <span class="codeWord">geom.Point</span>, a copy of the point. <br/><span class="codeWord">geom.toPoint()</span> returns the point with coordinates <span class="codeWord">{x:0,y:0}.</span> </div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Rectangle.mk(corner:geom.Point,<br/> extent:geom.Point):geom.Rectangle</div><div class="apiCallDf">Constructor for geom.Rectangle,
+  with properties corner and extent. For example <span class="codeWord" style="font-size:9pt">geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</span> has
+  (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Transform.mk(<br/>translation:geom.Point,<br/> scale:number,<br/>rotation:number):<br/>
+  geom.Transform</div><div class="apiCallDf">
+  Constructor for geom.Transform, with properties translation, scale, and rotation. Rotation is in radians. All arguments are
+  optional, defaulting to geom.Point.mk(0,0), 1, and 0, respectively.</div>
+</div>
+
+<div class="apiSection">svg</div>
+
+ <div style="padding-top:20px">Properties</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.__element</div><div class="apiCallDf"><a href="#setDomAttributes">Link</a></div>
+</div>
+
+ <div style="padding-top:20px">Methods</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.mk(s:string)</div><div class="apiCallDf">Constructor for svg Elements. s is markup.</div>
+</div>
+
+<!--
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
+  the last in the child list of its parent. This has the effect of displaying the element in front of its siblings.</div>
+</div>
+-->
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.hide()</div><div class="apiCallDf">Self-explanatory.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
+</div>
+
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.draw()</div><div class="apiCallDf">Refresh this element. Changes to the ProtoPedia
+  data for an element (and its descendents) are transferred to the svg model. Adding an element to the ProtoPedia tree
+  is not reflected </div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.setDomAttribute(<br/>attr:string,vl:any)</div><div class="apiCallDf">Sets the attribute named <span class="codeWord">attr</span> of the DOM element
+ associated with <span class="codeWord">this</span>. See the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute">SVG documentation</a> for the available attributes.</div>
+</div>
+
+<!--
+<div class="apiCall">
+  <div class="apiCallNm">svg.Root.mk(s:DomElement)</div><div class="apiCallDf">Constructor for a root of the svg model (with tag svg). DomElement should be an element on the current page, retrieved eg via document.getElementById("svgDiv"), to which the new
+top-level svg element will be added. The content to be displayed should be set as the child named "contents" of this root.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Root.fitContents(v:number)</div><div class="apiCallDf">Arrange for the current contents of the
+  svg model to appear centered in the viewing div, scaled into a box that is  fraction v of the available area (eg 0.9 if
+  you wish at least a 5% boundary around the content.</div>
+</div>
+-->
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.initializeData(dataString:JSONstring)</div><div class="apiCallDf2"><a href="#buildFromData">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.getTransform():<br/>geom.Transform</div><div class="apiCallDf">Returns the transform of this element.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.setTransform(tr:<br/>geom.Transform)</div><div class="apiCallDf">Sets the transform of this element.</div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.getTranslation():<br/>geom.Point</div><div class="apiCallDf">Returns the translation  of the svg transform of this element.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. That is, set the translation  of the svg transform of this element to p.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.getScale():number</div><div class="apiCallDf">Return the scale of the transform of this element.</div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.setScale(s:number)</div><div class="apiCallDf">Set the scale 
+   of the svg transform of this element to s.</div>
+</div>
+
+
+
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.bounds(rt:svg.Element):<br/>geom.Rectangle</div><div class="apiCallDf">Return the bounds
+  of the given Element (and its descendants).  rt is optional. If
+  rt is present, it should be an ancestor of this Element, and the bounds are given relative to rt's coordinate system. If
+  rt is absent, bounds are given in the Element's own coordinate system.</div>
+</div>
+
+<div id="graphApi" class="apiSection">graph</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+graph.connect1end(e:edge,<br/>whichEnd:number,v:vertex)
+</div><div class="apiCallDf">connnects one end of e to v. whichEnd should be 0 or 1.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+graph.connectVertices(e:edge,<br/>v0:vertex,v1:vertex)
+</div><div class="apiCallDf">connnects one end of e to v0, and the other to v1. </div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+graph.updateEnds(e:edge)
+</div><div class="apiCallDf">moves the ends of the edge as appropriate so that it maintains its connections</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+graph.graphUpdate()
+</div><div class="apiCallDf">updates the whole graph by updating the ends of all edges</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.mapEndToPeriphery(e:edge,<br/>whichEnd:number,pos:geom.Point)
+
+</div><div class="apiCallDf">Computes where to move the given end to, if that end is being dragged around the periphery</div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.installEdgeOps(n:node);</div>
+<div class="apiCallDf"><a href="#instantiation">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.installRectanglePeripheryOps(n:node);
+</div>
+<div class="apiCallDf2"><a href="#instantiation">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.installCirclePeripheryOps(n:node);
+</div>
+<div class="apiCallDf2"><a href="#instantiation">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.installLozengePeripheryOps(n:node);
+</div>
+<div class="apiCallDf2"><a href="#instantiation">Link</a></div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">
+   graph.buildFromData(n:node,<br/>v:vertex,e:edge,data:any)
+
+</div><div class="apiCallDf">adds vertices and edges instantiated from the prototypes v and ed respectively, as children of n, and as indicated by data. The Cayley D3 graph is built in this way. <a href="/data/cayley_d3.data">Here</a> is its data. The format should be self-explanatory to those familiar with JSON.
+</div>
+</div>
+
+
+
+<div class="apiSection">ui</div>
+
+ <div style="padding-top:20px">Globals</div>
+
+ <div class="apiCall">
+ <div class="apiCallNm">ui.whatToAdjust</div><div class="apiCallDf">In the UI, either the prototype or the instance of the selected item
+ can be adjusted (there is a <a href="/draw.html?source=(sys)/intro/logoShaded3.item&intro=properties&fit=0.5">check box</a> for telling  which). This global is set to the one being adjusted.</div>
+</div>
+
+
+ <div style="padding-top:20px">Properties you should set</div>
+ 
+ <div class="apiCall">
+ <div class="apiCallNm">Node.unselectable:boolean  (false)</div><div class="apiCallDf">If this node is clicked, its first selectable ancestor is selected</div>
+</div>
+
+<div class="apiCall">
+ <div class="apiCallNm">Node.adjustable:boolean (false)</div><div class="apiCallDf"> A resize box appears when this node is selected. </div>
+</div>
+
+<div class="apiCall">
+
+ <div class="apiCallNm">Node.draggable:boolean (false)</div><div class="apiCallDf">Self-explanatory </div>
+</div>
+
+ <div style="padding-top:20px">Methods<div>
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.updateInheritors(proto:Node)</div><div class="apiCallDf">Updates and draws all of the nodes that inherit
+  from <span class="codeWord">proto</span>. Frequently used in the form <span class="codeWord">ui.updateInheritors(ui.whatToAdjust)</span>, when an edit has been made to the prototype rather
+  instance. See the updateControlPoint method at the bottom of the implementation of the <a href="/arrow/arrow.js">arrow</a>.</div>
+</div>
+
+<p>These calls control how property values are displayed in the structure editor.
+ </p>
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.hide(nd:Node,props:array of string)</div><div class="apiCallDf"> <a href="#visibility">Link</a></div>
+</div>
+
+<div class="apiCall">
+
+ <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf"> <a href="#uifreeze">Link</a></div>
+</div>
+
+ <div style="padding-top:20px">Methods you define<div>
+
+<div class="apiCall">
+  <div class="apiCallNm2">Node.controlPoints():array of Point</div><div class="apiCallDf2"> <a href="#visibility">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm2">Node.updateControlPoints(index:number,pos:Point)</div><div class="apiCallDf2"> <a href="#visibility">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm2">Node.update()</div><div class="apiCallDf2"> <a href="#update">Link</a></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm2">Node.initialize()</div><div class="apiCallDf2"> <a href="#initialize">Link</a></div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm2">Node.buildFromData(data:JSONstring)</div><div class="apiCallDf2"> <a href="#buildFromData">Link</a></div>
+</div>
+
+
+<!--
+<div class="apiCall">
+  <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
+  properties of the specified node are modified in the inspector, run an update on the top level. </div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.setNote(nd:Node,
+  prop:string,note:string)</div><div class="apiCallDf">This supports a simple documentation scheme. It associates the given
+  note with property prop of nd. In the inspector, prop will appear with a little "?" which, when clicked, will pop the note.
+  </div>
+</div>
+-->
+
+
+<div class="apiCall">
+
+
+</div>
+
+
+<!--
+
+<div class="section" id="codeStructure">1. Code Structure </div>
+
+<p>ProtoPedia is implemented in a series of ECMAScript 2015 modules. The ones that are relevant here are: </p>
+
+<p style="padding:5px"></p><pre class="code">
+  <a href="https://protopedia.org/js/core-1.1.0.js">https://protopedia.org/js/core-1.1.0.js</a>
+  <a href="https://protopedia.org/js/geom-1.1.0.js">https://protopedia.org/js/geom-1.1.0.js</a>
+  <a href="https://protopedia.org/js/dom-1.1.0.js">https://protopedia.org/js/dom-1.1.0.js</a>
+  <a href="https://protopedia.org/js/ui-1.1.0.js">https://protopedia.org/js/ui-1.1.0.js</a>
+</pre>
+ 
+
+
+<p> There are also minimized versions, such as  <span class="codeWord">https://protopedia.org/js/core-1.1.0.js</span> (the naming scheme is identical for all modules).</p>
+
+<p>In the coding environment (as exhibited in the <a href="/code.html">code editor</a>), these modules are bound to the names core,geom,dom, and ui,
+respectively. The core module defines prototype trees
+and their basic operations, including serialization and instantiation. The dom module supports
+prototype trees in the context of 2d graphics.  This level of the implementation relies on
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.
+Finally, the ui module supports the user interface. The 
+core and dom modules are independent of the ProtoPedia website, and could be used in any JavaScript application, whereas ui is in various
+ways connected to the website (the latter code could be adapted for other situations, though).
+</p>
+
+<p>Include these lines in applications:</p>
+
+<p style="padding:5px"></p><pre class="code">
+import * as core from "https://protopedia.org/js/core-1.1.0.min.js";
+import * as dom from "https://protopedia.org/js/dom-1.1.0.min.js";
+</pre>
+
+<p>Of course, you can call the modules whatever you like, as in </p>
+import * as bandersnatch from "https://protopedia.org/js/core-1.1.0.min.js";
+</p>
+
+<p>
+ All code (organized into smaller files) is at <a href="https://github.com/chrisGoad/protopedia/tree/master">GitHub</a>, and is open source under the
+MIT License.</p>
+-->
+
+
+
+
+
+  </div>
+</div>
+</body>
+</html>

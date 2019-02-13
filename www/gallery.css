@@ -1,0 +1,13 @@
+.topGrid {
+  display:grid;
+  padding-top:0px;
+  grid-template-columns:1fr 3fr 1fr;
+}
+
+.svgGrid {
+  display:grid;
+   grid-template-columns:1fr 1fr;
+  grid-template-rows:200px 200px;
+
+}
+

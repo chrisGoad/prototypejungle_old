@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+</head>
+<body style="margin:11px;background-color:white;font-size:12pt">
+<script type="text/javascript" src="/intro/pages.js"></script>
+
+
+<div style="padding:0px;margin:0px">
+
+ 
+  <p style="padding-left:10px"><b>Properties and Prototypes</b></p>
+  
+  <p> When you select (click on) a circle, the right hand panel shows its  properties, which you can edit.</p>
+  <p>Note  that there are two sets of properties, one labeled "instance" and the other "prototype". Each of the circles
+  is derived from a common prototype, and you can edit either the prototype, affecting all of the circles,
+  or just the particular circle that you have selected. (The same goes for the arrows.) </p>
+  <p>Exercise: Try setting the fills (interior colors) first of a circle prototype, then of the instance, using different colors.
+  You will see that setting a property value for the instance overrides the value held by the prototype (signalled by an asterisk next
+  to the property in question)</p>
+  
+  <p>How to use the <span style="color:red">color</span>  <span style="color:blue">widget</span>: select a color in the vertical bar, and a shade of that color in the square, then click choose.
+  You can also enter a name of a color or an rgb value in the text box</p>
+  <p> The "Adjusting this" check box controls whether resizing applies to the
+ instance or the prototype.
+  </p>
+
+<p>For a more detailed explanation of ProtoPedia's treatment of prototype structures, see
+<a href='/draw.html?source=(sys)/forMainPage/three_circles.item&intro=mainIntro' target="_top">here.</a></p>
+<p><button  onclick="gotoPrevPage('properties')">Prev</button>
+<button  onclick="gotoNextPage('properties')">Next</button></p>
+
+
+</div>
+
+
+
+</body>
+</html>
