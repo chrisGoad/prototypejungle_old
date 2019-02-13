@@ -1,8 +1,0 @@
-{
-"vertices":[{"id":"L","position":[-50,0]},
-            {"id":"R","position":[50,0]}],
-"edges":[{"label":"a","end0":"L","end1":"R"}]
-}
-
-
- 

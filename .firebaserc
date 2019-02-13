@@ -1,8 +1,0 @@
-{
-  "projects": {
-    "default": "prototypejungle",
-    "prototypejungle": "project-5150272850535855811",
-    "staging": "prototypejungle-dev",
-    "dev": "prototypejungle-dev"
-  }
-}
