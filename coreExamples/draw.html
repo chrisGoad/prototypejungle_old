@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An Open Repository of Prototype Structures for the Visual Domain">
+<title>ProtoPedia</title>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<link rel="icon" href="/images/favicon.ico?v18" />
+</head>
+
+<body style="margin:0px;overflow:hidden">
+
+<script nomodule>
+        location.href = "/nomodules.html"
+</script>
+        
+<script type="module">
+import * as core from "/js/core-1.1.0.min.js";
+import * as geom from "/js/geom-1.1.0.min.js";
+import * as dom from "/js/dom-1.1.0.min.js";
+import * as harness from "/js/harness-1.1.0.min.js";
+
+
+/* make the modules available in all contexts */
+Window.core = core;
+Window.dom=dom;Window.harness=harness;
+Window.geom=geom;Window.dom=dom;
+Window.ui = harness.ui; // stubs a few UI functions
+Window.graph = harness.graph; // more stubs
+window.addEventListener("DOMContentLoaded", function() { 
+  //let pjr = core.pjr;
+  core.debugMode(false);
+  core.vars.tlogActive = true; // controls time logging (core.tlog)
+  core.vars.localPrototypeJungle = true;// turn off before deploy
+  core.vars.activeConsoleTags = ['error'];//'install'];//'control'
+  dom.vars.stdExtent = geom.Point.mk(200,200); // if there is no initial content, this is the area in image space originally in view
+  core.tlog('doc ready');
+  //harness.initPage();
+  core.tlog('page initialized');
+  core.loadTopDefs(harness.initPage);
+ // core.loadjs('/topdefs.js'); // binds globals to the modules
+
+});
+</script>
+ 
+
+<div id="main" style="display:none"> 
+  <div id="topbar"> 
+   <div id="topbarOuter" style="color:black;">
+      <div id="title" style="display:inline-block">
+        <div><span class="mainTitle">Draw</div>
+      </div>
+      <div id = "topbarInner" style="float:right"></div>
+   </div>
+   <div id="error"></div>
+  </div>  
+</div>
+
+<canvas id="imageCanvas"></canvas> <!-- used for image conversions to jpeg-->
+
+
+
+
+</body>
+</html>
