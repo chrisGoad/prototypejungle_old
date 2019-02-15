@@ -23,6 +23,14 @@ item.controlPoint = function () {
 
 item.updateControlPoint = function (head,pos,forMultiOut) {
   let toAdjust,h2shaft,cHeadWidth,cHeadLength;
+  let arrow = head.__parent;
+  let strokeWidth = 0;
+  if (arrow) {
+    let sw = arrow['stroke-width'];
+    if (typeof sw === 'number') {
+      strokeWidth = sw;
+    }
+  }
   if (!forMultiOut) {
     let arrow = head.__parent;
     // if arrow owns headWidth, then it  should be adjusted regardless of ui.whatToAdjust
@@ -39,8 +47,8 @@ item.updateControlPoint = function (head,pos,forMultiOut) {
   if (forMultiOut) {
     return [cHeadWidth,cHeadLength];
   }
-  toAdjust.headWidth = Math.max(0,cHeadWidth);
-  toAdjust.headLength = Math.max(0,cHeadLength); 
+  toAdjust.headWidth = Math.max(2*strokeWidth,cHeadWidth);
+  toAdjust.headLength = Math.max(strokeWidth,cHeadLength); 
   return head.headBase0;
 }
 
