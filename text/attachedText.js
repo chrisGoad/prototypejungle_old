@@ -46,12 +46,7 @@ item.update = function (ipos) {
     let normal = direction.normal();   
 	let  side = (direction.y > 0) === (this.sep > 0); 
 	let displacement = normal.times((side?-dist:dist) - this.sep);
-    /*let toSide = normal.times(this.sep);
-    if (this.side === 'left') {
-      toSide = toSide.times(-1);
-    }*/
     let along = parent.end0.plus(direction.times(length*this.fractionAlong));
-   // pos = along.plus(toSide);//radius+this.textSep);
     pos = along.plus(displacement);//radius+this.textSep);
  }
   this.moveto(pos);
