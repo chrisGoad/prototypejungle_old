@@ -30,21 +30,30 @@ item.transferState = function (src,own) { //own = consider only the own properti
 item.update = function (ipos) {
   let pos;
   let parent = this.__parent;
+  this.setText(parent.text);
+
   if (ipos) {
      pos = ipos;
   } else {
+	debugger;
     let {end0,end1} = parent;
     let length = end0.distance(end1);
     let direction = end1.difference(end0).normalize();
-    let normal = direction.normal();
-    let toSide = normal.times(this.sep);
+	let angle = Math.atan2(direction.y,direction.x);
+	let bnds = this.bounds();
+	let htx = 0.5 * bnds.extent.x;
+	let dist = htx * Math.sin(angle); // this is the distance by which the text should be displaced along normal
+    let normal = direction.normal();   
+	let  side = (direction.y > 0) === (this.sep > 0); 
+	let displacement = normal.times((side?-dist:dist) - this.sep);
+    /*let toSide = normal.times(this.sep);
     if (this.side === 'left') {
       toSide = toSide.times(-1);
-    }
+    }*/
     let along = parent.end0.plus(direction.times(length*this.fractionAlong));
-    pos = along.plus(toSide);//radius+this.textSep);
-  }
-  this.setText(parent.text);
+   // pos = along.plus(toSide);//radius+this.textSep);
+    pos = along.plus(displacement);//radius+this.textSep);
+ }
   this.moveto(pos);
   this.center();
 }
