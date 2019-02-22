@@ -16,6 +16,23 @@ item.includeEndControls = true; // turned on when added, and off when connected
 item.text = '';
 /*end adjustable parameters */
 
+
+
+let textPropertyValues = 
+         {"font-size":"12",
+         "font-style":"normal",
+         "font-family":"arial",
+         "font-weight":"normal",
+         "stroke":"black",
+         "lineSep":2
+         };
+
+let textProperties = Object.getOwnPropertyNames(textPropertyValues);
+
+item.set('textProperties',core.lift(textPropertyValues));
+item.textProperties.__hideInUI = true;
+item.textProperties.__setFieldType('stroke','svg.Rgb');
+
 item.role = "edge";
 
 let transferredProperties = ['text','stroke','stroke-width','headLength','headWidth','headGap','tailGap',
@@ -115,7 +132,13 @@ item.update = function () {
       this.set('textItem',textItemP.instantiate());
       this.textItem.unselectable = true;
     }
+    this.textProperties.__hideInUI = false;
+    let proto = Object.getPrototypeOf(this);
+    proto.textProperties.__hideInUI = false;
+    core.setProperties(this.textItem,this.textProperties,textProperties);
     this.textItem.update();
+  } else {
+    this.textProperties.__hideInUI = true;
   }
 }
 

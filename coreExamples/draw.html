@@ -15,10 +15,10 @@
 </script>
         
 <script type="module">
-import * as core from "/js/core-1.1.0.min.js";
-import * as geom from "/js/geom-1.1.0.min.js";
-import * as dom from "/js/dom-1.1.0.min.js";
-import * as harness from "/js/harness-1.1.0.min.js";
+import * as core from "/js/core-1.1.1.min.js";
+import * as geom from "/js/geom-1.1.1.min.js";
+import * as dom from "/js/dom-1.1.1.min.js";
+import * as harness from "/js/harness-1.1.1.min.js";
 
 
 /* make the modules available in all contexts */
@@ -29,7 +29,7 @@ Window.ui = harness.ui; // stubs a few UI functions
 Window.graph = harness.graph; // more stubs
 window.addEventListener("DOMContentLoaded", function() { 
   //let pjr = core.pjr;
-  core.debugMode(false);
+  core.debugMode(true);
   core.vars.tlogActive = true; // controls time logging (core.tlog)
   core.vars.localPrototypeJungle = true;// turn off before deploy
   core.vars.activeConsoleTags = ['error'];//'install'];//'control'

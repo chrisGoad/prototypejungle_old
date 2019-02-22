@@ -18,6 +18,24 @@ item.text = '';
 item.lineP = core.installPrototype('line',core.ObjectNode.mk());
 item.__deleteLevel = true; // deletes from the interface propogate to here
 
+
+let textPropertyValues = 
+         {"font-size":"12",
+         "font-style":"normal",
+         "font-family":"arial",
+         "font-weight":"normal",
+         "stroke":"black",
+         "lineSep":2
+         };
+
+//item.set('textProperties',textPropValues);
+
+let textProperties = Object.getOwnPropertyNames(textPropertyValues);
+
+item.set('textProperties',core.lift(textPropertyValues));
+item.textProperties.__hideInUI = true;
+item.textProperties.__setFieldType('stroke','svg.Rgb');
+
 item.setEnds = function (e0,e1) {
   this.end0.copyto(e0);
   this.end1.copyto(e1);
@@ -30,6 +48,8 @@ item.updateText = function (text,e0,e1) {
     this.set('textItem',textItemP.instantiate());
     this.textItem.unselectable = true;
   }
+  core.setProperties(this.textItem,this.textProperties,textProperties);
+
   this.textItem.update();
 }
 item.update = function () {
@@ -46,15 +66,15 @@ item.update = function () {
     core.setProperties(this.shaft,this,shaftProperties);
   }
   this.shaft.update();
+  let proto = Object.getPrototypeOf(this);
   if (this.text) {
+    this.textProperties.__hideInUI = false;
+    proto.textProperties.__hideInUI = false;
     this.updateText(this.text);
-    return;
-    if (!this.textItem) {
-      this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
-    }
-    this.textItem.update();
+  } else {
+    this.textProperties.__hideInUI = true;
   }
+   
 }
 // the next two functions support dragging the ends around. See https://protopedia.org/doc/code.html#controllers
 

@@ -1,4 +1,4 @@
-//elbowArrow
+//uArrow
 
 core.require('/shape/u.js','/arrow/solidHead.js','/text/attachedText.js',function (uP,arrowHeadP,textItemP) {
 

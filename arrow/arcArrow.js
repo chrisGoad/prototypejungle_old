@@ -22,6 +22,21 @@ item.includeEndControls = true;
 /* end adjustable parameters */
 
 
+let textPropertyValues = 
+         {"font-size":"12",
+         "font-style":"normal",
+         "font-family":"arial",
+         "font-weight":"normal",
+         "stroke":"black",
+         "lineSep":2
+         };
+
+let textProperties = Object.getOwnPropertyNames(textPropertyValues);
+
+item.set('textProperties',core.lift(textPropertyValues));
+item.textProperties.__hideInUI = true;
+item.textProperties.__setFieldType('stroke','svg.Rgb');
+
 item.setEnds = function (p0,p1) {
   this.setPointProperty('end0',p0);
   this.setPointProperty('end1',p1);
@@ -201,9 +216,15 @@ item.update = function () {
       //this.textItem.show();
       this.textItem.unselectable = true;
     }
+    this.textProperties.__hideInUI = false;
+    let proto = Object.getPrototypeOf(this);
+    proto.textProperties.__hideInUI = false;
+    core.setProperties(this.textItem,this.textProperties,textProperties);
     let textPos = this.middle(radius+this.textItem.sep);
     this.textItem.update(textPos);
-  } 
+  } else {
+    this.textProperties.__hideInUI = true;
+  }
 }
 
 // when connected, the associated control point goes away (no moving around the periphery)
@@ -331,7 +352,7 @@ item.setSide = function (whichSide) {  // used by verticalTree
   }
 }
  
-ui.hide(item,['head','shaft','includeEndControls','text','straight','end0','end1',
+ui.hide(item,['head','shaft','includeEndControls','text','straight','end0','end1','textItem',
               'head0','head1','LineP','totalHeadGap','totalTailGap','vertexTailGap','vertexHeadGap']);
 
 item.setFieldType('clockwise','boolean');

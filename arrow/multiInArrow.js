@@ -10,7 +10,6 @@ item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
 item.headWidth = 8;
-//item.pointsTo = 'right'; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
 item.includeHead = true;
 item.stroke = "black";
 item.elbowWidth = 10;
@@ -66,7 +65,6 @@ item.initializeNewEnds = function () {
       this.end0x = eBottom.x;
     } else {
       eTop = ends[currentLength-2];
-      //this.end0x = (this.pointsTo === 'left')?Math.min(eTop.x,eBottom.x):Math.max(eTop.x,eBottom.x);
         this.end0x = 0?Math.min(eTop.x,eBottom.x):Math.max(eTop.x,eBottom.x);
   }
   }
@@ -78,12 +76,10 @@ item.initializeNewEnds = function () {
   }
   if (currentLength === 1) { // special case for initialization of version dropped in the UI
     ends.push(Point.mk(0,15));
-   // this.flip =  true;//this.pointsTo === 'left';
     this.end0x = 0;
     return;
   }
   setEnd0x();
- // this.flip = true;// this.e01 < 0;
   if (numNew <= 0) {
     this.inCount = currentLength; // removing ends not supported
     return;
@@ -100,14 +96,7 @@ item.initializeNewEnds = function () {
   }
   ends.push(eBottom);
 }
-/* used in installing settings
-item.updatePrototype = function () {
-  if (0 && (this.pointsTo === 'left')) {
-    this.singleEnd.x = -this.singleEnd.x;
-    this.direction.x = -this.direction.x;
-  }
-}
-*/
+
 
 item.pointsToRight = function () {
  let e0 = this.ends[0];
@@ -132,16 +121,10 @@ item.update = function () {
   for (i=0;i<ln;i++) {
     let end0 = ends[i];
     let shaft = shafts[i];
-   // if (this.flip) {
     shaft.end1.copyto(end0);
     shaft.end0.copyto(shaftEnd);
-  //  } else {
-  //    shaft.end0.copyto(end0);
-  //    shaft.end1.copyto(shaftEnd);
-   // }
-  //  shaft.elbowPlacement = this.flip?(1-this.elbowPlacement):this.elbowPlacement;
-      shaft.elbowPlacement = 1-this.elbowPlacement;
-   shaft.update();
+    shaft.elbowPlacement = 1-this.elbowPlacement;
+    shaft.update();
     shaft.draw();
   }
   if (this.includeHead) {
@@ -168,13 +151,10 @@ item.controlPoints = function () {
   let rs = [joinPoint,headControlPoint];
   if (this.includeEndControls) {
     let ends = this.ends;
-   // rs.push((this.singleVertex)?null:e1);*
     rs.push(e1);
     let ln = this.ends.length;
     for (let i=0;i<ln;i++) {
       rs.push(ends[i]);
-     //      rs.push((vertices && vertices[i])?null:ends[i]); *
-
     }
   }
   return rs;

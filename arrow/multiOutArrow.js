@@ -72,7 +72,6 @@ item.initializeNewEnds = function () {
   let eBottom = ends[currentLength-1];
   this.end1x = (1 || (this.pointsTo === 'left'))?Math.max(eTop.x,eBottom.x):Math.min(eTop.x,eBottom.x);
   this.e01 = this.end1x - this.singleEnd.x;
-  //this.flip = true;// this.e01 < 0;
   if (numNew <= 0) {
     this.outCount = currentLength; // removing ends not supported
     return;
@@ -90,15 +89,6 @@ item.initializeNewEnds = function () {
   ends.push(eBottom);
 }
 
-// with a new installation, we need a new entry in core.root.prototypes for arrowHeadPName to point to, since swapping may have changed the existing one
-/*item.updatePrototype = function () {
-  this.arrowHeadPName = core.installPrototype('arrowHead',arrowHeadPP).__name;
-  // install settings
-  if (this.pointsTo === 'left') {
-    this.singleEnd.x = -this.singleEnd.x;
-    this.direction.x = -this.direction.x;
-  }
-*/
 item.pointsToRight = function () {
  let e0 = this.ends[0];
  return e0.x > this.singleEnd.x;
@@ -112,7 +102,7 @@ item.update = function () {
   let {singleEnd,ends,shafts,arrowHeads} = this;
   let ln = ends.length;
 
-  core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);//,'elbowPlacement']);
+  core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let toRight = this.pointsToRight();
 
   for (i=0;i<ln;i++) {
@@ -126,13 +116,8 @@ item.update = function () {
     core.setProperties(arrowHead,this,['headLength','headWidth']);
     let shaftEnd = arrowHead.solidHead ?end1.plus(this.direction.times((toRight?-0.5:0.5)*this.headLength)):end1;
     let shaft = shafts[i];
-    //if (1 || this.flip) {
     shaft.end1.copyto(singleEnd);
     shaft.end0.copyto(shaftEnd);
-   /* } else {
-      shaft.end0.copyto(singleEnd);
-      shaft.end1.copyto(shaftEnd);
-    }*/
     shaft.elbowPlacement = 1-this.elbowPlacement;
     shaft.update();
     shaft.draw();
