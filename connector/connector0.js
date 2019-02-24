@@ -1,16 +1,12 @@
-//okok
 // line, implemented as a graph edge with text
 
 core.require('/text/attachedText.js',function (textItemP) {
 
 let item = svg.Element.mk('<g/>');
-//item.set('content', svg.Element.mk('<line/>')); // the line itselte
-// a textItem is added if item.text is non-empty; see update
+
 /*adjustable parameters  */
 item.set('end0',Point.mk(-50,0));
 item.set('end1',Point.mk(50,0));
-//item.stroke = 'black';
-//item['stroke-width'] = 2;
 /* end adjustable parameters */
 
 item.role = 'edge';
@@ -28,7 +24,6 @@ let textPropertyValues =
          "lineSep":2
          };
 
-//item.set('textProperties',textPropValues);
 
 let textProperties = Object.getOwnPropertyNames(textPropertyValues);
 
@@ -43,7 +38,6 @@ item.setEnds = function (e0,e1) {
 
 item.updateText = function (text,e0,e1) {
   this.text = text;
- // this.setEnds(this.shaft.end0,this.shaft.end1);
   if (!this.textItem) {
     this.set('textItem',textItemP.instantiate());
     this.textItem.unselectable = true;

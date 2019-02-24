@@ -1,4 +1,3 @@
-//okok
 core.require('/shape/rectangle.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
 let item = svg.Element.mk('<g/>');
@@ -26,9 +25,11 @@ item.contentsP = core.installPrototype('contents',contentsPP);
 contentsPP.installContainerMethods(item,borderPP,contentsPP);
 
 
+
 item.update = function () {
   this.stdUpdate();
 }
+
 
 graph.installRectanglePeripheryOps(item);
 

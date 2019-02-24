@@ -1,5 +1,3 @@
-//okok
-//core.require('/line/line.','/shape/rectangle.js',function (linePP,backgroundPP) {
   
 core.require('/line/line.js','/shape/circle.js','/shape/rectangle.js',function (linePP,cornerPP,backgroundPP) {
 

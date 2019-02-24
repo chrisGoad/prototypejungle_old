@@ -1,4 +1,3 @@
-//okok
 core.require('/line/line.js','/shape/circle.js','/shape/rectangle.js',function (linePP,cornerPP,backgroundPP) {
 
 let item = svg.Element.mk('<g/>');
