@@ -1,4 +1,4 @@
-//okok
+
 core.require('/box/decorated0.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
 let item = svg.Element.mk('<g/>');

@@ -14,20 +14,10 @@ item.text = '';
 item.lineP = core.installPrototype('line',core.ObjectNode.mk());
 item.__deleteLevel = true; // deletes from the interface propogate to here
 
-
-let textPropertyValues = 
-         {"font-size":"12",
-         "font-style":"normal",
-         "font-family":"arial",
-         "font-weight":"normal",
-         "stroke":"black",
-         "lineSep":2
-         };
-
-
+let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
+textPropertyValues.lineSep = 20;
 let textProperties = Object.getOwnPropertyNames(textPropertyValues);
-
-item.set('textProperties',core.lift(textPropertyValues));
+item.set('textProperties',textPropertyValues);
 item.textProperties.__hideInUI = true;
 item.textProperties.__setFieldType('stroke','svg.Rgb');
 
@@ -113,7 +103,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
     
 }
 
-ui.hide(item,['end0','end1','text']);
+ui.hide(item,['end0','end1','text','textItem']);
 
 // support for the use of this item as an edge
 // See https://protopedia.org/doc/code.html#graph

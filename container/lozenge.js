@@ -1,4 +1,3 @@
-//okok
 core.require('/shape/lozenge.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
 let item = svg.Element.mk('<g/>');
@@ -33,7 +32,7 @@ item.update = function () {
 graph.installLozengePeripheryOps(item);
 
 
-//ui.hide(item,['contents','border','text']);
+//ui.hide(item,['border']);
 
 return item;
 });

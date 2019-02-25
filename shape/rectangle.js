@@ -1,4 +1,3 @@
-//okok
 
 //This code implements the rectangle shape
 

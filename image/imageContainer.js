@@ -64,7 +64,7 @@ let textPropValues =
          "fill":"black",
          "vPadding":5,
          "hPadding":5,
-         "lineSep":2
+         "lineSep":5
          });
 
 let textPropList = Object.getOwnPropertyNames(textPropValues);

@@ -22,18 +22,13 @@ item.includeEndControls = true;
 /* end adjustable parameters */
 
 
-let textPropertyValues = 
-         {"font-size":"12",
-         "font-style":"normal",
-         "font-family":"arial",
-         "font-weight":"normal",
-         "stroke":"black",
-         "lineSep":2
-         };
 
+let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
+textPropertyValues.lineSep = 12;
 let textProperties = Object.getOwnPropertyNames(textPropertyValues);
+item.set('textProperties',textPropertyValues);
 
-item.set('textProperties',core.lift(textPropertyValues));
+
 item.textProperties.__hideInUI = true;
 item.textProperties.__setFieldType('stroke','svg.Rgb');
 
@@ -220,7 +215,7 @@ item.update = function () {
     let proto = Object.getPrototypeOf(this);
     proto.textProperties.__hideInUI = false;
     core.setProperties(this.textItem,this.textProperties,textProperties);
-    let textPos = this.middle(radius+this.textItem.sep);
+    let textPos = this.middle(radius+this.textProperties.lineSep);
     this.textItem.update(textPos);
   } else {
     this.textProperties.__hideInUI = true;

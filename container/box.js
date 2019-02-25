@@ -1,4 +1,4 @@
-//okok
+
 core.require('/box/basic.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
 let item = svg.Element.mk('<g/>');
@@ -29,12 +29,12 @@ item.update = function () {
 }
 
 graph.installRectanglePeripheryOps(item);
-/*
+
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,ui.stdTransferredProperties,own);
 }
-*/
-//ui.hide(item,['contents','border','text']);
+
+ui.hide(item,['containerPropertiesShown','border']);
 
 return item;
 });

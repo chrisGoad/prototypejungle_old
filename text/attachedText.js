@@ -18,7 +18,7 @@ let propList = ['font-size',
          "fill",
          "fractionAlong",
          "side",
-         "sep"];
+         "lineSep"];
 
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
@@ -45,7 +45,7 @@ item.update = function (ipos) {
 	let dist = htx * Math.sin(angle); // this is the distance by which the text should be displaced along normal
     let normal = direction.normal();   
 	let  side = (direction.y > 0) === (this.sep > 0); 
-	let displacement = normal.times((side?-dist:dist) - this.sep);
+	let displacement = normal.times((side?-dist:dist) - this.lineSep);
     let along = parent.end0.plus(direction.times(length*this.fractionAlong));
     pos = along.plus(displacement);//radius+this.textSep);
  }

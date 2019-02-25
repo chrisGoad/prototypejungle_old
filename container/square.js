@@ -1,4 +1,3 @@
-//okok
 core.require('/shape/square.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
 let item = svg.Element.mk('<g/>');
@@ -32,7 +31,6 @@ item.update = function () {
 graph.installRectanglePeripheryOps(item);
 
 
-//ui.hide(item,['contents','border','text']);
 
 return item;
 });

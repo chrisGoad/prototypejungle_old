@@ -1,4 +1,3 @@
-//okok
 
 // many basic shapes optionally include text, and so are groups in SVG
 
@@ -23,27 +22,7 @@ item["font-weight"]="normal";
 /*end adjustable parameters*/
 
 
-// dummy up an image
-
-//item.set('image',svg.Element.mk('<rect stroke="black" fill="transparent" stroke-width="2"/>'));
-//item.image.aspectRatio = 0.5;
-
-
 item.text = '';
-
-
-let textPropertyValues = 
-         {"font-size":"12",
-         "font-style":"normal",
-         "font-family":"arial",
-         "font-weight":"normal",
-         "stroke":"black",
-         "lineSep":2
-         };
-
-//item.set('textProperties',textPropValues);
-
-let textProperties = Object.getOwnPropertyNames(textPropertyValues);
 
 
 
@@ -124,14 +103,9 @@ const hideContainerProperties  = (container,hideEm) => {
   };
     
 item.containerUpdate =  function () {
-  //let textProperties = this.textProperties;
   let borderProperties = this.borderProperties;
-  
-  //**
-  
   if (!this.border) {
     this.set('border',this.borderP.instantiate()).show();
-    //this.border.role = undefined;
     this.__hideInUI = true;
     this.border.unselectable = true;
   }
@@ -148,7 +122,7 @@ item.containerUpdate =  function () {
       this.contents.unselectable = true;
       this.contents.__hideInUI = true;
     }
-    core.setProperties(this.contents,this.textProperties,textProperties);
+    core.setProperties(this.contents,this.textProperties,dom.textProperties);
     core.setProperties(this.contents,this,contentProperties);
     if (this.width) {
       this.contents.width = this.width;
@@ -220,7 +194,7 @@ item.containerTransferState = function (src,own) { //own = consider only the own
     core.setProperties(this,src,borderProperties,own);
   }
   if (src.textProperties) {
-    core.setProperties(this.textProperties,src.textProperties,textProperties,own);
+    core.setProperties(this.textProperties,src.textProperties,dom.textProperties,own);
   }
 }
 
@@ -233,12 +207,12 @@ item.installContainerMethods = function (container,iborderPP,icontentsPP) {
    container.setImage = this.containerSetImage;
    container.transferState = this.containerTransferState;
    //container.initialize = this.containerInit;
-   container.set('textProperties',core.lift(textPropertyValues));
+   container.set('textProperties',core.lift(dom.defaultTextPropertyValues));
    borderPP = iborderPP;
    contentsPP = icontentsPP;
    core.setPropertiesIfMissing(container,this,contentProperties);
    container.textProperties.__setFieldType('stroke','svg.Rgb');
-   ui.hide(container,['text','borderProperties','containerPropertiesHidden']);
+   ui.hide(container,['text','borderProperties','containerPropertiesShown','containerPropertiesHidden','border']);
    hideContainerProperties(container,true);
 
 }
@@ -256,11 +230,6 @@ item.showConditions  = {
 
 
 
- /*             
-item.transferState = function (src,own) { //own = consider only the own properties of src
-  core.setProperties(this,src,['text','image']);
-}
-*/
 return item;
 });
 

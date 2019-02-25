@@ -1,4 +1,4 @@
-//okok
+
 core.require('/line/line.js',function (linePP,textItemP) {
 
 let item = svg.Element.mk('<g/>');

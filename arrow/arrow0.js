@@ -18,18 +18,10 @@ item.text = '';
 
 
 
-let textPropertyValues = 
-         {"font-size":"12",
-         "font-style":"normal",
-         "font-family":"arial",
-         "font-weight":"normal",
-         "stroke":"black",
-         "lineSep":2
-         };
-
+let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
+textPropertyValues.lineSep = 12;
 let textProperties = Object.getOwnPropertyNames(textPropertyValues);
-
-item.set('textProperties',core.lift(textPropertyValues));
+item.set('textProperties',textPropertyValues);
 item.textProperties.__hideInUI = true;
 item.textProperties.__setFieldType('stroke','svg.Rgb');
 
@@ -180,7 +172,7 @@ item.updateControlPoint = function (idx,rpos) {
   this.draw();
 }
 
-ui.hide(item,['head','direction',"text",'includeEndControls',//shaft,
+ui.hide(item,['head','direction',"text",'textItem','includeEndControls',//shaft,
               'headInMiddle','end0','end1']);
 
 item.setFieldType('stroke','svg.Rgb');
