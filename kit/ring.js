@@ -2,10 +2,6 @@ core.require('/container/circle.js','/arrow/arcArrow.js',function (vertexPP,arro
   
 let item = svg.Element.mk('<g/>');
 
-//item.vertexP = core.installPrototype('vertexP',vertexPP);
-
-//item.edgeP = core.installPrototype('edgeP',arrowPP);
-
 item.numNodes = 5;
 item.dimension = 150;
 

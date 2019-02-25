@@ -49,6 +49,7 @@ item.addChild = function (parent,text,index=0) {
   parent.__childBeenMoved = false;
   parent.show();
   parent.connector.show();
+  core.saveState();
   return rs;
 }
 

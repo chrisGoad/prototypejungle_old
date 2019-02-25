@@ -1,8 +1,9 @@
-//okok
+// This is the simplest shape with a custom control, or "handle".
+// Click on the rectangle and drag the handle to see it in action.
 
 core.require(function () {
 
-var item = svg.Element.mk('<rect/>');
+let item = svg.Element.mk('<rect/>');
 
 /* adjustable parameters */
 item.width = 50;
@@ -21,7 +22,6 @@ item.update =  function () {
   var wd = this.width;
   var ht = this.height;
   var radius = this.cornerRadiusFraction * Math.min(wd,ht);
-  this.outlinePadFraction =   0.6*this.cornerRadiusFraction;//0.6 to give a little extra room
   this.setDomAttribute('x',-0.5*wd);
   this.setDomAttribute('y',-0.5*ht);
   this.setDomAttribute('rx',radius);
@@ -29,28 +29,28 @@ item.update =  function () {
 }
 
 
-var sqrt2 = Math.sqrt(2);
-
+const sqrt2 = Math.sqrt(2);
+// where to put the handle
 item.controlPoints = function () {
-  var hw = this.width/2;
-  var mhh = -this.height/2;
-  var crf = this.cornerRadiusFraction;
-  var cr = crf * Math.min(this.width,this.height);
-  var cext = cr/sqrt2;
+  let hw = this.width/2;
+  let mhh = -this.height/2;
+  let crf = this.cornerRadiusFraction;
+  let cr = crf * Math.min(this.width,this.height);
+  let cext = cr/sqrt2;
   let rs =  Point.mk(-hw+cext,mhh);
   return [rs];
 }
 
-//supports updateControlPoint for this, and for roundedRectangleWithText
+//supports updateControlPoint 
 item.newCornerRadiusFraction = function (idx,pos) {
-  var hw = this.width/2;
-  var ext = pos.x + hw;
-  var cr = ext * sqrt2;
+  let hw = this.width/2;
+  let ext = pos.x + hw;
+  let cr = ext * sqrt2;
   let crf =  cr/Math.min(this.width,this.height);
   return crf;
 }
 
-
+// adjust the shape to the handle's position
 item.updateControlPoint = function (idx,pos) {
   let crf = this.newCornerRadiusFraction(idx,pos);
   this.setActiveProperty('cornerRadiusFraction',crf); // might set the prototypes cornerRadiusFraction

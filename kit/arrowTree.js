@@ -194,6 +194,7 @@ kit.addSibling = function (vertex,doUpdate=true) {
 
 kit.addChild = function (vertex) {
   this.addDescendant(vertex,0);
+  core.saveState();
   vertex.__select('svg');
 }
 
@@ -225,7 +226,7 @@ kit.buildFromData = function (data) {
     let vertex = vertices[vid];
     vertex.parentVertex = parent;
     let rpos = dataForVertex.relPos;
-    vertex.set('__relPosition', geom.Point.mk(rpos[0],rpos[1]));
+    vertex.set('__relPosition', rpos.copy());
     if (parentDescendants) { // only the root lacks these
       parentDescendants.plainPush(vertex);
     }

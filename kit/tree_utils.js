@@ -22,12 +22,14 @@ let g = core.root.main.toGraphData(d);
 let item = core.ObjectNode.mk();
 
 const relativeToAbsolutePositions = function (vertex,cp) {
-  vertex.position  = cp;
+  vertex.set('position',cp.copy());
   let descendants = vertex.d;
   if (descendants) {
     descendants.forEach(function (vertex) {
       let rp = vertex.relPos;
-      let ap = [cp[0] + rp[0],cp[1] + rp[1]];
+      //let ap = core.ArrayNode.mk([cp[0] + rp[0],cp[1] + rp[1]]);
+      let ap = cp.plus(rp);
+      //let ap = core.ArrayNode.mk([cp[0] + rp[0],cp[1] + rp[1]]);
       relativeToAbsolutePositions(vertex,ap);
     });
   }
@@ -70,14 +72,15 @@ item.layout = function (data,hSpacing,vSpacing) {
          let w = widths[i];
          let cp = cx + w/2;
          cx = cx + w + hSpacing;
-         descendants[i].relPos = [cp,vSpacing];
+         console.log('bbbb');
+         descendants[i].set('relPos',geom.Point.mk(cp,vSpacing));
       }
     }
     return tw;
   }
   recurseV(data);
-  data.relPos = [0,0];
-  relativeToAbsolutePositions(data,[0,0]);
+  data.set('relPos',geom.Point.mk(0,0));
+  relativeToAbsolutePositions(data,geom.Point.mk(0,0));
 }
  
 item.toGraphData = function (vertex) {
@@ -85,10 +88,11 @@ item.toGraphData = function (vertex) {
   let edges = [];
   let collect = function (vertex) {
     let vid = vertex.id;
-    let newVertex = {id:vid};
+    let newVertex = core.lift({id:vid});
     let pos = vertex.position;
     if (pos) {
-     newVertex.position = [pos[0],pos[1]];
+     newVertex.set('position',pos.copy());
+     //([pos[0],pos[1]]));
     }
     let txt = vertex.text;
     if (txt) {
