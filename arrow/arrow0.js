@@ -14,6 +14,7 @@ item.headGap = 0; // arrow head falls short of end1 by this amount
 item.tailGap = 0; // arrow tail is this distance away from end0
 item.includeEndControls = true; // turned on when added, and off when connected
 item.text = '';
+item.doubleEnded = false;
 /*end adjustable parameters */
 
 
@@ -92,17 +93,27 @@ item.update = function () {
     this.shaft.show();
     this.head.unselectable = true;
     this.head.show();
+    if (this.doubleEnded) {
+      this.set('tail',this.headP.instantiate());
+      this.tail.unselectable = true;
+      this.tail.show();
+    }     
   }
   let e0 = this.end0;
   let e0p = this.computeEnd0(this.tailGap);
   let e1p = this.computeEnd1(-this.headGap);
   let shaftEnd = (this.head.solidHead  && !this.headInMiddle)?this.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
+  let shaftStart = (this.doubleEnded && this.tail.solidHead)?this.computeEnd0(0.5*this.headLength+this.tailGap):e0p;
   let headPoint = this.headInMiddle?
-      (e0.plus(e1p).times(0.5)).plus(this.direction.times(this.headLength*0.5)):e1p;  
+      (e0.plus(e1p).times(0.5)).plus(this.direction.times(this.headLength*0.5)):e1p;
+  let tailPoint;      
+  if (this.doubleEnded) {
+    tailPoint = e0p;
+  }
   this.shaft['stroke-width'] = this['stroke-width'];
   this.shaft.stroke = this.stroke;
   if (this.shaft.setEnds) { // might be a dummy before replacePrototype
-    this.shaft.setEnds(e0p,shaftEnd);
+    this.shaft.setEnds(shaftStart,shaftEnd);
     this.shaft.update();
   }
   
@@ -110,14 +121,33 @@ item.update = function () {
     this.head.headPoint.copyto(headPoint);
     this.head.direction.copyto(this.direction);
   }
+  if (this.doubleEnded && this.tail.headPoint && this.tail.headPoint.copyto) {
+    this.tail.headPoint.copyto(tailPoint);
+    this.tail.direction.copyto(this.direction.times(-1));
+  }
   if (this.head.solidHead) {
     this.head.fill = this.stroke;
+    if (this.doubleEnded) {
+      this.tail.fill = this.stroke;
+    }
   } else {
     core.setProperties(this.head,this,['stroke','stroke-width']);
+    if (this.doubleEnded) {
+      core.setProperties(this.tail,this,['stroke','stroke-width']);
+    }
   }
+
   core.setProperties(this.head,this,['headLength','headWidth']);
+  if (this.doubleEnded) {
+    core.setProperties(this.tail,this,['headLength','headWidth']);
+  }
+
   if (this.head.update) {
     this.head.update();
+  }
+  
+  if (this.doubleEnded && this.tail.update) {
+    this.tail.update();
   }
   if (this.text) {
     if (!this.textItem) {

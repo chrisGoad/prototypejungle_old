@@ -127,7 +127,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
 
 graph.installEdgeOps(item);
 
-item.connectionType = 'UpDown'; 
+item.connectionType = 'EastWest'; 
 
 ui.hide(item,['head','shaft','direction','elbowPlacement','end0','end1']);
 item.setFieldType('solidHead','boolean');
