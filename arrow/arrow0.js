@@ -93,12 +93,12 @@ item.update = function () {
     this.shaft.show();
     this.head.unselectable = true;
     this.head.show();
-    if (this.doubleEnded) {
+  }
+   if (this.doubleEnded && (!this.tail)) {
       this.set('tail',this.headP.instantiate());
       this.tail.unselectable = true;
       this.tail.show();
     }     
-  }
   let e0 = this.end0;
   let e0p = this.computeEnd0(this.tailGap);
   let e1p = this.computeEnd1(-this.headGap);

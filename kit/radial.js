@@ -49,15 +49,16 @@ item.update = function () {
     return;
   }
   graph.reset(this);
+  let vertex;
   for (let i=0;i<numNodes;i++) {
     let nm = 'v'+i;
-    let vertex = this.vertexP.instantiate().show();
+    vertex = this.vertexP.instantiate().show();
     this.vertices.set(nm,vertex);
   }
-  if (!this.center) {
-    let vertex = this.vertexP.instantiate().show();
-    center = this.set('center',vertex);
-  }
+  //if (!this.center) {
+  vertex = this.vertexP.instantiate().show();
+  center = this.set('center',vertex);
+  //}
   this.updatePositions();
   let edgeIndex = 0;
   const addEdge =  (v0,v1) => {
@@ -72,6 +73,21 @@ item.update = function () {
    
   }
  this.numNodesBuilt = numNodes;
+}
+
+
+item.selectRoot = function () {
+  this.__select('svg');
+}
+ 
+
+item.actions = function (node) {
+  let rs = [];
+  if (!node) return;
+  if (node.role === 'vertex') {
+     rs.push({title:'Select Kit Root',action:'selectRoot'});
+  }
+  return rs;
 }
 ui.hide(item,['builtDimension','vertices','edges','numNodesBuilt']);
 

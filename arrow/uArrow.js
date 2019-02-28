@@ -110,10 +110,10 @@ item.updateControlPoint = function (idx,rpos) {
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,['stroke','stroke-width','headLength','headWidth'],own);
-  if (this.head.__sourceUrl !== src.head.__sourceUrl) {
+  /*if (this.head.__sourceUrl !== src.head.__sourceUrl) {
     this.set('head',Object.getPrototypeOf(src.head).instantiate());
   }
-  this.head.transferState(src.head,own);
+  this.head.transferState(src.head,own);*/
    if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());

@@ -290,7 +290,7 @@ kit.actions = function (node) {
   let rs = [];
   if (!node) return;
   if (node.role === 'vertex') {
-     rs.push({title:'Select Whole Tree',action:'selectTree'},
+     rs.push({title:'Select Kit Root',action:'selectTree'},
                {title:'Add Child',action:'addChild'});
     if (node.parentVertex) {
       rs.push({title:'Add Sibling',action:'addSibling'});
@@ -317,7 +317,7 @@ kit.transferElementState = function (dst,src,own) {
 }
 kit.isKit = true;
 /* end section: misc */
-
+ui.hide(kit,['edges','vertices']);
 
 return kit;
 });

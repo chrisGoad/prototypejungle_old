@@ -331,7 +331,7 @@ item.selectTree = function () {
 item.actions = function (text) {
   let rs = [];
   if (text.role === 'vertex') {
-    rs.push({title:'Select Whole Tree',action:'selectTree'});
+    rs.push({title:'Select Kit Root',action:'selectTree'});
     rs.push({title:'Add Child',action:'addChildAction'});
     if (!(text.__parent.__parent.isKit)) {
       rs.push({title:'Add Sibling',action:'addSibling'});
@@ -350,6 +350,8 @@ item.transferElementState = function (dst,src,own) {
     core.setProperties(dst,src, ['draggableInKit'],own,true);       // dontCopy = true
   } 
 }
+ui.hide(item,['firstUpdate','rootNode','leafWidth']);
+
 
 item.isKit = true;
 

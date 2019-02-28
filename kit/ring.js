@@ -73,6 +73,22 @@ item.update = function () {
 }
 ui.hide(item,['builtDimension','vertices','edges','numNodesBuilt']);
 
+
+
+item.selectRoot = function () {
+  this.__select('svg');
+}
+ 
+
+item.actions = function (node) {
+  let rs = [];
+  if (!node) return;
+  if (node.role === 'vertex') {
+     rs.push({title:'Select Kit Root',action:'selectRoot'});
+  }
+  return rs;
+}
+
 return item;
 });
      
