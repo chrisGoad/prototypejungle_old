@@ -5,8 +5,8 @@ core.require('/line/line0.js',function (lineP) {
 
 let item = lineP.instantiate();
 // adjustable parameters
-item.waveLength = 10;
-item.waveAmplitude = 1; // as a fraction of the wave length
+item.waveLength = 20;
+item.waveAmplitude = 10; 
 item.cornerFraction = 0.4; // the fraction of the wave taken up by  corners
 /* end adjustable parameters */
 //item.adjustableProperties = lineP.adjustableProperties.concat(['waveLength','waveAmplitude','cornerFraction']);
@@ -17,8 +17,8 @@ item.update = function () {
   let thisHere = this;
   let e0 = this.end0,e1 = this.end1;
   let v = e1.difference(e0);
-  let hln = e1.length();
-  let halfWaveCount = Math.round(4*hln/(this.waveLength));
+  let hln = v.length();
+  let halfWaveCount = Math.round(2*hln/(this.waveLength));
   const p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
@@ -27,7 +27,7 @@ item.update = function () {
     let delta = endPoint.difference(startPoint);
     let a = 0.5 * thisHere.waveAmplitude;
     let distToP1 = ((1 - thisHere.cornerFraction)/2);
-    let n = delta.normal();
+    let n = (delta.normal().normalize()).times(1/1.3);
     if (up) {
       n = n.minus();
     }

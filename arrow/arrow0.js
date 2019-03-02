@@ -67,7 +67,7 @@ let normal,length;
 item.computeParams = function () {
   let {end0,end1} = this;
   length = end0.distance(end1);
-  this.set('direction', end1.difference(end0).normalize());
+  this.direction.copyto(end1.difference(end0).normalize());
   normal = this.direction.normal();
 }
 

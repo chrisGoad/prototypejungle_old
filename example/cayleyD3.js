@@ -3,7 +3,7 @@
 core.require('/shape/circle.js','/arrow/arcArrow.js','/data/cayley_d3.json',function (circlePP,arrowPP,data) {
 let item = svg.Element.mk('<g/>');
 let circleP = core.installPrototype('circle',circlePP);
-let arrowP = item.set('edgeP',arrowPP.instantiate()).hide();
+let arrowP = core.installPrototype('arrow',arrowPP);
 circleP.dimension = 40;
 circleP.fill = 'red';
 arrowP.labelSep = 15;
