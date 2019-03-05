@@ -18,7 +18,7 @@ item.cornerOffset = 0;
 item.role = 'vertex';
 item.resizable = true;
 item.text = '';
-item.set('borderProperties',['extraRight','extraLeft','cornerOffset']);
+item.set('borderProperties',core.lift(['extraRight','extraLeft','cornerOffset']));
 
 item.borderP = core.installPrototype('border',borderPP);
 item.contentsP = core.installPrototype('contents',contentsPP);

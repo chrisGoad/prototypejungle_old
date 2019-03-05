@@ -21,10 +21,18 @@ item.text = '';
 item.borderP = core.installPrototype('border',borderPP);
 item.contentsP = core.installPrototype('contents',contentsPP);
 contentsPP.installContainerMethods(item,borderPP,contentsPP);
-
+/*
+item.initializePrototype = function () {
+  debugger;
+  contentsPP.installContainerMethods(this,borderPP,contentsPP);
+}
+*/
 item.update = function () {
   this.stdUpdate();
 }
+
+//item.__setFieldType('stroke','svg.Rgb');
+
 
 graph.installCirclePeripheryOps(item);
 
