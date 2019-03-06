@@ -83,10 +83,10 @@ item.initializeNewEnds = function () {
   let interval = (rightX - leftX)/(numNew+1);
   let cx = leftX+interval;
   for (let i=currentLength;i<this.outCount;i++) {
-    ends.push(Point.mk(cx,this.end1x));
-    cy += interval;
+    ends.push(Point.mk(cx,this.end1y));
+    cx += interval;
   }
-  ends.push(eBottom);
+  ends.push(eRight);
 }
 
 item.pointsDown = function () {
@@ -95,6 +95,7 @@ item.pointsDown = function () {
  
 }
 item.update = function () {
+  debugger;
   let i;
   this.initializeNewEnds();
   this.buildShafts();
