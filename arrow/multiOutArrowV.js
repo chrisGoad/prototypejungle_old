@@ -14,10 +14,10 @@ item.headWidth = 8;
 item.stroke = "black";
 item.elbowWidth = 10;
 item.joinY = 25; // distance from join to end1
-item.set('singleEnd',Point.mk(0,30)); 
+item.set('singleEnd',Point.mk(0,-15)); 
 item.set("ends",core.ArrayNode.mk());
-item.ends.push(Point.mk(-10,0));
-item.ends.push(Point.mk(10,0));
+item.ends.push(Point.mk(0,15));
+//item.ends.push(Point.mk(10,0));
 item.set("arrowHeads", svg.Element.mk('<g/>'));
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
@@ -31,6 +31,7 @@ item.arrowHeadPName = arrowHeadP.__name; //needed to make swap prototype do the 
 item.role = 'multiOut';
 item.outCount = item.ends.length;
 item.includeEndControls = true;
+item.vertical = true;
 
 item.set("shafts",core.ArrayNode.mk());
 
@@ -63,25 +64,38 @@ item.buildArrowHeads= function () {
   }
 }
 
-// new ends are always placed between the last two ends
+// new ends are always placed between the last two ends, if there are two
 item.initializeNewEnds = function () {
   let currentLength = this.ends.length;
   let numNew = this.outCount - currentLength;
   let ends = this.ends;  
-  let eLeft = ends[currentLength-2];
   let eRight = ends[currentLength-1];
-  this.end1y= Math.max(eLeft.y,eRight.y);
+  let eLeft;
+  if (ends.length < 2) {
+    this.end1y = eRight.y;
+  } else {
+    eLeft = ends[currentLength-2];
+    eRight = ends[currentLength-1];
+    this.end1y= Math.max(eLeft.y,eRight.y);
+  }
   this.e01 = this.end1y - this.singleEnd.y;
+
   if (numNew <= 0) {
     this.outCount = currentLength; // removing ends not supported
     return;
   }
   ui.unselect();
-  ends.pop();
-  let leftX = eLeft.x;
+  let cx,interval;
   let rightX = eRight.x;
-  let interval = (rightX - leftX)/(numNew+1);
-  let cx = leftX+interval;
+  ends.pop();
+  if (ends.length < 2) {
+    cx = rightX - 5;
+    interval = 10;
+  }  else {
+    let leftX = eLeft.x;
+    interval = (rightX - leftX)/(numNew+1);
+    cx = leftX+interval;
+  }
   for (let i=currentLength;i<this.outCount;i++) {
     ends.push(Point.mk(cx,this.end1y));
     cx += interval;
@@ -95,7 +109,6 @@ item.pointsDown = function () {
  
 }
 item.update = function () {
-  debugger;
   let i;
   this.initializeNewEnds();
   this.buildShafts();
@@ -160,7 +173,6 @@ item.updateControlPoint = function (idx,pos) {
       this.singleEnd.copyto(pos);
     }
   } else if (idx === 0) {
-    debugger;
     let params = this.arrowHeads.h0.updateControlPoint(pos,true);
     let ln = this.ends.length;
     for (let i=0;i<ln;i++) {
@@ -185,25 +197,26 @@ item.updateControlPoint = function (idx,pos) {
 
 
 item.connected = function (idx) {
-  if (idx === 2) {
+  if (idx === 1) {
     return !!(this.singleVertex);
-  } else if (idx > 2) {
+  } else if (idx > 1) {
     let vertices = this.vertices;
     if (vertices) {
-      return  !!(vertices[idx-3]);
+      return  !!(vertices[idx-2]);
     }
   }
   return false;
 }
 
 item.dropControlPoint = function (idx,droppedOver) {
+  debugger;
   if (!droppedOver) {
     return;
   }
-  if (idx === 2) {
+  if (idx === 1) {
     graph.connectMultiSingleVertex(this,droppedOver);
-  } else if (idx > 2) {
-    graph.connectMultiVertex(this,idx-3,droppedOver);
+  } else if (idx > 1) {
+    graph.connectMultiVertex(this,idx-2,droppedOver);
   }
   graph.updateMultiEnds(this);
   this.update();
