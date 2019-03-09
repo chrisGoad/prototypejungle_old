@@ -119,7 +119,7 @@ item.update = function () {
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let down = this.pointsDown();
   let end0 = ends[0];
-  let depth =(singleEnd.y - end0.y)/2;
+  let depth =-(singleEnd.y - end0.y)/2;
   for (i=0;i<ln;i++) {
     let end1 = ends[i];
     let arrowHead = arrowHeads['h'+i];
@@ -132,8 +132,8 @@ item.update = function () {
     let shaftEnd = arrowHead.solidHead ?end1.plus(this.direction.times((down?0.5:-0.5)*this.headLength)):end1;
     let shaft = shafts[i];
     shaft.depth = depth;
-    shaft.end1.copyto(singleEnd);
-    shaft.end0.copyto(shaftEnd);
+    shaft.end0.copyto(singleEnd);
+    shaft.end1.copyto(shaftEnd);
     shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
