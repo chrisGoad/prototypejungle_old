@@ -99,10 +99,15 @@ kit.positionvertices = function (root) {
 kit.deleteSubtree = function (vertex,topCall) {
   let children = vertex.__descendants;
   let thisHere = this;
+  let outMulti = this.outMulti;
+  
   if  (children && (children.length > 0)) {
     children.forEach(function (child) {
       thisHere.deleteSubtree(child);
     });
+  }
+  if (outMulti) {
+    outMulti.remove();
   }
   let parent = vertex.parentVertex;
   if (parent) {
@@ -189,7 +194,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
     multi.outCount = ln;
     multi.initializeNewEnds();
 
-    graph.connectMultiVertex(multi,ln-1,newVertex);
+    graph.connectMultiVertex(multi,ln-1,newVertex,'top');
     
     if (doUpdate) {
       multi.update();
@@ -257,12 +262,12 @@ kit.addMultis = function (vertex) {
     this.multis.add(newMulti,'m');
     vertex.outMulti = newMulti;
     debugger;
-    graph.connectMultiSingleVertex(newMulti,vertex);
+    graph.connectMultiSingleVertex(newMulti,vertex,'bottom');
     let idx = 0;
     //graph.connectMultiVertex(newMulti,idx++,ds[0]);
     //return;
     ds.forEach((child) => {
-      graph.connectMultiVertex(newMulti,idx++,child);
+      graph.connectMultiVertex(newMulti,idx++,child,'top');
     });
    //ds.forEach(this.addMultis);
   }
