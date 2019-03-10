@@ -18,7 +18,7 @@ item.set('singleEnd',Point.mk(0,-15));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(Point.mk(0,15));
 //item.ends.push(Point.mk(10,0));
-item.set("arrowHeads", svg.Element.mk('<g/>'));
+item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
 
@@ -48,19 +48,16 @@ item.buildShafts = function () {
     this.shafts.push(shaft);
   }
 }
-item.numHeads = 0;
 item.buildArrowHeads= function () {
-  let arrowHeads = this.arrowHeads;
-  let arrowHeadP = core.root.prototypes[this.arrowHeadPName];
   let ln = this.ends.length;
-  let lns = this.numHeads;
-  let i;
-  for (i=lns;i<ln;i++) {
+  let arrowHeads = this.arrowHeads;
+  let lns = arrowHeads.length;
+  let arrowHeadP = core.root.prototypes[this.arrowHeadPName];
+  for (let i=lns;i<ln;i++) {
     let arrowHead = arrowHeadP.instantiate();
     arrowHead.unselectable = true;
     arrowHead.show();
-    let nm = 'h'+this.numHeads++;
-    arrowHeads.set(nm,arrowHead);
+    arrowHeads.push(arrowHead);
   }
 }
 
@@ -122,7 +119,7 @@ item.update = function () {
   let depth =-(singleEnd.y - end0.y)/2;
   for (i=0;i<ln;i++) {
     let end1 = ends[i];
-    let arrowHead = arrowHeads['h'+i];
+    let arrowHead = arrowHeads[i];
     if (arrowHead.solidHead) {
       arrowHead.fill = this.stroke;
     } else {
@@ -145,12 +142,23 @@ item.update = function () {
   }
 }
 
+item.removeEnd = function (idx) {
+  let ends = this.ends;
+  if (idx >= ends.length) {
+    error('out of bounds in removeEnd');
+  }
+  ends[idx].remove();
+  this.shafts[idx].remove();
+  this.arrowHeads[idx].remove();
+  this.outCount = ends.length;
+}
+  
 
 item.controlPoints = function () {
   let e0 = this.singleEnd;
 //  this.joinX = this.e01 * this.elbowPlacement;
 //  let joinPoint = Point.mk(this.singleEnd.x+this.joinX,e0.y);
-  let headControlPoint = this.arrowHeads.h0.controlPoint(); 
+  let headControlPoint = this.arrowHeads[0].controlPoint(); 
   let rs = [headControlPoint];
   if (this.includeEndControls) {
     rs.push(e0);
@@ -173,10 +181,10 @@ item.updateControlPoint = function (idx,pos) {
       this.singleEnd.copyto(pos);
     }
   } else if (idx === 0) {
-    let params = this.arrowHeads.h0.updateControlPoint(pos,true);
+    let params = this.arrowHeads[0].updateControlPoint(pos,true);
     let ln = this.ends.length;
     for (let i=0;i<ln;i++) {
-      let arrowHead = this.arrowHeads['h'+i];
+      let arrowHead = this.arrowHeads[i];
       arrowHead.headWidth = params[0];
       arrowHead.headLength = params[1];
       arrowHead.update();
