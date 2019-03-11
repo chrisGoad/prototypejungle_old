@@ -1,16 +1,18 @@
-core.require('/kit/multiOutTreeV.js','/arrow/multiOutArrowV.js','/container/roundedRectangle.js',function (treeP,multiPP,circlePP) {
+core.require('/kit/multiTree.js','/arrow/multiOut.js','/container/roundedRectangle.js',function (treeP,multiPP,circlePP) {
 let tree = treeP.instantiate();
 
 let dataString ='{"d":[{},{}]}';
 let data = {d:[{},{}]};
 
 tree.initialize = function () {
+  tree.vertical = true;
   let vertexP = core.installPrototype('vertexP',circlePP);
   let multiP = core.installPrototype('edgeP',multiPP);
   vertexP.fill = "transparent";
   vertexP.stroke = "black";
-  vertexP.dimension = 30;
-  /*
+  vertexP.width = 40;
+   vertexP.height = 30;
+ /*
   edgeP.headGap = 5;
   edgeP.tailGap = 7;
   edgeP['stroke-width'] = 3;

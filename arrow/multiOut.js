@@ -1,7 +1,8 @@
 //multiOutArrow
 
 
-core.require('/shape/c.js','/shape/u.js','/arrow/solidHead.js',function (elbowPPH,elbowPPV,arrowHeadPP) {
+//core.require('/shape/c.js','/shape/u.js','/arrow/solidHead.js',function (elbowPPH,elbowPPV,arrowHeadPP) {
+core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -22,7 +23,7 @@ item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
 
-item.set('elbowP',(item.vertical?elbowPPV:elbowPPH.instantiate()).hide());
+item.set('elbowP',elbowPP.instantiate().hide());
 item.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
 
 let arrowHeadP = item.arrowHeadP;
@@ -34,10 +35,11 @@ item.includeEndControls = true;
 
 item.set("shafts",core.ArrayNode.mk());
 
-item.set('direction',item.vertical?Point.mk(0,1):Point.mk(1,0));
+item.set('direction',Point.mk(0,0));
 
 item.elbowPlacement = 0.5;
 item.buildShafts = function () {
+  this.elbowP.vertical = !this.vertical;
   let ln = this.ends.length;
   let lns = this.shafts.length;
   let i;
@@ -108,6 +110,7 @@ item.pointsPositive = function () { // down for vertical; right for horizontal
 item.update = function () {
   let i;
   let vertical = this.vertical;
+  this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
   this.initializeNewEnds();
   this.buildShafts();
   this.buildArrowHeads();
@@ -129,11 +132,7 @@ item.update = function () {
     core.setProperties(arrowHead,this,['headLength','headWidth']);
     let shaftEnd = arrowHead.solidHead ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
     let shaft = shafts[i];
-    if (vertical) {
-      shaft.depth = depth;
-    } else {
-      shaft.width = depth;
-    }
+    shaft.depth = depth;
     shaft.end0.copyto(singleEnd);
     shaft.end1.copyto(shaftEnd);
     shaft.elbowPlacement = this.elbowPlacement;
