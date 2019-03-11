@@ -52,7 +52,7 @@ kit.positionRelative = function () {
 }
 
 
-kit.computeRelativePositions = function () {
+kit.computeRelativePositionssss = function () {
 
   let recurse = function (vertex) {
     let rootPosition = vertex.getTranslation();
@@ -143,7 +143,9 @@ kit.__delete = function (vertex) {
       return;
     }
     this.deleteSubtree(vertex,true);
-    this.positionRelative();
+    treeLib.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
+
+    //this.positionRelative();
     //this.update();
     ui.vars.setSaved(false);
     this.draw();
@@ -156,6 +158,7 @@ kit.__delete = function (vertex) {
 //index = index at which to insert the descendant
  
 kit.addDescendant = function (vertex,index=0,doUpdate=true) {
+  debugger;
   let edgeP = this.edgeP;
   let newEdge = edgeP.instantiate().show();
   this.edges.add(newEdge,'e');
@@ -165,15 +168,19 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true) {
   this.vertices.add(newVertex,'x');
   if (doUpdate) {
     let vertexPos = vertex.getTranslation();
-    let newPos = vertexPos.plus(geom.Point.mk(0,this.vSpacing));
+    let newPos = vertexPos.plus(this.vertical?geom.Point.mk(0,this.vSpacing):geom.Point.mk(this.vSpacing,0));
     newVertex.moveto(newPos);
   }
   graph.connectVertices(newEdge,vertex,newVertex);
-  descendants(vertex).plainSplice(index,0,newEdge.end1vertex);
+  descendants(vertex).plainSplice(index,0,newVertex);
+
+  //descendants(vertex).plainSplice(index,0,newEdge.end1vertex);
   newVertex.parentVertex = vertex;
   if (doUpdate) {
-    this.positionRelative(vertex);
-    this.positionvertices(vertex);
+    treeLib.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
+
+    //this.positionRelative(vertex);
+    treeLib.positionvertices(vertex);
     graph.graphUpdate();
     vertex.__select('svg');
     dom.svgMain.fitContentsIfNeeded();
@@ -201,6 +208,7 @@ kit.addChild = function (vertex) {
 
 
 kit.buildFromData = function (data) {
+  debugger;
   let vertexP = this.vertexP;
   let edgeP = this.edgeP;
   if (vertexP) {
@@ -211,9 +219,11 @@ kit.buildFromData = function (data) {
   if (!data) {
     return;
   }
-  treeLib.layout(data,this.hSpacing,this.vSpacing);
+  //treeLib.layout(this.vertical,data,this.hSpacing,this.vSpacing);
+  treeLib.addIds(data);
   let gdata = treeLib.toGraphData(data);
-  graph.buildFromData(this,gdata);
+  
+  graph.buildFromData(this,gdata,false);
   //now add the descendants relation on the built graph
   let vertices = this.vertices;  
   node.root = vertices[data.id];
@@ -225,8 +235,8 @@ kit.buildFromData = function (data) {
     let vid = dataForVertex.id;
     let vertex = vertices[vid];
     vertex.parentVertex = parent;
-    let rpos = dataForVertex.relPos;
-    vertex.set('__relPosition', rpos.copy());
+   // let rpos = dataForVertex.relPos;
+   // vertex.set('__relPosition', rpos.copy());
     if (parentDescendants) { // only the root lacks these
       parentDescendants.plainPush(vertex);
     }
@@ -236,8 +246,14 @@ kit.buildFromData = function (data) {
         recurse(v,vertex);
       });
     }
-  }
+  }  
   recurse(data);
+  node.root.set('__relPosition',Point.mk(0,0));
+  treeLib.layout2(node.root,this.vertical,this.hSpacing,this.vSpacing);
+  treeLib.positionvertices(node.root);
+
+  graph.graphUpdate();
+
 
 }
 
@@ -257,7 +273,7 @@ kit.dragStep = function (vertex,pos) {
 }
 
 kit.dragStart = function () {
-  this.computeRelativePositions();
+  treeLib.computeRelativePositions(this.root);
 }
 
 /* end section: drag support */
@@ -266,13 +282,20 @@ kit.dragStart = function () {
 
 
 
-kit.reposition = function (root) {
-  this.positionRelative(root);
+kit.reposition = function (root) { treeLib.reposition(root,this.vertical,this.hSpacing,this.vSpacing);}
+/*
+   treeLib.layout2(root,this.vertical,this.hSpacing,this.vSpacing);
+  //this.positionRelative(root);
+  treeLib.positionvertices(root);
+  graph.graphUpdate();
+  dom.svgMain.fitContentsIfNeeded();
+}
+ this.positionRelative(root);
   this.positionvertices(root);
   graph.graphUpdate();
   dom.svgMain.fitContentsIfNeeded();
+}*/
 
-}
 
 
 kit.repositionTree = function () {

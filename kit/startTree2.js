@@ -5,7 +5,7 @@ let dataString ='{"d":[{},{}]}';
 let data = {d:[{},{}]};
 
 tree.initialize = function () {
-  tree.vertical = true;
+  tree.vvertical = true;
   let vertexP = core.installPrototype('vertexP',circlePP);
   let multiP = core.installPrototype('edgeP',multiPP);
   vertexP.fill = "transparent";

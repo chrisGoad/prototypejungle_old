@@ -2,6 +2,9 @@
 core.require('/kit/tree_utils.js',function (treeLib) {
 let kit = svg.Element.mk('<g/>');
 
+/* this supports both vertical and horizontal trees, but variable names are chosen for the vertical case.
+For the horizontal case, for example, totalWidth actually signifies total height. Only when we hit the level of points
+do the "logical" positions (where width means "across the tree" turn into x,y positions, which take into account verticality */
 kit.hSpacing = 50;
 kit.vSpacing = 50;
 
@@ -19,11 +22,13 @@ let descendants = function (vertex) {
   return d;
 }
 
-kit.positionRelative = function () {
+
+kit.pppppositionRelative = function () {
   let root = this.root;//vertices.V0;
   root.set('__relPosition',geom.Point.mk(0,0));
   let hSpacing = this.hSpacing;
   let vSpacing = this.vSpacing;
+  let vertical = this.vertical;
   let recurse = function (vertex) {
     let children = vertex.__descendants;
     if (!children || (children.length === 0)) {
@@ -42,7 +47,7 @@ kit.positionRelative = function () {
     children.forEach(function (child) {
       let childWidth = child.treeWidth;
       let vxpos =  0.5 * childWidth + xpos;
-      child.set('__relPosition',geom.Point.mk(vxpos,ypos));
+      child.set('__relPosition',vertical?Point.mk(vxpos,ypos):Point.mk(ypos,vxpos));
       xpos += childWidth + hSpacing;
     });
     return totalWidth;
@@ -52,7 +57,7 @@ kit.positionRelative = function () {
 }
 
 
-kit.computeRelativePositions = function () {
+kit.computeRelativePositionssss = function () {
 
   let recurse = function (vertex) {
     let rootPosition = vertex.getTranslation();
@@ -70,7 +75,7 @@ kit.computeRelativePositions = function () {
 
 
 
-kit.positionvertices = function (root) {
+kit.positionverticesss = function (root) {
   // now generate absolute  positions
   let recurse  = function (vertex,position) {
     let myPosition;
@@ -175,7 +180,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
     
   if (doUpdate) {
     let vertexPos = vertex.getTranslation();
-    let newPos = vertexPos.plus(geom.Point.mk(0,this.vSpacing));
+    let newPos = vertexPos.plus(this.vertical?Point.mk(0,this.vSpacing):Point.mk(this.vSpacing,0));
     newVertex.moveto(newPos);
     newVertex.update();
     newVertex.draw();
@@ -194,7 +199,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
     multi.outCount = ln;
     multi.initializeNewEnds();
 
-    graph.connectMultiVertex(multi,ln-1,newVertex,'top');
+    graph.connectMultiVertex(multi,ln-1,newVertex,this.vertical?'top':'right');
     
     if (doUpdate) {
       multi.update();
@@ -203,11 +208,12 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
   } else {
     this.addMultis(vertex);
   }
-  vertex.outMulti.ends[ln-1] = geom.Point.mk(0,-10000); // so that connection will be made from the top
+  vertex.outMulti.ends[ln-1] = this.vertical?Point.mk(0,-10000):Point.mk(-10000,0); // so that connection will be made from the top
 
   if (doUpdate) {
-    this.positionRelative(vertex);
-    this.positionvertices(vertex);
+    treeLib.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
+  //  this.positionRelative(vertex);
+    treeLib.positionvertices(vertex);
     let ends = this.ends;
     newVertexPos = newVertex.toGlobalCoords();
     debugger;
@@ -226,6 +232,7 @@ kit.addSibling = function (vertex,doUpdate=true) {
   if (parent) {
     let idx = descendants(parent).indexOf(vertex);
     this.addDescendant(parent,idx+1,doUpdate);
+    core.saveState();
     vertex.__select('svg');
   }
 }
@@ -233,16 +240,18 @@ kit.addSibling = function (vertex,doUpdate=true) {
 
 kit.addChild = function (vertex) {
   this.addDescendant(vertex,-1);
+  graph.graphUpdate();
   core.saveState();
   vertex.__select('svg');
 }
 
 
+
 kit.addVertices = function (parent,childrenData) {
   childrenData.forEach( (cd) => {
     let newVertex = this.addDescendant(parent,-1,false);
-    let rpos = cd.relPos;
-    newVertex.set('__relPosition', rpos.copy());
+   // let rpos = cd.relPos;
+    newVertex.set('__relPosition', Point.mk(0,0));
     newVertex.parentVertex = parent;
     if (cd.d) {
       this.addVertices(newVertex,cd.d);
@@ -253,22 +262,23 @@ kit.addVertices = function (parent,childrenData) {
 kit.addMultis = function (vertex) {
   debugger;
   let ds = vertex.__descendants;
+  let vertical = this.vertical;
   if ((!vertex.outMulti) && ds && (ds.length > 0)) {
     this.multiP.vertical = this.vertical;
     let newMulti = this.multiP.instantiate().show();
     newMulti.outCount = ds.length;
     newMulti.initializeNewEnds();
-    newMulti.singleEnd = geom.Point.mk(0,10000); // so that connection will be made from the bottom
+    newMulti.singleEnd = this.vertical?Point.mk(0,10000):Point.mk(10000,0); // so that connection will be made from the bottom
 
     this.multis.add(newMulti,'m');
     vertex.outMulti = newMulti;
     debugger;
-    graph.connectMultiSingleVertex(newMulti,vertex,'bottom');
+    graph.connectMultiSingleVertex(newMulti,vertex,vertical?'bottom':'left');
     let idx = 0;
     //graph.connectMultiVertex(newMulti,idx++,ds[0]);
     //return;
     ds.forEach((child) => {
-      graph.connectMultiVertex(newMulti,idx++,child,'top');
+      graph.connectMultiVertex(newMulti,idx++,child,vertical?'top':'right');
     });
    //ds.forEach(this.addMultis);
   }
@@ -278,6 +288,8 @@ kit.addMultis = function (vertex) {
   
   
 kit.buildFromData = function (data) {
+  debugger;
+  let vertical = this.vertical;
   let vertexP = this.vertexP;
   let edgeP = this.edgeP;
   if (vertexP) {
@@ -288,7 +300,7 @@ kit.buildFromData = function (data) {
   if (!data) {
     return;
   }
-  treeLib.layout(data,this.hSpacing,this.vSpacing);
+  //treeLib.layout(vertical,data,this.hSpacing,this.vSpacing);
   //let gdata = treeLib.toGraphData(data);
   //graph.buildFromData(this,gdata);
   //now add the descendants relation on the built graph
@@ -303,7 +315,7 @@ kit.buildFromData = function (data) {
   if (data.d) {
     this.addVertices(root,data.d);
   }
-  let recurse = function (dataForVertex,parent) { 
+  let recurseee = function (dataForVertex,parent) { 
     let parentDescendants;
     if (parent) {
       parentDescendants = descendants(parent); // creates the descendant array
@@ -325,7 +337,8 @@ kit.buildFromData = function (data) {
   }
 //  recurse(data);
 //  this.computeRelativePositions();
-  this.positionvertices(root);
+  treeLib.layout2(root,this.vertical,this.hSpacing,this.vSpacing);
+  treeLib.positionvertices(root);
   debugger;
   graph.graphUpdate();
   //this.addMultis(root);
@@ -344,28 +357,30 @@ kit.dragStep = function (vertex,pos) {
  /* move all the descendants of vertex to the relative
     positions they had prior to the move of vertex
  */
- this.positionvertices(vertex);
+ treeLib.positionvertices(vertex);
  graph.graphUpdate();
 }
 
 kit.dragStart = function () {
-  this.computeRelativePositions();
+  treeLib.computeRelativePositions(this.root);
 }
 
 /* end section: drag support */
 
 /* begin section: action panel */
 
+kit.reposition = function (root) { treeLib.reposition(root,this.vertical,this.hSpacing,this.vSpacing);}
 
-
+/*
 kit.reposition = function (root) {
-  this.positionRelative(root);
-  this.positionvertices(root);
+  treeLib.layout2(root,this.vertical,this.hSpacing,this.vSpacing);
+  //this.positionRelative(root);
+  treeLib.positionvertices(root);
   graph.graphUpdate();
   dom.svgMain.fitContentsIfNeeded();
 
 }
-
+*/
 
 kit.repositionTree = function () {
   this.reposition(this.root);

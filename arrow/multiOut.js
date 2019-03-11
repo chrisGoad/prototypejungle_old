@@ -18,7 +18,7 @@ item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
-item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
+//item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
@@ -96,7 +96,7 @@ item.initializeNewEnds = function () {
     cv = firstV+interval;
   }
   for (let i=currentLength;i<this.outCount;i++) {
-    ends.push(vertical?Point.mk(cx,this.end1v):Point.mk(this.end1v,cv));
+    ends.push(vertical?Point.mk(cv,this.end1v):Point.mk(this.end1v,cv));
     cv += interval;
   }
   ends.push(eLast);

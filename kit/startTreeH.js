@@ -1,11 +1,12 @@
-//core.require('/kit/arrowTree.js','/arrow/arrow.js','/container/circle.js',function (treeP,arrowPP,circlePP) {
-core.require('/kit/arrowTree.js','/arrow/arrow.js','/shape/textPlain.js',function (treeP,arrowPP,circlePP) {
+core.require('/kit/arrowTree.js','/arrow/arrow.js','/container/circle.js',function (treeP,arrowPP,circlePP) {
+//core.require('/kit/arrowTree.js','/arrow/arrow.js','/shape/textPlain.js',function (treeP,arrowPP,circlePP) {
 let tree = treeP.instantiate();
 
 let dataString ='{"d":[{},{}]}';
 let data = {d:[{},{}]};
 
 tree.initialize = function () {
+  tree.vertical = false;
   let vertexP = core.installPrototype('vertexP',circlePP);
   let edgeP = core.installPrototype('edgeP',arrowPP);
   vertexP.fill = "transparent";
