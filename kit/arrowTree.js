@@ -125,6 +125,10 @@ kit.deleteSubtree = function (vertex,topCall) {
 
 
 kit.__delete = function (vertex) {
+  debugger;
+  treeLib.deleteVertex(vertex);
+}
+/*  debugger;
   if (core.hasRole(vertex,'edge')) {
     if (vertex.__treeEdge) {
       ui.alert('Edges that are part of the tree cannot be deleted');
@@ -151,7 +155,7 @@ kit.__delete = function (vertex) {
     this.draw();
 });
 }
-
+*/
 /* end section :deletion  */
 
 /* begin section: constructing trees */

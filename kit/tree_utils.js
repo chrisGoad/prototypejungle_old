@@ -225,6 +225,80 @@ item.addChildggg = function (vertex) {
   vertex.__select('svg');
 }
 
+
+item.deleteSubtree = function (vertex,topCall) {
+  let children = vertex.__descendants;
+  let thisHere = this;
+  if  (children && (children.length > 0)) {
+    children.forEach(function (child) {
+      thisHere.deleteSubtree(child);
+    });
+  }
+  let parent = vertex.parentVertex;
+  if (parent) {
+    let connectedEdges = vertex.connectedEdges;
+      let edgesToRemove = [];
+      connectedEdges.forEach((edge) => {
+        let isMulti = edge.__sourceUrl === '/arrow/multiOut.js';
+        if (isMulti) {
+          debugger;
+          if (edge.singleVertex === parent) {
+            if (topCall) {
+              let idx = edge.vertices.indexOf(vertex);
+              debugger;
+              edge.removeEnd(idx);
+            } else {
+              edgesToRemove.push(edge);
+              //edge.remove(); removal from an array that you are currently iterating over causes problems
+            }
+          }
+        } else {
+          edgesToRemove.push(edge);
+          //edge.remove();
+        }
+      });
+    debugger;
+    edgesToRemove.forEach((edge) => edge.remove());
+    if (topCall) {
+      let descendants = parent.__descendants;
+      let idx = descendants.indexOf(vertex);
+      descendants.splice(idx,1);
+    }
+  }
+  graph.disconnectVertex(vertex);
+  vertex.remove();
+}
+
+item.deleteVertex = function (vertex) {
+  debugger;
+  if (core.hasRole(vertex,'edge')) {
+    if (vertex.__treeEdge) {
+      ui.alert('Edges that are part of the tree cannot be deleted');
+    } else {
+      ui.standardDelete(vertex);
+    }
+    return;
+  }
+  if (!core.hasRole(vertex,'vertex')) {
+    ui.standardDelete(vertex);
+    return;
+  }
+ // editor.confirm('Are you sure you wish to delete this subtree?', () => {
+    if (this.root === vertex) {
+      ui.standardDelete(this);
+      return;
+    }
+    this.deleteSubtree(vertex,true);
+    this.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
+
+    //this.positionRelative();
+    //this.update();
+    ui.vars.setSaved(false);
+    core.saveState();
+//});
+}
+
+
      
   return item;
 });

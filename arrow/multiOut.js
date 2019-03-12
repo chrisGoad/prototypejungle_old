@@ -153,6 +153,7 @@ item.removeEnd = function (idx) {
   ends[idx].remove();
   this.shafts[idx].remove();
   this.arrowHeads[idx].remove();
+  this.vertices.splice(idx,1);
   this.outCount = ends.length;
 }
   

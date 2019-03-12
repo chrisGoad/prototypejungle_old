@@ -135,29 +135,7 @@ kit.deleteSubtree = function (vertex,topCall) {
 
 
 kit.__delete = function (vertex) {
-  if (core.hasRole(vertex,'edge')) {
-    if (vertex.__treeEdge) {
-      ui.alert('Edges that are part of the tree cannot be deleted');
-    } else {
-      ui.standardDelete(vertex);
-    }
-    return;
-  }
-  if (!core.hasRole(vertex,'vertex')) {
-    ui.standardDelete(vertex);
-    return;
-  }
-  editor.confirm('Are you sure you wish to delete this subtree?', () => {
-    if (this.root === vertex) {
-      ui.standardDelete(this);
-      return;
-    }
-    this.deleteSubtree(vertex,true);
-    this.positionRelative();
-    //this.update();
-    ui.vars.setSaved(false);
-    this.draw();
-});
+  treeLib.deleteVertex(vertex);
 }
 
 /* end section :deletion  */
@@ -208,13 +186,13 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
   } else {
     this.addMultis(vertex);
   }
-  vertex.outMulti.ends[ln-1] = this.vertical?Point.mk(0,-10000):Point.mk(-10000,0); // so that connection will be made from the top
+  vertex.outMulti.ends[ln-1].copyto(this.vertical?Point.mk(0,-10000):Point.mk(-10000,0)); // so that connection will be made from the top
 
   if (doUpdate) {
     treeLib.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
   //  this.positionRelative(vertex);
     treeLib.positionvertices(vertex);
-    let ends = this.ends;
+    //let ends = this.ends;
     newVertexPos = newVertex.toGlobalCoords();
     debugger;
     //this.update();
@@ -268,7 +246,7 @@ kit.addMultis = function (vertex) {
     let newMulti = this.multiP.instantiate().show();
     newMulti.outCount = ds.length;
     newMulti.initializeNewEnds();
-    newMulti.singleEnd = this.vertical?Point.mk(0,10000):Point.mk(10000,0); // so that connection will be made from the bottom
+    newMulti.set('singleEnd',this.vertical?Point.mk(0,10000):Point.mk(10000,0)); // so that connection will be made from the bottom
 
     this.multis.add(newMulti,'m');
     vertex.outMulti = newMulti;
