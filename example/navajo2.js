@@ -6,16 +6,17 @@ core.require('/kit/multiTree.js','/shape/textPlain.js','/arrow/multiOut.js','/da
 let tree = treeP.instantiate();//svg.Element.mk('<g/>');
 let vertexP = core.installPrototype('vertexP',vertexPP);
 tree.vertexP = vertexP;
+vertexP.width = 150;
 let multiP = core.installPrototype('edgeP',multiPP);
 tree.multiP = multiP;
-//var tree =  item.set('tree',treeP.instantiate());
-/*tree.connectorP.width = 100;
-tree.leafWidth = 180;
-tree.textP.width = 180;
-tree.textP.hPadding = 10;
-tree.textP['font-size'] = 12;
-tree.paddingRight=10;*/
-tree.show();
-tree.buildFromData(data);
+tree.vertical = false;
+tree.hSpacing = 250;
+tree.vSpacing = 20;
+
+tree.initialize = function () {
+  tree.show();
+  debugger;
+  tree.buildFromData(data);
+}
 return tree;
 });

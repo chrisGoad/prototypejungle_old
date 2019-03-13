@@ -1,4 +1,4 @@
-//multiOutArrow
+//multiOut
 
 
 //core.require('/shape/c.js','/shape/u.js','/arrow/solidHead.js',function (elbowPPH,elbowPPV,arrowHeadPP) {
@@ -7,6 +7,7 @@ let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 //item.pointsDown = true; 
+item.includeArrows = false;
 item.vertical = false;
 item.stroke = "black";
 item['stroke-width'] = 2;
@@ -113,9 +114,12 @@ item.update = function () {
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
   this.initializeNewEnds();
   this.buildShafts();
-  this.buildArrowHeads();
+  if (this.includeArrows) {
+    this.buildArrowHeads();
+  }
   let {singleEnd,ends,shafts,arrowHeads} = this;
   let ln = ends.length;
+  core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let positiveDir = this.pointsPositive();
@@ -123,14 +127,16 @@ item.update = function () {
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
   for (i=0;i<ln;i++) {
     let end1 = ends[i];
-    let arrowHead = arrowHeads[i];
-    if (arrowHead.solidHead) {
-      arrowHead.fill = this.stroke;
-    } else {
-      core.setProperties(arrowHead,this,['stroke','stroke-width']);
+    if (this.includeArrows) {
+      let arrowHead = arrowHeads[i];
+      if (arrowHead.solidHead) {
+        arrowHead.fill = this.stroke;
+      } else {
+        core.setProperties(arrowHead,this,['stroke','stroke-width']);
+      }
+      core.setProperties(arrowHead,this,['headLength','headWidth']);
     }
-    core.setProperties(arrowHead,this,['headLength','headWidth']);
-    let shaftEnd = arrowHead.solidHead ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
+    let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
     let shaft = shafts[i];
     shaft.depth = depth;
     shaft.end0.copyto(singleEnd);
@@ -138,10 +144,11 @@ item.update = function () {
     shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
-    arrowHead.headPoint.copyto(end1);
-    arrowHead.direction.copyto(this.direction.times(positiveDir?-1:1));
-
-    arrowHead.update();
+    if (this.includeArrows) {
+      arrowHead.headPoint.copyto(end1);
+      arrowHead.direction.copyto(this.direction.times(positiveDir?-1:1));
+      arrowHead.update();
+    }
   }
 }
 

@@ -1,5 +1,9 @@
 core.require(function () {
 
+/* this supports both vertical and horizontal trees, but variable names are chosen for the vertical case.
+For the horizontal case, for example, totalWidth actually signifies total height. Only when we hit the level of points
+do the "logical" positions (where width means "across the tree" turn into x,y positions, which take into account verticality*/
+
 
 // Section: connection support
 //data structure for tree
@@ -30,16 +34,13 @@ item.descendants = function (vertex) {
   return d;
 }
 
-
 const relativeToAbsolutePositions = function (vertex,cp) {
   vertex.set('position',cp.copy());
   let descendants = vertex.d;
   if (descendants) {
     descendants.forEach(function (vertex) {
       let rp = vertex.relPos;
-      //let ap = core.ArrayNode.mk([cp[0] + rp[0],cp[1] + rp[1]]);
       let ap = cp.plus(rp);
-      //let ap = core.ArrayNode.mk([cp[0] + rp[0],cp[1] + rp[1]]);
       relativeToAbsolutePositions(vertex,ap);
     });
   }
@@ -57,10 +58,7 @@ item.addIds = function (vertex) {
      }
   }
   recurse(vertex);
-}
-         
-//kit.asPoint = (vertical,x,y) => vertical? Point.mk(x,y):Point.mk(y,x);
-    
+}    
 
 
 item.positionvertices = function (root) {
@@ -86,10 +84,15 @@ item.positionvertices = function (root) {
 
 
 item.layout2 = function (root,vertical,hSpacing,vSpacing) {
+  debugger;
   let recurse = function (vertex) {
     let children = vertex.__descendants;
     if (!children || (children.length === 0)) {
-       vertex.treeWidth = 0;//(vertex.__element)?vertex.bounds().extent.x:0;
+       let xt = (vertex.__element)?vertex.bounds().extent:undefined;
+       if (xt) {
+         console.log(xt.x,xt.y);
+       }
+       vertex.treeWidth =  xt?(this.vertical?xt.x:xt.y):0;
        return vertex.treeWidth;
     }
     let totalWidth = 0;
@@ -115,7 +118,6 @@ item.layout2 = function (root,vertical,hSpacing,vSpacing) {
 
 
 item.computeRelativePositions = function (root) {
-
   let recurse = function (vertex) {
     let rootPosition = vertex.getTranslation();
     let children = vertex.__descendants;
@@ -133,7 +135,7 @@ item.computeRelativePositions = function (root) {
   
   
 
-item.layout = function (vertical,data,hSpacing,vSpacing) {
+item.layoutttt = function (vertical,data,hSpacing,vSpacing) {
   addIds(data);
   var cy = 0;
   var recurseV = function (vertex) {
@@ -174,7 +176,6 @@ item.toGraphData = function (vertex) {
     let pos = vertex.position;
     if (pos) {
      newVertex.set('position',pos.copy());
-     //([pos[0],pos[1]]));
     }
     let txt = vertex.text;
     if (txt) {
@@ -198,79 +199,73 @@ item.toGraphData = function (vertex) {
 
 
 item.reposition = function (root,vertical,hSpacing,vSpacing) {
-   debugger;
-   this.layout2(root,vertical,hSpacing,vSpacing);
-  //this.positionRelative(root);
+  this.layout2(root,vertical,hSpacing,vSpacing);
   this.positionvertices(root);
   graph.graphUpdate();
   dom.svgMain.fitContentsIfNeeded();
 }
 
-item.addSiblinggg = function (vertex,doUpdate=true) {
-  debugger;
-  let parent = vertex.parentVertex;
-  if (parent) {
-    let idx = this.descendants(parent).indexOf(vertex);
-    this.addDescendant(parent,idx+1,doUpdate);
-    core.saveState();
-    vertex.__select('svg');
-  }
-}
-
-
-item.addChildggg = function (vertex) {
-  this.addDescendant(vertex,-1);
-  graph.graphUpdate();
-  core.saveState();
-  vertex.__select('svg');
-}
-
-
-item.deleteSubtree = function (vertex,topCall) {
-  let children = vertex.__descendants;
-  let thisHere = this;
-  if  (children && (children.length > 0)) {
-    children.forEach(function (child) {
-      thisHere.deleteSubtree(child);
-    });
-  }
-  let parent = vertex.parentVertex;
-  if (parent) {
-    let connectedEdges = vertex.connectedEdges;
-      let edgesToRemove = [];
-      connectedEdges.forEach((edge) => {
-        let isMulti = edge.__sourceUrl === '/arrow/multiOut.js';
-        if (isMulti) {
-          debugger;
-          if (edge.singleVertex === parent) {
-            if (topCall) {
-              let idx = edge.vertices.indexOf(vertex);
-              debugger;
-              edge.removeEnd(idx);
-            } else {
-              edgesToRemove.push(edge);
-              //edge.remove(); removal from an array that you are currently iterating over causes problems
-            }
-          }
-        } else {
-          edgesToRemove.push(edge);
-          //edge.remove();
-        }
+item.deleteSubtree = function (vertex) {
+  let edgeToRemoveFromConnectedEdges;
+  let verticesToRemove = [];
+  const recurse = function (vertex,topCall) {
+    let children = vertex.__descendants;
+    let thisHere = this;
+    if  (children && (children.length > 0)) {
+      children.forEach((child) => {
+        recurse(child);
       });
-    debugger;
-    edgesToRemove.forEach((edge) => edge.remove());
+    }
+    let parent = vertex.parentVertex;
+    let connectedEdges = vertex.connectedEdges;
+    connectedEdges.forEach((edge) => {
+      let isMulti = edge.__sourceUrl === '/arrow/multiOut.js';
+      if (isMulti) {
+        let isIncoming = edge.singleVertex === parent;
+        if (topCall && isIncoming) {
+          debugger;
+          if (edge.outCount === 1) {
+            edge.remove();
+            edgeToRemoveFromConnectedEdges = edge;
+          } else {
+            let idx = edge.vertices.indexOf(vertex);
+            edge.removeEnd(idx);
+          }
+        } else if (!isIncoming) {
+          edge.remove(); 
+        }
+      } else {
+        let isIncoming = edge.end1vertex === vertex;
+        if (topCall && isIncoming) {
+          edgeToRemoveFromConnectedEdges = edge;
+          edge.remove();
+        } else {
+          if (!isIncoming) {
+            edge.remove();
+          }
+        }
+      }
+    });
     if (topCall) {
+      debugger;
       let descendants = parent.__descendants;
       let idx = descendants.indexOf(vertex);
       descendants.splice(idx,1);
+      if (edgeToRemoveFromConnectedEdges) {
+        let connectedEdges = parent.connectedEdges;
+        let idx = connectedEdges.indexOf(edgeToRemoveFromConnectedEdges);
+        connectedEdges.splice(idx,1);
+        parent.outMulti = undefined;
+      }
     }
+    verticesToRemove.push(vertex);
   }
-  graph.disconnectVertex(vertex);
-  vertex.remove();
+  recurse(vertex,true);
+  graph.disconnectVertices(verticesToRemove);
+  verticesToRemove.forEach( (vertex) => vertex.remove());
 }
 
 item.deleteVertex = function (vertex) {
-  debugger;
   if (core.hasRole(vertex,'edge')) {
     if (vertex.__treeEdge) {
       ui.alert('Edges that are part of the tree cannot be deleted');
@@ -283,19 +278,14 @@ item.deleteVertex = function (vertex) {
     ui.standardDelete(vertex);
     return;
   }
- // editor.confirm('Are you sure you wish to delete this subtree?', () => {
-    if (this.root === vertex) {
-      ui.standardDelete(this);
-      return;
-    }
-    this.deleteSubtree(vertex,true);
-    this.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
-
-    //this.positionRelative();
-    //this.update();
-    ui.vars.setSaved(false);
-    core.saveState();
-//});
+  if (this.root === vertex) {
+    ui.standardDelete(this);
+    return;
+  }
+  this.deleteSubtree(vertex);
+  this.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
+  ui.vars.setSaved(false);
+  core.saveState();
 }
 
 
