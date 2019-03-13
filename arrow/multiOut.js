@@ -7,8 +7,8 @@ let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 //item.pointsDown = true; 
-item.includeArrows = false;
-item.vertical = false;
+item.includeArrows = true;
+item.vertical = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
@@ -19,7 +19,7 @@ item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
-//item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
+item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
@@ -126,9 +126,10 @@ item.update = function () {
   let end0 = ends[0];
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
   for (i=0;i<ln;i++) {
+    let arrowHead;
     let end1 = ends[i];
     if (this.includeArrows) {
-      let arrowHead = arrowHeads[i];
+      arrowHead = arrowHeads[i];
       if (arrowHead.solidHead) {
         arrowHead.fill = this.stroke;
       } else {
@@ -159,27 +160,43 @@ item.removeEnd = function (idx) {
   }
   ends[idx].remove();
   this.shafts[idx].remove();
-  this.arrowHeads[idx].remove();
+  if (this.includeArrows) {
+    this.arrowHeads[idx].remove();
+  }
   this.vertices.splice(idx,1);
   this.outCount = ends.length;
 }
   
 
 item.controlPoints = function () {
-  let e0 = this.singleEnd;
-//  this.joinX = this.e01 * this.elbowPlacement;
-//  let joinPoint = Point.mk(this.singleEnd.x+this.joinX,e0.y);
-  let headControlPoint = this.arrowHeads[0].controlPoint(); 
-  let rs = [headControlPoint];
-  if (this.includeEndControls) {
-    rs.push(e0);
-    this.ends.forEach(function (inEnd) {rs.push(inEnd)});
+  let rs = [this.singleEnd];
+  this.ends.forEach(function (inEnd) {rs.push(inEnd)});
+  if (this.includeArrows) {
+    rs.push(this.arrowHeads[0].controlPoint()); 
   }
   return rs;
 }
 
+
+
+item.connected = function (idx) {
+  let ln = this.ends.length;
+  if (idx === 0) {
+    return !!(this.singleVertex);
+  } else if (idx <= ln) {
+    let vertices = this.vertices;
+    if (vertices) {
+      return  !!(vertices[idx-1]);
+    }
+  }
+  return false;
+}
+
+
 item.updateControlPoint = function (idx,pos) {
   let vertical = this.vertical;
+  let ln = this.ends.length;
+  let idxBase = this.includeArrows?0:-1;
   if (idx === 110) {
     this.joinV = vertical? this.ends[0].x - pos.x : this.ends[0].y - pos.y;
     this.elbowPlacement = Math.max(0,1 - (this.joinV)/(this.e01));
@@ -190,46 +207,33 @@ item.updateControlPoint = function (idx,pos) {
         this.singleEnd.x = pos.x;
       }
     }
-  } else if (idx === 1) {
+  } else if (idx === 0) {
      if (this.singleVertex) {
       graph.mapEndToPeriphery(this,this.singleEnd,this.singleVertex,'outConnection',pos);
     } else {
       this.singleEnd.copyto(pos);
     }
-  } else if (idx === 0) {
+  } else if (idx <= ln) {
+    let eidx = idx - 1;
+    if (this.vertices && this.vertices[eidx]) {
+       graph.mapEndToPeriphery(this,this.ends[eidx],this.vertices[eidx],'inConnections',pos,eidx);
+    } else {
+      this.ends[eidx].copyto(pos);
+    }
+  } else {
+    debugger;
     let params = this.arrowHeads[0].updateControlPoint(pos,true);
-    let ln = this.ends.length;
     for (let i=0;i<ln;i++) {
       let arrowHead = this.arrowHeads[i];
       arrowHead.headWidth = params[0];
       arrowHead.headLength = params[1];
       arrowHead.update();
       arrowHead.draw();
-    };
-    return;
-  } else {
-    let eidx = idx-2;
-    if (this.vertices && this.vertices[eidx]) {
-       graph.mapEndToPeriphery(this,this.ends[eidx],this.vertices[eidx],'inConnections',pos,eidx);
-    } else {
-      this.ends[eidx].copyto(pos);
     }
+    return;
   }
   this.update();
   this.draw();
-}
-
-
-item.connected = function (idx) {
-  if (idx === 1) {
-    return !!(this.singleVertex);
-  } else if (idx > 1) {
-    let vertices = this.vertices;
-    if (vertices) {
-      return  !!(vertices[idx-2]);
-    }
-  }
-  return false;
 }
 
 item.dropControlPoint = function (idx,droppedOver) {
@@ -237,10 +241,11 @@ item.dropControlPoint = function (idx,droppedOver) {
   if (!droppedOver) {
     return;
   }
-  if (idx === 1) {
+  let ln = this.ends.length;
+  if (idx === 0) {
     graph.connectMultiSingleVertex(this,droppedOver);
-  } else if (idx > 1) {
-    graph.connectMultiVertex(this,idx-2,droppedOver);
+  } else if (idx <= ln) {
+    graph.connectMultiVertex(this,idx-1,droppedOver);
   }
   graph.updateMultiEnds(this);
   this.update();

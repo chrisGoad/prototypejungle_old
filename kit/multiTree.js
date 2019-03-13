@@ -7,6 +7,7 @@ let kit = svg.Element.mk('<g/>');
 kit.vertical = true;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
+kit.includeArrows = true;
 
 
 // the layout operator takes across tree and out tree spacing arguments, and these little functions generate those parameters from orientation
@@ -122,6 +123,7 @@ kit.addMultis = function (vertex) {
   let vertical = this.vertical;
   if ((!vertex.outMulti) && ds && (ds.length > 0)) {
     this.multiP.vertical = this.vertical;
+    this.multiP.includeArrows = this.includeArrows;
     let newMulti = this.multiP.instantiate().show();
     newMulti.outCount = ds.length;
     newMulti.initializeNewEnds();

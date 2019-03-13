@@ -10,6 +10,7 @@ vertexP.width = 150;
 let multiP = core.installPrototype('edgeP',multiPP);
 tree.multiP = multiP;
 tree.vertical = false;
+tree.includeArrows = false;
 tree.hSpacing = 250;
 tree.vSpacing = 20;
 
