@@ -6,11 +6,11 @@ core.require(function () {
 let item =  svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>');
 
 /* adjustable parameters */
-item.vertical = true; // the part between bends is vertical, as in a C
+item.vertical = false; // the part between bends is vertical, as in a C
 item.stroke = "black";
 item['stroke-width'] = 0.2;
 item.elbowWidth = 5;
-item.depth = 10; // from end0
+//item.depth = 25; // from end0
 
 /* end adjustable parameters */
 
@@ -34,7 +34,7 @@ item.__connectionType = 'EastWest'; //  only makes east/west connections
 
 item.update = function () {
   let vertical = this.vertical;
-  this.__connectionType = vertical?'EastWest':'UpDown';
+  this.__connectionType = vertical?'UpDown':'EastWest';
   let p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
@@ -61,6 +61,9 @@ item.update = function () {
     elbow1a = geom.Point.mk(ipx,y1 + (up?ew1:-ew1));
     controlPoint1 = geom.Point.mk(ipx,y1);
     elbow1b = geom.Point.mk(ipx + (e1right?-ew1:ew1),y1);
+    if (this.depth === undefined) {
+      this.depth = 25 // for the catalog
+    }
   } else {
     let x0 = e0.x;
     let y0 = e0.y;
@@ -79,6 +82,9 @@ item.update = function () {
     elbow1a = geom.Point.mk(x1 - (toRight?ew1:-ew1),ipy);
     controlPoint1 = geom.Point.mk(x1,ipy);
     elbow1b = geom.Point.mk(x1,ipy + (e1down?-ew1:ew1));
+    if (this.depth === undefined) {
+      this.depth = -15 // for the catalog
+    }
   }
   let path = p2str('M',e0,' ');
   path += p2str('L',elbow0a,' ');
@@ -96,8 +102,21 @@ item.update = function () {
 
 
 
-item.controlPoints = function () {
+item.middlePoint =  function () {
   let e0 = this.end0;
+  let e1 = this.end1;
+  let x0 = e0.x;
+  let x1 = e1.x;
+  let y0 = e0.y;
+  let y1 = e1.y;
+  return(this.vertical)?geom.Point.mk(x0+this.depth,(y0+y1)/2):
+                                    geom.Point.mk((x0+x1)/2,y0+this.depth);
+}
+
+
+
+item.controlPoints = function () {
+ /* let e0 = this.end0;
   let e1 = this.end1;
   let middlePoint;
   let x0 = e0.x;
@@ -105,9 +124,8 @@ item.controlPoints = function () {
   let y0 = e0.y;
   let y1 = e1.y;
   middlePoint = (this.vertical)?geom.Point.mk(x0+this.depth,(y0+y1)/2):
-                                    geom.Point.mk((x0+x1)/2,y0+this.depth);
-  let rs = [this.end0,this.end1,middlePoint];
-  return rs;
+                                    geom.Point.mk((x0+x1)/2,y0+this.depth);*/
+  return [this.end0,this.end1,this.middlePoint()];
 }
 
 
@@ -137,6 +155,7 @@ item.updateControlPoint = function (idx,rpos) {
       } else {
         let y = rpos.y;
         let y0 = this.end0.y;
+        console.log('y',y,'y0',y0);
         this.depth = y - y0;
         break;
       }

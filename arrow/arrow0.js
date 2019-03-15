@@ -61,13 +61,18 @@ item.lineP = core.installPrototype('line',core.ObjectNode.mk());
 item.set("end0",geom.Point.mk(0,0));
 item.set("end1",geom.Point.mk(50,0));
 item.set("direction",geom.Point.mk(0,0)); // direction at end1
+item.set("direction1",geom.Point.mk(0,0)); // direction at end1
+item.set("direction0",geom.Point.mk(0,0)); // direction at end1
 
 let normal,length;
 
 item.computeParams = function () {
   let {end0,end1} = this;
   length = end0.distance(end1);
-  this.direction.copyto(end1.difference(end0).normalize());
+  let dir = end1.difference(end0).normalize()
+  this.direction.copyto(dir);
+  this.direction1.copyto(dir);
+  this.direction0.copyto(dir.times(-1));
   normal = this.direction.normal();
 }
 
