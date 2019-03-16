@@ -18,8 +18,10 @@ item.elbowWidth = 10;
 item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
+item.set('armDirections',core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
 //item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
+item.armDirections.push(Point.mk(0,-1));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
@@ -63,6 +65,17 @@ item.buildArrowHeads= function () {
   }
 }
 
+
+
+item.initializeDirections = function () {
+  let ln = this.ends.length;
+  let dln = this.armDirections.length;
+  for (let i=dln;i<ln;i++) {
+    this.armDirections.push(this.vertical?Point.mk(0,1):Point.mk(1,0));
+  }
+}
+
+
 // new ends are always placed between the last two ends, if there are two
 item.initializeNewEnds = function () {
   let vertical = this.vertical;
@@ -101,16 +114,22 @@ item.initializeNewEnds = function () {
     cv += interval;
   }
   ends.push(eLast);
+  this.initializeDirections();
 }
 
-item.pointsPositive = function () { // down for vertical; right for horizontal
+item.singlePointsPositive = function () { // down for vertical; right for horizontal
  let e0 = this.ends[0];
  return this.vertical? e0.y  < this.singleEnd.y : e0.x < this.singleEnd.x;
 }
 
 
+item.armPointsPositive = function (n,midPoint) { // the nth arm
+ let end = this.ends[n];
+ return this.vertical? end.y  > midPoint.y : end.x > midPoint.x;
+}
+
+
 item.set('singleDirection',Point.mk(0,-1));
-item.set('multiDirection',Point.mk(0,1));
 
 item.update = function () {
   let i;
@@ -124,14 +143,15 @@ item.update = function () {
   let {singleEnd,ends,shafts,arrowHeads} = this;
   let ln = ends.length;
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
-
-  core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
-  let positiveDir = this.pointsPositive();
+  let positiveDir = this.singlePointsPositive();
   this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
-  this.multiDirection.copyto(this.singleDirection.times(-1));  
   let end0 = ends[0];
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
+  let  middle = vertical?Point.mk(singleEnd.x,singleEnd.y+depth):Point.mk(singleEnd.x+depth,singleEnd.y);
+
   for (i=0;i<ln;i++) {
+    let app = this.armPointsPositive(i,middle);
+    this.armDirections[i].copyto(vertical?Point.mk(0,app?1:-1):Point.mk(app?1:-1,0));
     let arrowHead;
     let end1 = ends[i];
     if (this.includeArrows) {

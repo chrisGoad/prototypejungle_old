@@ -16,8 +16,13 @@ item.elbowWidth = 10;
 item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,15):Point.mk(15,0));
 item.set("ends",core.ArrayNode.mk());
+item.set('singleDirection',Point.mk(0,0));
+item.set('armDirections',core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,-15):Point.mk(-15,0));
-item.ends.push(item.vertical?Point.mk(10,-15):Point.mk(-15,10));
+//item.ends.push(item.vertical?Point.mk(10,-15):Point.mk(-15,10));
+item.armDirections.push(Point.mk(0,-1));
+//item.armDirections.push(Point.mk(0,-1));
+
 
 /* end adjustable parameters */
 
@@ -44,6 +49,14 @@ item.buildShafts = function () {
     let shaft = this.elbowP.instantiate().show();
     shaft.unselectable = true;
     this.shafts.push(shaft);
+  }
+}
+
+item.initializeDirections = function () {
+  let ln = this.ends.length;
+  let dln = this.armDirections.length;
+  for (let i=dln;i<ln;i++) {
+    this.armDirections.push(this.vertical?Point.mk(0,1):Point.mk(1,0));
   }
 }
 
@@ -85,37 +98,50 @@ item.initializeNewEnds = function () {
     cv += interval;
   }
   ends.push(eLast);
+  this.initializeDirections();
+
 }
 
-item.set('singleDirection',Point.mk(0,0));
-item.set('multiDirection',Point.mk(0,0));
 
 
-item.pointsPositive = function () { // down for vertical; right for horizontal
+item.singlePointsPositive = function () { // down for vertical; right for horizontal
  let e0 = this.ends[0];
  return this.vertical? e0.y  < this.singleEnd.y : e0.x < this.singleEnd.x;
  
 }
+item.armPointsPositive = function (n,midPoint) { // the nth arm
+ let end = this.ends[n];
+ return this.vertical? end.y  > midPoint.y : end.x > midPoint.x;
+}
+
 item.update = function () {
   let i;
   let vertical = this.vertical;
   let head = this.head;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
   this.initializeNewEnds();
+
   this.buildShafts();
   //this.buildArrowHeads();
   let {singleEnd,ends,shafts} = this;//diff
   let ln = ends.length;
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
-  let positiveDir = this.pointsPositive();
+  let positiveDir = this.singlePointsPositive();
   this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
-  this.multiDirection.copyto(this.singleDirection.times(-1));  
+  //this.multiDirection.copyto(this.singleDirection.times(-1));  
   let end0 = ends[0];
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
+  this.depth = depth;
+  
+  
+  let  middle = vertical?Point.mk(singleEnd.x,singleEnd.y+depth):Point.mk(singleEnd.x+depth,singleEnd.y);
+  this.middle = middle;
   for (i=0;i<ln;i++) {
     //let end1 = ends[i];
     // TO HERE
+    let app = this.armPointsPositive(i,middle);
+    this.armDirections[i].copyto(vertical?Point.mk(0,app?1:-1):Point.mk(app?1:-1,0));
     if (head.solidHead) {
       head.fill = this.stroke;
     } else {
