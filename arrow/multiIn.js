@@ -87,6 +87,10 @@ item.initializeNewEnds = function () {
   ends.push(eLast);
 }
 
+item.set('singleDirection',Point.mk(0,0));
+item.set('multiDirection',Point.mk(0,0));
+
+
 item.pointsPositive = function () { // down for vertical; right for horizontal
  let e0 = this.ends[0];
  return this.vertical? e0.y  < this.singleEnd.y : e0.x < this.singleEnd.x;
@@ -105,6 +109,8 @@ item.update = function () {
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let positiveDir = this.pointsPositive();
+  this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
+  this.multiDirection.copyto(this.singleDirection.times(-1));  
   let end0 = ends[0];
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
   for (i=0;i<ln;i++) {
@@ -120,15 +126,14 @@ item.update = function () {
     //let shaftEnd = head.solidHead?singleEnd.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):singleEnd;
     let shaft = shafts[i];
     shaft.depth = depth;
-    shaft.end0.copyto(singleEnd);
+    let shaftEnd = head.solidHead?singleEnd.plus(this.direction.times((positiveDir?-0.5:0.5)*this.headLength)):singleEnd;
+    shaft.end0.copyto(shaftEnd);
     shaft.end1.copyto(ends[i]);
     shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
   }
-    debugger;
-    let shaftEnd = head.solidHead?singleEnd.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):singleEnd;
-    head.headPoint.copyto(shaftEnd);
+    head.headPoint.copyto(singleEnd);
     head.direction.copyto(this.direction.times(positiveDir?1:-1));
     head.update();
  

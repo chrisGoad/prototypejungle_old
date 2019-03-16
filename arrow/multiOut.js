@@ -19,7 +19,7 @@ item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
-item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
+//item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
@@ -106,8 +106,12 @@ item.initializeNewEnds = function () {
 item.pointsPositive = function () { // down for vertical; right for horizontal
  let e0 = this.ends[0];
  return this.vertical? e0.y  < this.singleEnd.y : e0.x < this.singleEnd.x;
- 
 }
+
+
+item.set('singleDirection',Point.mk(0,-1));
+item.set('multiDirection',Point.mk(0,1));
+
 item.update = function () {
   let i;
   let vertical = this.vertical;
@@ -123,6 +127,8 @@ item.update = function () {
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let positiveDir = this.pointsPositive();
+  this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
+  this.multiDirection.copyto(this.singleDirection.times(-1));  
   let end0 = ends[0];
   let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
   for (i=0;i<ln;i++) {
