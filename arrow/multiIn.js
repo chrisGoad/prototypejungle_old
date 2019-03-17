@@ -7,6 +7,7 @@ let item = svg.Element.mk('<g/>');
 /* adjustable parameters */
 //item.pointsDown = true; 
 item.vertical = true;
+item.includeArrow = false;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
@@ -27,9 +28,6 @@ item.armDirections.push(Point.mk(0,-1));
 /* end adjustable parameters */
 
 item.set('elbowP',elbowPP.instantiate().hide());
-
-item.set('head',arrowHeadP.instantiate());
-item.head.unselectable = true;
 
 item.role = 'multiIn';
 item.inCount = item.ends.length;
@@ -62,6 +60,7 @@ item.initializeDirections = function () {
 
 // new ends are always placed between the last two ends, if there are two
 item.initializeNewEnds = function () {
+  this.initializeDirections();
   let vertical = this.vertical;
   let currentLength = this.ends.length;
   let numNew = this.inCount - currentLength;
@@ -98,7 +97,6 @@ item.initializeNewEnds = function () {
     cv += interval;
   }
   ends.push(eLast);
-  this.initializeDirections();
 
 }
 
@@ -115,9 +113,9 @@ item.armPointsPositive = function (n,midPoint) { // the nth arm
 }
 
 item.update = function () {
+  debugger;
   let i;
   let vertical = this.vertical;
-  let head = this.head;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
   this.initializeNewEnds();
 
@@ -125,6 +123,11 @@ item.update = function () {
   //this.buildArrowHeads();
   let {singleEnd,ends,shafts} = this;//diff
   let ln = ends.length;
+  if (this.includeArrow && (!this.head)) {
+    this.set('head',arrowHeadP.instantiate());
+    this.head.unselectable = true;
+  }
+  let head = this.head;
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
   let positiveDir = this.singlePointsPositive();
@@ -142,26 +145,29 @@ item.update = function () {
     // TO HERE
     let app = this.armPointsPositive(i,middle);
     this.armDirections[i].copyto(vertical?Point.mk(0,app?1:-1):Point.mk(app?1:-1,0));
-    if (head.solidHead) {
-      head.fill = this.stroke;
-    } else {
-      core.setProperties(head,this,['stroke','stroke-width']);
+    if (head) {
+      if (head.solidHead) {
+        head.fill = this.stroke;
+      } else {
+        core.setProperties(head,this,['stroke','stroke-width']);
+      }
+      core.setProperties(head,this,['headLength','headWidth']);
     }
-    core.setProperties(head,this,['headLength','headWidth']);
- 
     //let shaftEnd = head.solidHead?singleEnd.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):singleEnd;
     let shaft = shafts[i];
     shaft.depth = depth;
-    let shaftEnd = head.solidHead?singleEnd.plus(this.direction.times((positiveDir?-0.5:0.5)*this.headLength)):singleEnd;
+    let shaftEnd = (head && head.solidHead)?singleEnd.plus(this.direction.times((positiveDir?-0.5:0.5)*this.headLength)):singleEnd;
     shaft.end0.copyto(shaftEnd);
     shaft.end1.copyto(ends[i]);
     shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
   }
+  if (head) {
     head.headPoint.copyto(singleEnd);
     head.direction.copyto(this.direction.times(positiveDir?1:-1));
     head.update();
+  }
  
 }
 
@@ -181,12 +187,15 @@ item.controlPoints = function () {
   let e0 = this.singleEnd;
 //  this.joinX = this.e01 * this.elbowPlacement;
 //  let joinPoint = Point.mk(this.singleEnd.x+this.joinX,e0.y);
-  let headControlPoint = this.head.controlPoint(); 
-  let rs = [headControlPoint];
+  let rs = [];
+  if (this.head) {
+    rs.push(this.head.controlPoint());
+  }   
   if (this.includeEndControls) {
     rs.push(e0);
     this.ends.forEach(function (inEnd) {rs.push(inEnd)});
   }
+  
   return rs;
 }
 
@@ -207,6 +216,7 @@ item.connected = function (idx) {
 
 item.updateControlPoint = function (idx,pos) {
   let vertical = this.vertical;
+  let idxOff=(this.head)?1:0;
   if (idx === 110) {
     this.joinV = vertical? this.ends[0].x - pos.x : this.ends[0].y - pos.y;
     this.elbowPlacement = Math.max(0,1 - (this.joinV)/(this.e01));
@@ -217,30 +227,21 @@ item.updateControlPoint = function (idx,pos) {
         this.singleEnd.x = pos.x;
       }
     }
-  } else if (idx === 1) {
-     if (this.singleVertex) {
-      graph.mapEndToPeriphery(this,this.singleEnd,this.singleVertex,'outConnection',pos);
-    } else {
-      this.singleEnd.copyto(pos);
-    }
-  } else if (idx === 0) {
+  } else if (this.head && (idx === 0)) {
     let head = this.head;
     let params = head.updateControlPoint(pos,true);
     head.headWidth = params[0];
     head.headLength = params[1];
     head.updateAndDraw();
     return;
-    let ln = this.ends.length;
-    for (let i=0;i<ln;i++) {
-      let arrowHead = this.arrowHeads[i];
-      arrowHead.headWidth = params[0];
-      arrowHead.headLength = params[1];
-      arrowHead.update();
-      arrowHead.draw();
-    };
-    return;
+  } else if (idx === idxOff) {
+     if (this.singleVertex) {
+      graph.mapEndToPeriphery(this,this.singleEnd,this.singleVertex,'outConnection',pos);
+    } else {
+      this.singleEnd.copyto(pos);
+    }
   } else {
-    let eidx = idx-2;
+    let eidx = idx-(idxOff+1);
     if (this.vertices && this.vertices[eidx]) {
        graph.mapEndToPeriphery(this,this.ends[eidx],this.vertices[eidx],'inConnections',pos,eidx);
     } else {

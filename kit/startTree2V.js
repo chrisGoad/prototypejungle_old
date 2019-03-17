@@ -19,8 +19,8 @@ tree.initialize = function () {
   edgeP.headWidth = 15;
   edgeP.headLength = 12;
   */
-  this.hSpacing = 50;
-  this.vSpacing = 50;
+  this.hSpacing = 30;
+  this.vSpacing = 70;
   this.__internalDataString=dataString;
   //this.data =
   this.vertexP = vertexP;

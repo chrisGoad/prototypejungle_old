@@ -78,6 +78,7 @@ item.initializeDirections = function () {
 
 // new ends are always placed between the last two ends, if there are two
 item.initializeNewEnds = function () {
+  this.initializeDirections();
   let vertical = this.vertical;
   let currentLength = this.ends.length;
   let numNew = this.outCount - currentLength;
@@ -114,7 +115,6 @@ item.initializeNewEnds = function () {
     cv += interval;
   }
   ends.push(eLast);
-  this.initializeDirections();
 }
 
 item.singlePointsPositive = function () { // down for vertical; right for horizontal
