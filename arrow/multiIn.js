@@ -1,7 +1,6 @@
 //multiIn
 
-//core.require('/shape/c.js','/shape/u.js','/arrow/solidHead.js',function (elbowPPH,elbowPPV,arrowHeadP) {
-core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadP) {
+core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -26,6 +25,9 @@ item.armDirections.push(Point.mk(0,-1));
 
 
 /* end adjustable parameters */
+
+let elbowP = core.installPrototype('elbow',elbowPP);
+let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
 
 item.set('elbowP',elbowPP.instantiate().hide());
 
@@ -124,7 +126,7 @@ item.update = function () {
   let {singleEnd,ends,shafts} = this;//diff
   let ln = ends.length;
   if (this.includeArrow && (!this.head)) {
-    this.set('head',arrowHeadP.instantiate());
+    this.set('head',arrowHeadP.instantiate()).show();
     this.head.unselectable = true;
   }
   let head = this.head;

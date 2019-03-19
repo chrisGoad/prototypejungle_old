@@ -3,7 +3,8 @@
 core.require('/shape/u.js','/arrow/solidHead.js','/text/attachedText.js',function (uP,arrowHeadP,textItemP) {
 
 let item = svg.Element.mk('<g/>');
-
+alert(22);
+return item;
 /* adjustable parameters */
 item.stroke = "black";
 item['stroke-width'] = 2;

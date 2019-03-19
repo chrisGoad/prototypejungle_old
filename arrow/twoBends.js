@@ -1,28 +1,31 @@
 //cArrow
 
-core.require('/shape/twoBends.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftP,arrowHeadP,textItemP) {
+core.require('/shape/twoBends.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
 
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 item.vertical = false; // the middle segment is vertical
-item.includeArrow = false;
+item.includeArrow = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
 item.headWidth = 8;
 item.elbowWidth = 10;
-item.width = 19; // fraction of along the way where the elbow appears
+item.depth = 19; // fraction of along the way where the elbow appears
 item.set("end0",Point.mk(-20,12));
 item.set("end1",Point.mk(20,-12));
 item.text = '';
 /* end adjustable parameters */
 
 
+let shaftP = core.installPrototype('shaft',shaftPP);
+let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
+let textItemP = core.installPrototype('textItem',textItemPP);
 
 
 //item.set('head',arrowHeadP.instantiate());
-item.set('shaft',shaftP.instantiate());
+item.set('shaft',shaftP.instantiate()).show();
 
 item.shaft.unselectable = true;
 //item.head.unselectable = true;
@@ -35,7 +38,8 @@ item.set('direction1',geom.Point.mk(1,0));
 item.pointsPositive0 = function () { // end0 points positive
  let middle = this.shaft.middlePoint();
  let end = this.end0;
- return this.vertical? end.x  < middle : end.y < middle.y;
+ //console('positivie',this.vertical,end.x,middle.x);
+ return this.vertical? middle.x < end.x:  middle.y < end.y;
  
 }
 
@@ -58,7 +62,7 @@ item.update = function () {
   let includeArrow = this.includeArrow;
   if (includeArrow) {
     if (!this.head) {
-      this.set('head',arrowHeadP.instantiate());
+      this.set('head',arrowHeadP.instantiate()).show();
       this.head.unselectable = true;
     }
   }  
@@ -73,13 +77,14 @@ item.update = function () {
   let positiveDir0 = this.pointsPositive0();
   let dir0 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir0?1:-1);
   this.direction0.copyto(dir0);
+  console.log('dir0',dir0);
   let positiveDir1 = this.pointsPositive1();
   let dir1 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir1?1:-1);
   this.direction1.copyto(dir1);
   let shaftEnd = (includeArrow&&head.solidHead)?e1.plus(this.direction1.times(-this.headLength)):e1;
   this.shaft.end0.copyto(e0);
   this.shaft.end1.copyto(shaftEnd);
-  core.setProperties(this.shaft,this,['stroke-width','stroke','width','elbowWidth']);
+  core.setProperties(this.shaft,this,['stroke-width','stroke','depth','elbowWidth']);
   this.shaft.update();
   //thhead.headPoint.copyto(e1);
   //this.head.direction.copyto(this.direction.times(flip?-1:1));
@@ -97,20 +102,23 @@ item.update = function () {
   if (this.text) {
     let textItem = this.textItem;
     if (!textItem) {
-      textItem = this.set('textItem',textItemP.instantiate());
+      textItem = this.set('textItem',textItemP.instantiate()).show();
       textItem.unselectable = true;
       textItem.sep = 7;
       textItem['font-size'] = 8;
       
     }
-    let textPos = geom.Point.mk(cx+this.textItem.sep,(e0.y + e1.y)/2,);
+    let middle = this.shaft.middlePoint();
+
+    let textPos = geom.Point.mk(middle.x+this.textItem.sep,(e0.y + e1.y)/2,);
     this.textItem.update(textPos);
   }
 }
 
 
 item.controlPoints = function () {
-  let rs = this.shaft.controlPoints();
+  let rs = [this.end0,this.end1,this.shaft.middlePoint()]
+  //let rs = this.shaft.controlPoints();
   if (this.includeArrow) {
     rs.push(this.head.controlPoint());
   }
@@ -128,10 +136,20 @@ item.updateControlPoint = function (idx,rpos) {
       if (this.end0vertex) {
         graph.mapEndToPeriphery(this,this.end0,this.end0vertex,'end0connection',rpos);
       } else {
+        
+        let delta = this.vertical?0: rpos.y - this.end0.y;
+        this.end0.copyto(rpos);
+        this.depth = this.depth - delta;
+        
+        /*
         let delta = rpos.x - this.end0.x;
         this.end0.copyto(rpos);
-        this.width = this.width - delta;
+        console.log('depth 0',this.depth);
+        
+        this.depth = this.depth + (this.vertical?-delta:delta);
+        console.log('depth 1',this.depth);
         this.end0.copyto(rpos);
+        */
       }
       break;
     case 1:
@@ -143,7 +161,7 @@ item.updateControlPoint = function (idx,rpos) {
       break;
     case 2:
       this.shaft.updateControlPoint(2,rpos);
-      this.width = this.shaft.width;
+      this.depth = this.shaft.depth;
       break;
    
     case 3:
@@ -165,7 +183,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   }*/
   if (src.textItem) {
     if (!this.textItem) {
-      this.set('textItem',textItemP.instantiate());
+      this.set('textItem',textItemP.instantiate()).show();
       this.textItem.unselectable = true;
     }
     this.textItem.transferState(src.textItem,own);

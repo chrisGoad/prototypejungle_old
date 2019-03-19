@@ -68,7 +68,8 @@ item.buildArrowHeads= function () {
 
 
 item.initializeDirections = function () {
-  let ln = this.ends.length;
+  //let ln = this.ends.length;
+  let ln = this.outCount;
   let dln = this.armDirections.length;
   for (let i=dln;i<ln;i++) {
     this.armDirections.push(this.vertical?Point.mk(0,1):Point.mk(1,0));
