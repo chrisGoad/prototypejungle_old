@@ -1,7 +1,7 @@
 
 
 
-core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftP,arrowHeadP,textItemP) {
+core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
 
 let item = svg.Element.mk('<g/>');
 debugger;
@@ -17,14 +17,18 @@ item.elbowWidth = 10;
 item.width = 19; // fraction of along the way where the elbow appears
 item.set("end0",Point.mk(-20,12));
 item.set("end1",Point.mk(20,-12));
-item.text = '';
+//item.text = '';
 /* end adjustable parameters */
 
 
-
+// put the arrow on end1 if vertical, end0 if not
 
 //item.set('head',arrowHeadP.instantiate());
-item.set('shaft',shaftP.instantiate());
+
+let shaftP = core.installPrototype('shaft',shaftPP);
+let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
+let textItemP = core.installPrototype('textItem',textItemPP);
+item.set('shaft',shaftP.instantiate()).show();
 
 item.shaft.unselectable = true;
 
@@ -32,23 +36,34 @@ item.shaft.unselectable = true;
 
 item.set('direction0',geom.Point.mk(0,1));
 item.set('direction1',geom.Point.mk(0,1));
-item.set('arrowDirection',geom.Point.mk(0,1));
+//item.set('arrowEnd',0);
+//item.set('arrowDirection',geom.Point.mk(0,1));
 
+
+
+item.pointsPositive0 = function () { // end0 points positive
+ let middle = this.shaft.middlePoint();
+ let end = this.end0;
+ //console('positivie',this.vertical,end.x,middle.x);
+ return this.vertical? middle.x < end.x:  middle.y < end.y;
+ 
+}
 item.computeEnd0 = function (deviation) {
- return this.end0.plus(this.direction.times(deviation));
+ return this.end0.plus(this.direction0.times(deviation));
 }
 
 
 item.computeArrowEnd = function (deviation) {
- return this.vertical?this.end1.plus(this.arrowDirection.times(-deviation)):this.end0.plus(this.arrowDirection.times(-deviation))
+ return this.vertical?this.end1.plus(this.direction1.times(-deviation)):this.end0.plus(this.direction0.times(-deviation))
 }
 
 item.update = function () {
+  debugger;
   let vertical = this.vertical;
   let includeArrow = this.includeArrow;
   if (includeArrow) {
     if (!this.head) {
-      this.set('head',arrowHeadP.instantiate());
+      this.set('head',arrowHeadP.instantiate()).show();
       this.head.unselectable = true;
     }
   }
@@ -58,20 +73,35 @@ item.update = function () {
   let x1 = e1.x;
   let y0 = e0.y;
   let y1 = e1.y;
+  const pointsPositive = (end) => (end===0)?x1<x0:y1>y0;
+   /* if (end===0) {
+      return x1<x0;
+    } else {
+      return y1>y0;
+    }
+  }
+  */
+  let pp0 = pointsPositive(0);
+  let pp1 = pointsPositive(1);
+      
   this.connectionType = 'UpDown';
   
-  if (vertical) {
-    this.direction1.copyto(Point.mk(0,y1>y0?1:-1));
-    this.direction0.copyto(Point.mk(x1>x0?-1:1,0));
+  if (1 || vertical) {
+    this.direction0.copyto(Point.mk(pp0?1:-1,0));
+    this.direction1.copyto(Point.mk(0,pp1?1:-1));
+  } else {
+    this.direction0.copyto(Point.mk(pp0?1:-1,0));
+    this.direction1.copyto(Point.mk(0,pp1?1:-1));
   }
-  if (includeArrow) {
-    let positiveArrowDir = vertical?y1>y0:x0 > x1;
-    this.arrowDirection.copyto(vertical?Point.mk(0,positiveArrowDir?1:-1):
-                                     Point.mk(positiveArrowDir?1:-1,0));
-  }
+  let arrowDirection = vertical?this.direction1:this.direction0;
   //let cx = e0.x + this.width;
  // let flip = y1 > y0;
-  let shaftEnd = includeArrow?this.computeArrowEnd(this.head.solidHead?this.headLength:0):e1;                               
+  let shaftEnd;
+  if (includeArrow && this.head.solidHead) {
+    shaftEnd = vertical?e1.difference(this.direction1.times(this.headLength)):e0.difference(this.direction0.times(this.headLength));  
+  } else {
+    shaftEnd = vertical?e1:e0;
+  }    
   if (vertical) {
     this.shaft.end0.copyto(e0);
     this.shaft.end1.copyto(shaftEnd);
@@ -83,7 +113,7 @@ item.update = function () {
   this.shaft.update();
   if (includeArrow) {
     this.head.headPoint.copyto(vertical?e1:e0);
-    this.head.direction.copyto(this.arrowDirection);
+    this.head.direction.copyto(arrowDirection);
     if (this.head.solidHead) {
       this.head.fill = this.stroke;
     } else {

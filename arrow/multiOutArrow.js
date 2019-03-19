@@ -3,8 +3,7 @@
 
 core.require('/shape/elbow.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
 let item = svg.Element.mk('<g/>');
-alert(66);
-return item;
+
 /* adjustable parameters */
 item.pointsTo = 'right'; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
 

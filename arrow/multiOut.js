@@ -27,7 +27,7 @@ item.arrowHeads.unselectable = true;
 /* end adjustable parameters */
 
 item.set('elbowP',elbowPP.instantiate().hide());
-item.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
+//item.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
 
 let arrowHeadP = item.arrowHeadP;
 arrowHeadP.hide();
@@ -79,6 +79,7 @@ item.initializeDirections = function () {
 
 // new ends are always placed between the last two ends, if there are two
 item.initializeNewEnds = function () {
+  this.outCount = Math.max(this.outCount,this.ends.length);
   this.initializeDirections();
   let vertical = this.vertical;
   let currentLength = this.ends.length;
@@ -125,6 +126,7 @@ item.singlePointsPositive = function () { // down for vertical; right for horizo
 
 
 item.armPointsPositive = function (n,midPoint) { // the nth arm
+debugger;
  let end = this.ends[n];
  return this.vertical? end.y  > midPoint.y : end.x > midPoint.x;
 }
@@ -133,6 +135,7 @@ item.armPointsPositive = function (n,midPoint) { // the nth arm
 item.set('singleDirection',Point.mk(0,-1));
 
 item.update = function () {
+  debugger;
   let i;
   let vertical = this.vertical;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
@@ -164,7 +167,8 @@ item.update = function () {
       }
       core.setProperties(arrowHead,this,['headLength','headWidth']);
     }
-    let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
+    //let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
+    let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.armDirections[i].times(-this.headLength)):end1;
     let shaft = shafts[i];
     shaft.depth = depth;
     shaft.end0.copyto(singleEnd);
@@ -174,8 +178,9 @@ item.update = function () {
     shaft.draw();
     if (this.includeArrows) {
       arrowHead.headPoint.copyto(end1);
-      arrowHead.direction.copyto(this.direction.times(positiveDir?-1:1));
-      arrowHead.update();
+      //arrowHead.direction.copyto(this.direction.times(positiveDir?-1:1));
+      arrowHead.direction.copyto(this.armDirections[i]);//.times(app?-1:1));
+    arrowHead.update();
     }
   }
 }
