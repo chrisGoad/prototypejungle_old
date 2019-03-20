@@ -84,14 +84,10 @@ item.positionvertices = function (root) {
 
 
 item.layout2 = function (root,vertical,hSpacing,vSpacing) {
-  debugger;
   let recurse = function (vertex) {
     let children = vertex.__descendants;
     if (!children || (children.length === 0)) {
        let xt = (vertex.__element)?vertex.bounds().extent:undefined;
-       if (xt) {
-         console.log(xt.x,xt.y);
-       }
        vertex.treeWidth =  xt?(this.vertical?xt.x:xt.y):0;
        return vertex.treeWidth;
     }
@@ -156,7 +152,6 @@ item.layoutttt = function (vertical,data,hSpacing,vSpacing) {
          let w = widths[i];
          let cp = cx + w/2;
          cx = cx + w + hSpacing;
-         console.log('bbbb');
          descendants[i].set('relPos',vertical?Point.mk(cp,vSpacing):Point.mk(vSpacing,cp));
       }
     }
@@ -223,7 +218,6 @@ item.deleteSubtree = function (vertex) {
       if (isMulti) {
         let isIncoming = edge.singleVertex === parent;
         if (topCall && isIncoming) {
-          debugger;
           if (edge.outCount === 1) {
             edge.remove();
             edgeToRemoveFromConnectedEdges = edge;
@@ -247,7 +241,6 @@ item.deleteSubtree = function (vertex) {
       }
     });
     if (topCall) {
-      debugger;
       let descendants = parent.__descendants;
       let idx = descendants.indexOf(vertex);
       descendants.splice(idx,1);

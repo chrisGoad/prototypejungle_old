@@ -155,7 +155,6 @@ item.updateControlPoint = function (idx,rpos) {
       } else {
         let y = rpos.y;
         let y0 = this.end0.y;
-        console.log('y',y,'y0',y0);
         this.depth = y - y0;
         break;
       }

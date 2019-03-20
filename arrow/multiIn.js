@@ -267,7 +267,6 @@ item.updateControlPoint = function (idx,pos) {
 
 
 item.dropControlPoint = function (idx,droppedOver) {
-  debugger;
   if (!droppedOver) {
     return;
   }

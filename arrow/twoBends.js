@@ -88,7 +88,6 @@ item.update = function () {
   let positiveDir0 = this.pointsPositive0();
   let dir0 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir0?1:-1);
   this.direction0.copyto(dir0);
-  console.log('dir0',dir0);
   let positiveDir1 = this.pointsPositive1();
   let dir1 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir1?1:-1);
   this.direction1.copyto(dir1);
@@ -151,16 +150,6 @@ item.updateControlPoint = function (idx,rpos) {
         let delta = this.vertical?0: rpos.y - this.end0.y;
         this.end0.copyto(rpos);
         this.depth = this.depth - delta;
-        
-        /*
-        let delta = rpos.x - this.end0.x;
-        this.end0.copyto(rpos);
-        console.log('depth 0',this.depth);
-        
-        this.depth = this.depth + (this.vertical?-delta:delta);
-        console.log('depth 1',this.depth);
-        this.end0.copyto(rpos);
-        */
       }
       break;
     case 1:

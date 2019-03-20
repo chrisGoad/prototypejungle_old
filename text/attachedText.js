@@ -35,7 +35,6 @@ item.update = function (ipos) {
   if (ipos) {
      pos = ipos;
   } else {
-	debugger;
     let {end0,end1} = parent;
     let length = end0.distance(end1);
     let direction = end1.difference(end0).normalize();

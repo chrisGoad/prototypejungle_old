@@ -48,7 +48,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
 }
 
 // replacePrototye for headP and lineP is expected
-const mkDummy = function () {
+/*const mkDummy = function () {
   let rs = svg.Element.mk('<g/>');
   rs.setEnds = () => {};
   rs.update = () => {};
@@ -56,7 +56,7 @@ const mkDummy = function () {
 }
 item.headP = core.installPrototype('head',core.ObjectNode.mk());
 item.lineP = core.installPrototype('line',core.ObjectNode.mk());
-
+*/
 
 item.set("end0",geom.Point.mk(0,0));
 item.set("end1",geom.Point.mk(50,0));
@@ -90,7 +90,25 @@ item.middle = function () {
 
 item.update = function () {
   this.computeParams();
+  if (!this.head) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.headP) {
+      proto.headP = core.installPrototype('headP',this.initialHeadPP);
+    }
+    this.set('head',this.headP.instantiate()).show();
+    this.head.unselectable = true;
+  }
   if (!this.shaft) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.shaftP) {
+      proto.shaftP = core.installPrototype('shaft',this.initialLinePP);
+    }
+    this.set('shaft',this.shaftP.instantiate()).show();
+    this.shaft.unselectable = true;
+    this.shaft.role = 'line';
+
+  }
+  /*if (!this.shaft) {
     this.set("shaft",this.lineP.instantiate());
     this.set('head',this.headP.instantiate());
     this.shaft.unselectable = true;
@@ -98,7 +116,7 @@ item.update = function () {
     this.shaft.show();
     this.head.unselectable = true;
     this.head.show();
-  }
+  }*/
    if (this.doubleEnded && (!this.tail)) {
       this.set('tail',this.headP.instantiate());
       this.tail.unselectable = true;

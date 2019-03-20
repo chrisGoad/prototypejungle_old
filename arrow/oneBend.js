@@ -4,7 +4,6 @@
 core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
 
 let item = svg.Element.mk('<g/>');
-debugger;
 /* adjustable parameters */
 item.vertical = true; // the arrow is vertical (ie at end1)
 item.includeArrow = true;
@@ -58,7 +57,6 @@ item.computeArrowEnd = function (deviation) {
 }
 
 item.update = function () {
-  debugger;
   let vertical = this.vertical;
   let includeArrow = this.includeArrow;
   if (includeArrow && (!this.head)) {

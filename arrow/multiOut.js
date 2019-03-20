@@ -26,7 +26,6 @@ item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
 item.armDirections.push(Point.mk(0,-1));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
-debugger;
 
 //let elbowP = core.installPrototype('elbow',elbowPP);
 //let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
@@ -143,7 +142,6 @@ item.singlePointsPositive = function () { // down for vertical; right for horizo
 
 
 item.armPointsPositive = function (n,midPoint) { // the nth arm
-debugger;
  let end = this.ends[n];
  return this.vertical? end.y  > midPoint.y : end.x > midPoint.x;
 }
@@ -152,7 +150,6 @@ debugger;
 item.set('singleDirection',Point.mk(0,-1));
 
 item.update = function () {
-  debugger;
   let i;
   let vertical = this.vertical;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
@@ -271,7 +268,6 @@ item.updateControlPoint = function (idx,pos) {
       this.ends[eidx].copyto(pos);
     }
   } else {
-    debugger;
     let params = this.arrowHeads[0].updateControlPoint(pos,true);
     for (let i=0;i<ln;i++) {
       let arrowHead = this.arrowHeads[i];
@@ -287,7 +283,6 @@ item.updateControlPoint = function (idx,pos) {
 }
 
 item.dropControlPoint = function (idx,droppedOver) {
-  debugger;
   if (!droppedOver) {
     return;
   }
