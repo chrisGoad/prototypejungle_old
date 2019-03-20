@@ -24,7 +24,7 @@ item.set("end1",Point.mk(20,-12));
 // put the arrow on end1 if vertical, end0 if not
 
 //item.set('head',arrowHeadP.instantiate());
-
+/*
 let shaftP = core.installPrototype('shaft',shaftPP);
 let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
 let textItemP = core.installPrototype('textItem',textItemPP);
@@ -32,7 +32,7 @@ item.set('shaft',shaftP.instantiate()).show();
 
 item.shaft.unselectable = true;
 
-
+*/
 
 item.set('direction0',geom.Point.mk(0,1));
 item.set('direction1',geom.Point.mk(0,1));
@@ -61,11 +61,21 @@ item.update = function () {
   debugger;
   let vertical = this.vertical;
   let includeArrow = this.includeArrow;
-  if (includeArrow) {
-    if (!this.head) {
-      this.set('head',arrowHeadP.instantiate()).show();
-      this.head.unselectable = true;
+  if (includeArrow && (!this.head)) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.arrowHeadP) {
+      proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
     }
+    this.set('head',this.arrowHeadP.instantiate()).show();
+    this.head.unselectable = true;
+  }
+  if (!this.shaft) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.shaftP) {
+      proto.shaftP = core.installPrototype('shaft',shaftPP);
+    }
+    this.set('shaft',this.shaftP.instantiate()).show();
+    this.shaft.unselectable = true;
   }
   let e0 = this.end0;
   let e1 = this.end1;

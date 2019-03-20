@@ -20,18 +20,23 @@ item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
 item.set('armDirections',core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
+/* end adjustable parameters */
+
 //item.ends.push(item.vertical?Point.mk(10,15):Point.mk(15,10));
 item.armDirections.push(Point.mk(0,-1));
 item.set("arrowHeads", core.ArrayNode.mk());
 item.arrowHeads.unselectable = true;
-/* end adjustable parameters */
+debugger;
 
-item.set('elbowP',elbowPP.instantiate().hide());
+//let elbowP = core.installPrototype('elbow',elbowPP);
+//let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
+//item.set('elbowP',elbowPP.instantiate().hide());
 //item.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-
-let arrowHeadP = item.arrowHeadP;
-arrowHeadP.hide();
-item.arrowHeadPName = arrowHeadP.__name; //needed to make swap prototype do the right thing;dangling pointer to old prototype if arrowHeadP is used directly
+//item.elbowP == elbowP;
+//item.arrowHeadP = arrowHeadP;
+//let arrowHeadP = item.arrowHeadP;
+//arrowHeadP.hide();
+//item.arrowHeadPName = arrowHeadP.__name; //needed to make swap prototype do the right thing;dangling pointer to old prototype if arrowHeadP is used directly
 item.role = 'multiOut';
 item.outCount = item.ends.length;
 item.includeEndControls = true;
@@ -41,7 +46,13 @@ item.set("shafts",core.ArrayNode.mk());
 item.set('direction',Point.mk(0,0));
 
 item.elbowPlacement = 0.5;
+// each prototype of this multiOUt should have its own associated elbow prototype
 item.buildShafts = function () {
+  let proto = Object.getPrototypeOf(this);
+  if (!proto.elbowP) {
+    proto.elbowP = core.installPrototype('elbowP',elbowPP);
+  }
+
   this.elbowP.vertical = !this.vertical;
   let ln = this.ends.length;
   let lns = this.shafts.length;
@@ -52,13 +63,19 @@ item.buildShafts = function () {
     this.shafts.push(shaft);
   }
 }
+// each prototype of this multiOUt should have its own associated arrowHead prototype
 item.buildArrowHeads= function () {
+  let proto = Object.getPrototypeOf(this);
+  if (!proto.arrowHeadP) {
+    proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
+  }
+
   let ln = this.ends.length;
   let arrowHeads = this.arrowHeads;
   let lns = arrowHeads.length;
-  let arrowHeadP = core.root.prototypes[this.arrowHeadPName];
+ // let arrowHeadP = core.root.prototypes[this.arrowHeadPName];
   for (let i=lns;i<ln;i++) {
-    let arrowHead = arrowHeadP.instantiate();
+    let arrowHead = this.arrowHeadP.instantiate();
     arrowHead.unselectable = true;
     arrowHead.show();
     arrowHeads.push(arrowHead);
@@ -146,7 +163,7 @@ item.update = function () {
   }
   let {singleEnd,ends,shafts,arrowHeads} = this;
   let ln = ends.length;
-  core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
+ // core.setProperties(elbowP,this,['stroke-width','stroke','elbowWidth']);
   let positiveDir = this.singlePointsPositive();
   this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
   let end0 = ends[0];
@@ -159,7 +176,7 @@ item.update = function () {
     let arrowHead;
     let end1 = ends[i];
     if (this.includeArrows) {
-      arrowHead = arrowHeads[i];
+      arrowHead = this.arrowHeads[i];
       if (arrowHead.solidHead) {
         arrowHead.fill = this.stroke;
       } else {
@@ -169,7 +186,8 @@ item.update = function () {
     }
     //let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.direction.times((positiveDir?0.5:-0.5)*this.headLength)):end1;
     let shaftEnd = (this.includeArrows && arrowHead.solidHead) ?end1.plus(this.armDirections[i].times(-this.headLength)):end1;
-    let shaft = shafts[i];
+    let shaft = this.shafts[i];
+    core.setProperties(shaft,this,['stroke-width','stroke','elbowWidth']);
     shaft.depth = depth;
     shaft.end0.copyto(singleEnd);
     shaft.end1.copyto(shaftEnd);

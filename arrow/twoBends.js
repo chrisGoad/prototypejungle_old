@@ -15,19 +15,19 @@ item.elbowWidth = 10;
 item.depth = 19; // fraction of along the way where the elbow appears
 item.set("end0",Point.mk(-20,12));
 item.set("end1",Point.mk(20,-12));
-item.text = '';
+//item.text = '';
 /* end adjustable parameters */
 
-
+/*
 let shaftP = core.installPrototype('shaft',shaftPP);
 let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
 let textItemP = core.installPrototype('textItem',textItemPP);
-
+*/
 
 //item.set('head',arrowHeadP.instantiate());
-item.set('shaft',shaftP.instantiate()).show();
+//item.set('shaft',shaftP.instantiate()).show();
 
-item.shaft.unselectable = true;
+//tem.shaft.unselectable = true;
 //item.head.unselectable = true;
 
 item.set('direction0',geom.Point.mk(1,0));
@@ -60,12 +60,23 @@ item.update = function () {
   let e0 = this.end0;
   let e1 = this.end1;
   let includeArrow = this.includeArrow;
-  if (includeArrow) {
-    if (!this.head) {
-      this.set('head',arrowHeadP.instantiate()).show();
-      this.head.unselectable = true;
+  if (this.includeArrow && (!this.head)) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.arrowHeadP) {
+      proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
     }
-  }  
+    this.set('head',this.arrowHeadP.instantiate()).show();
+    this.head.unselectable = true;
+  }
+  if (!this.shaft) {
+    let proto = Object.getPrototypeOf(this);
+    if (!proto.shaftP) {
+      proto.shaftP = core.installPrototype('shaft',shaftPP);
+    }
+    this.set('shaft',this.shaftP.instantiate()).show();
+    this.shaft.unselectable = true;
+  }
+  
  // let x1 = e1.x;
  // let cx = e0.x + this.width;
  // let flip = cx > x1;
