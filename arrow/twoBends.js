@@ -18,34 +18,22 @@ item.set("end1",Point.mk(20,-12));
 //item.text = '';
 /* end adjustable parameters */
 
-/*
-let shaftP = core.installPrototype('shaft',shaftPP);
-let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-let textItemP = core.installPrototype('textItem',textItemPP);
-*/
-
-//item.set('head',arrowHeadP.instantiate());
-//item.set('shaft',shaftP.instantiate()).show();
-
-//tem.shaft.unselectable = true;
-//item.head.unselectable = true;
 
 item.set('direction0',geom.Point.mk(1,0));
 
 item.set('direction1',geom.Point.mk(1,0));
 
-
+/*
 item.pointsPositive0 = function () { // end0 points positive
  let middle = this.shaft.middlePoint();
  let end = this.end0;
- //console('positivie',this.vertical,end.x,middle.x);
  return this.vertical? middle.x < end.x:  middle.y < end.y;
  
 }
-
-item.pointsPositive1 = function () { // end1 points positive
+*/
+item.pointsPositive = function (whichEnd) { // end1 points positive
  let middle = this.shaft.middlePoint();
- let end = this.end1;
+ let end = (whichEnd === 0)?this.end0:this.end1;
  return this.vertical? middle.x  < end.x : middle.y < end.y;
  
 }
@@ -85,10 +73,10 @@ item.update = function () {
   let vertical = this.vertical;
   this.connectionType = vertical?"EastWest":"UpDown"; 
   shaft.vertical = vertical;
-  let positiveDir0 = this.pointsPositive0();
+  let positiveDir0 = this.pointsPositive(0);
   let dir0 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir0?1:-1);
   this.direction0.copyto(dir0);
-  let positiveDir1 = this.pointsPositive1();
+  let positiveDir1 = this.pointsPositive(1);
   let dir1 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir1?1:-1);
   this.direction1.copyto(dir1);
   let shaftEnd = (includeArrow&&head.solidHead)?e1.plus(this.direction1.times(-this.headLength)):e1;

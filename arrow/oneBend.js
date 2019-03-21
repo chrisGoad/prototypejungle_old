@@ -4,10 +4,10 @@
 core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
 
 let item = svg.Element.mk('<g/>');
+
 /* adjustable parameters */
 item.vertical = true; // the arrow is vertical (ie at end1)
 item.includeArrow = true;
-
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
@@ -22,39 +22,8 @@ item.set("end1",Point.mk(20,-12));
 
 // put the arrow on end1 if vertical, end0 if not
 
-//item.set('head',arrowHeadP.instantiate());
-/*
-let shaftP = core.installPrototype('shaft',shaftPP);
-let arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-let textItemP = core.installPrototype('textItem',textItemPP);
-item.set('shaft',shaftP.instantiate()).show();
-
-item.shaft.unselectable = true;
-
-*/
-
 item.set('direction0',geom.Point.mk(0,1));
 item.set('direction1',geom.Point.mk(0,1));
-//item.set('arrowEnd',0);
-//item.set('arrowDirection',geom.Point.mk(0,1));
-
-
-
-item.pointsPositive0 = function () { // end0 points positive
- let middle = this.shaft.middlePoint();
- let end = this.end0;
- //console('positivie',this.vertical,end.x,middle.x);
- return this.vertical? middle.x < end.x:  middle.y < end.y;
- 
-}
-item.computeEnd0 = function (deviation) {
- return this.end0.plus(this.direction0.times(deviation));
-}
-
-
-item.computeArrowEnd = function (deviation) {
- return this.vertical?this.end1.plus(this.direction1.times(-deviation)):this.end0.plus(this.direction0.times(-deviation))
-}
 
 item.update = function () {
   let vertical = this.vertical;
@@ -82,13 +51,6 @@ item.update = function () {
   let y0 = e0.y;
   let y1 = e1.y;
   const pointsPositive = (end) => (end===0)?x1<x0:y1>y0;
-   /* if (end===0) {
-      return x1<x0;
-    } else {
-      return y1>y0;
-    }
-  }
-  */
   let pp0 = pointsPositive(0);
   let pp1 = pointsPositive(1);
       
@@ -102,8 +64,6 @@ item.update = function () {
     this.direction1.copyto(Point.mk(0,pp1?1:-1));
   }
   let arrowDirection = vertical?this.direction1:this.direction0;
-  //let cx = e0.x + this.width;
- // let flip = y1 > y0;
   let shaftEnd;
   if (includeArrow && this.head.solidHead) {
     shaftEnd = vertical?e1.difference(this.direction1.times(this.headLength)):e0.difference(this.direction0.times(this.headLength));  
@@ -153,8 +113,6 @@ item.controlPoints = function () {
   return rs;
 }
 
-
-
 item.updateControlPoint = function (idx,rpos) {
   switch (idx) {
     case 0:
@@ -185,12 +143,6 @@ item.updateControlPoint = function (idx,rpos) {
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,['stroke','stroke-width','headLength','headWidth'],own);
-  /*if (this.head && src.head) {
-    if ((this.head.__sourceUrl !== src.head.__sourceUrl)) {
-      this.set('head',Object.getPrototypeOf(src.head).instantiate());
-      this.head.transferState(src.head,own);
-    }
-  }*/
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());

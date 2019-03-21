@@ -9,8 +9,8 @@ item.headLength = 20;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.solidHead = false;
-
 /*end adjustable parameters */
+
 item.role = 'arrowHead';
 item.unselectable = true;
 
