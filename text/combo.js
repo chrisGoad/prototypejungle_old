@@ -28,6 +28,7 @@ let textProperties =
 
 
 item.updateCombo = function (itm,whichExtent,dealWithImage) {
+ // debugger;
    if (!itm.__element) { // not yet in DOM
     return;
   }
