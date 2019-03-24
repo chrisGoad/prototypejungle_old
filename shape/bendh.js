@@ -28,7 +28,6 @@ item.setEnds = function (p0,p1) {
 item.__connectionType = 'EastWest'; //  only makes east/west connections
 
 item.update = function () {
-  debugger;
   let p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
