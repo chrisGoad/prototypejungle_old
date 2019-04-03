@@ -2,6 +2,7 @@
 
 
 core.require('/connector/connector0.js','/line/bulbous.js',function (connectorP,lineP) {
+core.standsAlone('/line/bulbous.js');  // suitable for loading into code editor
 let rs = connectorP.instantiate();
 rs.bulbWidth0 = 5;
 rs.bulbWidth1 = 10;

@@ -3,6 +3,7 @@
 
 
 core.require('/connector/connector0.js','/shape/c.js',function (connectorP,lineP) {
+core.standsAlone('/shape/c.js');  // suitable for loading into code editor
 let rs = connectorP.instantiate();
 
 rs.set('shaftProperties',core.lift(['stroke','stroke-width']));

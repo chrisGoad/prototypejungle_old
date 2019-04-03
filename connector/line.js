@@ -2,6 +2,7 @@
 
 
 core.require('/connector/connector0.js','/line/line.js',function (connectorP,lineP) {
+core.standsAlone('/line/line.js');  // suitable for loading into code editor
 let rs = connectorP.instantiate();
 rs.stroke = 'black';
 rs['stroke-width'] =2;
