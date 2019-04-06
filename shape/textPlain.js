@@ -34,6 +34,10 @@ let textProperties =
     combo.updateCombo(this,whichExtent);
   }
   
+  item.afterCopy = function (src) {
+    this.text = src.text;
+  }
+  
   graph.installRectanglePeripheryOps(item);
   return item;
 });

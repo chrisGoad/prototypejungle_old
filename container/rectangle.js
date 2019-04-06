@@ -1,5 +1,7 @@
 core.require('/shape/rectangle.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
+core.standsAlone('/shape/rectangle.js');  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /*adjustable parameters  */

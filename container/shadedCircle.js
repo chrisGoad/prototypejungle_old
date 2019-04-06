@@ -1,5 +1,7 @@
-//okok
+
 core.require('/shape/shadedCircle.js','/container/textAndImage.js',function (borderPP,contentsPP) {
+
+core.standsAlone('/shape/shadedCircle.js');  // suitable for loading into code editor
 
 let item = svg.Element.mk('<g/>');
 

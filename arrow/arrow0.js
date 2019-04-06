@@ -205,6 +205,12 @@ item.updateControlPoint = function (idx,rpos) {
   this.draw();
 }
 
+item.afterCopy = function () {
+  let delta = this.end1.difference(this.end0);
+  this.end0.copyto(Point.mk(0,0));
+  this.end1.copyto(delta);
+}
+
 ui.hide(item,['head','direction',"text",'textItem','includeEndControls',//shaft,
               'headInMiddle','end0','end1']);
 

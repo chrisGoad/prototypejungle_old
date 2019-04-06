@@ -1,5 +1,7 @@
 core.require('/line/line.js','/shape/circle.js','/shape/rectangle.js',function (linePP,cornerPP,backgroundPP) {
 
+core.standsAlone(['/shape/circle.js','/shape/rectangle.js','/line/line.js']);  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 /*adjustable parameters  */
 

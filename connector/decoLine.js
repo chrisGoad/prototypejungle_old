@@ -1,6 +1,8 @@
 
 core.require('/connector/connector0.js','/line/decoLine.js',function (connectorP,lineP) {
 
+core.standsAlone('/line/decoLine.js');  // suitable for loading into code editor
+
 let rs = connectorP.instantiate();
 rs.wavesToSkip = 0;
 rs.waveAmplitude = 0.2;

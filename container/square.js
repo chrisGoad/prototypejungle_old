@@ -1,5 +1,7 @@
 core.require('/shape/square.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
+core.standsAlone('/shape/square.js');  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /*adjustable parameters  */

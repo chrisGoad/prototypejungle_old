@@ -1,6 +1,9 @@
 //okok
 core.require('/box/decorated1.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
+
+core.standsAlone('/box/decorated1.js');  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /*adjustable parameters  */

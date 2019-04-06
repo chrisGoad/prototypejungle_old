@@ -1,5 +1,7 @@
 core.require('/shape/lozenge.js','/container/textAndImage.js',function (borderPP,contentsPP) {
 
+core.standsAlone('/shape/lozenge.js');  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /*adjustable parameters  */

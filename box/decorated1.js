@@ -1,6 +1,8 @@
 
 core.require('/line/line.js',function (linePP,textItemP) {
 
+core.standsAlone(['/line/line.js']);  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /*adjustable parameters  */
