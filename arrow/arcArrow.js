@@ -18,6 +18,7 @@ item.radius = 0.8; // radius of the arc as a multiple of arrow length
 item.set("end0",Point.mk(0,0));
 item.set("end1",Point.mk(35,0));
 item.includeEndControls = true;
+item.followsCenter = true;// follows the center of the connected shape
 
 /* end adjustable parameters */
 
@@ -186,6 +187,12 @@ item.updateShaft = function () {
 }
 
 item.update = function () {
+  if (this.end0vertex && (this.end0connection!=='periphery')){
+    this.vertexTailGap = 0;
+  }
+   if (this.end1vertex && (this.end1connection!=='periphery')){
+    this.vertexHeadGap = 0;
+  }
   this.totalHeadGap = this.headGap + this.vertexHeadGap;
   this.totalTailGap = this.tailGap + this.vertexTailGap;
   
@@ -222,40 +229,48 @@ item.update = function () {
   }
 }
 
-// when connected, the associated control point goes away (no moving around the periphery)
 
+/*
 
 item.endFromIndex = function (idx) {
   return this.end0vertex?idx+1:idx; 
 }
+*/
 
 item.controlPoints = function () {
   this.computeEnds();
   let headControlPoint = this.head.controlPoint();
   let rs =  [];
   if (this.includeEndControls) {
-    if (!this.end0vertex) {
-      rs.push(this.end0);
-    }
-    if (!this.end1vertex) {
-      rs.push(this.end1);
-    }
+      if (this.end0vertex && (this.end0connection === 'periphery')) {
+        rs.push(this.svEnd0);
+      } else { 
+        rs.push(this.end0);
+      }
+       if (this.end1vertex && (this.end1connection === 'periphery')) {
+        rs.push(this.svEnd1);
+      } else { 
+        rs.push(this.end1);
+      }
   }
   rs.push(headControlPoint);
   rs.push(this.middle());
   return rs;
 }
+
 item.updateControlPoint = function (idx,pos) {
+  console.log('connection',this.end0connection,core.stringPathOf(this));
+  
   let toAdjust,middle,v,dist,hwdist,delta,newMiddle,mx,my,vx,vy,cx,cy,hx,hy,ss,t,maxRadius;
   let cidx = 0;
   let end0idx  = -1;
   let end1idx = -1;
-  if (!this.end0vertex) {
+ // if (!this.end0vertex || peripheryMovement) {
     end0idx = cidx++;
-  }
-  if (!this.end1vertex) {
+ // }
+ // if (!this.end1vertex || peripheryMovement) {
     end1idx = cidx++;
-  }
+ // }
   let headIdx = cidx++;
   let centerIdx = cidx++;
   switch (idx) {
@@ -265,11 +280,20 @@ item.updateControlPoint = function (idx,pos) {
       return;
     case end0idx:
     //case 0:
-      this.end0.copyto(pos);
+      if (this.end0vertex) {
+        graph.mapEndToPeriphery(this,this.end0,this.end0vertex,'end0connection',pos);
+      } else {
+        this.end0.copyto(pos);
+      } 
+    //  this.end0.copyto(pos);
       break;
     case end1idx:
    // case 1:
-      this.end1.copyto(pos);
+      if (this.end1vertex) {
+        graph.mapEndToPeriphery(this,this.end1,this.end1vertex,'end1connection',pos);
+      } else {
+        this.end1.copyto(pos);
+      } 
       break;
     case centerIdx:
         // adjust the radius
@@ -354,22 +378,31 @@ item.setFieldType('clockwise','boolean');
 
 graph.installEdgeOps(item);
 
+
+
 item.updateConnectedEnds = function (vertex0,vertex1) {
+  debugger;
+  let updated = [0,0];
   let {end0,end1} = this;
   this.computeDirections();
   let tr = this.getTranslation();
-  if (vertex0) {
+  if (vertex0 && (this.end0connection==='periphery')) {
     let vertex0pos = vertex0.getTranslation();
     end0.copyto(vertex0pos.difference(tr));
     let tailPeriphery = vertex0.peripheryAtDirection(this.tailDirection);
+    this.svEnd0 = vertex0pos.difference(tailPeriphery.intersection).difference(tr);
     this.vertexTailGap = tailPeriphery.intersection.length();//distance(vertex0pos);
+    updated[0]=1;
   }
-  if (vertex1) {
+  if (vertex1 && (this.end1connection==='periphery')) {
     let vertex1pos = vertex1.getTranslation();
     end1.copyto(vertex1pos.difference(tr));
     let headPeriphery = vertex1.peripheryAtDirection(this.headDirection);
-     this.vertexHeadGap = headPeriphery.intersection.length();
+     this.svEnd1 = vertex1pos.difference(headPeriphery.intersection).difference(tr);
+    this.vertexHeadGap = headPeriphery.intersection.length()
+    updated[1] = 1;
   }
+  return updated;
 }
 
 

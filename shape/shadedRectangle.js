@@ -11,13 +11,13 @@ let item = svg.Element.mk('<g/>');
 item.width = 50;
 item.height = 35;
 item.cornerRadiusFraction = 0.3;
-item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = .1;
-item.outerFill = 'rgb(200,200,200)';
+item.outerFill = 'rgb(200,200,240)';
 item.innerFill = 'white';
 /*end  adjustable parameters */
 
+item.fill = 'transparent';
 item.resizable = true;
 item.role = 'vertex';
 
