@@ -1,5 +1,8 @@
 
 core.require('/connector/connector0.js','/line/wavyLine.js',function (connectorP,lineP) {
+
+core.standsAlone('/line/wavyLine.js');  // suitable for loading into code editor
+
 let rs = connectorP.instantiate();
 rs.cornerFraction = 0.4;
 rs.waveAmplitude = 10;

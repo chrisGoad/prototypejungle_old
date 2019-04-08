@@ -2,6 +2,9 @@
 
 
 core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
+
+core.standsAlone(['/shape/twoBends.js','/arrow/solidHead.js']);  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -43,7 +46,7 @@ item.buildShafts = function () {
   let i;
   for (i=lns;i<ln;i++) {
     let shaft = this.elbowP.instantiate().show();
-    shaft.unselectable = true;
+    shaft.neverselectable = true;
     this.shafts.push(shaft);
   }
 }

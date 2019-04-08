@@ -1,6 +1,9 @@
 //multiIn
 
 core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
+  
+core.standsAlone(['/shape/twoBends.js','/arrow/solidHead.js']);  // suitable for loading into code editor
+
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */

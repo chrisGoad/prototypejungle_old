@@ -2,6 +2,8 @@
 
 
 core.require('/arrow/solidHead.js','/text/attachedText.js',function (arrowHeadP,textItemP) {
+  
+core.standsAlone(['/arrow/solidHead.js']);  // suitable for loading into code editor
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -258,9 +260,7 @@ item.controlPoints = function () {
   return rs;
 }
 
-item.updateControlPoint = function (idx,pos) {
-  console.log('connection',this.end0connection,core.stringPathOf(this));
-  
+item.updateControlPoint = function (idx,pos) {  
   let toAdjust,middle,v,dist,hwdist,delta,newMiddle,mx,my,vx,vy,cx,cy,hx,hy,ss,t,maxRadius;
   let cidx = 0;
   let end0idx  = -1;

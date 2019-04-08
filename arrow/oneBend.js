@@ -2,6 +2,8 @@
 
 
 core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
+  
+core.standsAlone(['/shape/oneBend.js','/arrow/solidHead.js']);  // suitable for loading into code editor
 
 let item = svg.Element.mk('<g/>');
 

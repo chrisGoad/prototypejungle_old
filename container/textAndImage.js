@@ -107,7 +107,8 @@ item.containerUpdate =  function () {
   if (!this.border) {
     this.set('border',this.borderP.instantiate()).show();
     this.__hideInUI = true;
-    this.border.unselectable = true;
+    //this.border.unselectable = true;
+    this.border.neverselectable = true;
   }
   this.border.role = undefined;
 
@@ -119,7 +120,8 @@ item.containerUpdate =  function () {
   if (this.contents || this.text || this.image) {
     if (!this.contents) {
       this.set('contents',this.contentsP.instantiate()).show();
-      this.contents.unselectable = true;
+      //this.contents.unselectable = true;
+      this.contents.neverselectable = true;
       this.contents.__hideInUI = true;
     }
     core.setProperties(this.contents,this.textProperties,dom.textProperties);
@@ -173,7 +175,8 @@ item.containerUpdate =  function () {
 
 item.containerSetImage = function (image) {
   image.role = undefined;
-  image.unselectable = true;
+  //image.unselectable = true;
+  image.neverselectable = true;
   this.set('image',image);
 };
 
