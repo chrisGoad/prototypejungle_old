@@ -92,7 +92,7 @@ item.updateControlPoint = function (pos,forMultiOut) {
 }
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
-  core.setProperties(this,src,['unselectable','solidHead'],own);
+  core.setProperties(this,src,['unselectable','neverselectable','solidHead'],own);
 }
 
 

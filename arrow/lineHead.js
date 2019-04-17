@@ -12,7 +12,7 @@ item.solidHead = false;
 /*end adjustable parameters */
 
 item.role = 'arrowHead';
-item.unselectable = true;
+item.neverselectable = true;
 
 
 item.set('headBase0',Point.mk(0,-10));

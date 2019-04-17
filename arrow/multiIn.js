@@ -47,7 +47,7 @@ item.buildShafts = function () {
   let i;
   for (i=lns;i<ln;i++) {
     let shaft = this.elbowP.instantiate().show();
-    shaft.unselectable = true;
+    shaft.neverselectable = true;
     this.shafts.push(shaft);
   }
 }
@@ -131,7 +131,7 @@ item.update = function () {
       proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
     }
     this.set('head',this.arrowHeadP.instantiate()).show();
-    this.head.unselectable = true;
+    this.head.neverselectable = true;
   }
   let head = this.head;
 

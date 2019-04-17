@@ -1,7 +1,8 @@
 // line, implemented as a graph edge with text
 
-core.require('/line/line.js','/text/attachedText.js',function (linePP,textItemP) {
 
+core.require('/line/line.js','/text/attachedText.js',function (linePP,textItemP) {
+alert('obsolete:shape/line');
 let item = svg.Element.mk('<g/>');
 //item.set('content', svg.Element.mk('<line/>')); // the line itself
 // a textItem is added if item.text is non-empty; see update

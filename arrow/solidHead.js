@@ -11,7 +11,7 @@ item.headLength = 20;
 
 
 item.role = 'arrowHead';
-item.unselectable = true;
+item.neverselectable = true;
 item.customControlsOnly = true;
 item.solidHead = true;
 

@@ -16,6 +16,7 @@ item['stroke-width'] = .1;
 item.outerFill = 'rgb(200,200,240)';
 item.innerFill = 'white';
 /*end  adjustable parameters */
+item.outerFill = 'rgb(100,100,240)';
 
 item.fill = 'transparent';
 item.resizable = true;

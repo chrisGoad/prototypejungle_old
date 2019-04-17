@@ -40,7 +40,7 @@ item.updateControlPoint = function (line,idx,rpos) {
 }
 
 item.transferState = function (line,src,own) { //own = consider only the own properties of src
-  core.setProperties(line,src,['unselectable','stroke','stroke-width'],own);
+  core.setProperties(line,src,['unselectable','neverselectable','stroke','stroke-width'],own);
 }
 
 

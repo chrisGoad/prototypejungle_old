@@ -3,6 +3,7 @@
 'use strict';
   
 core.require(function () {
+  alert('obsolete: shape/arrowHead');
 let {geom,svg,ui} = core;
 
 

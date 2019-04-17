@@ -30,7 +30,7 @@ item.updateText = function (text,e0,e1) {
   this.text = text;
   if (!this.textItem) {
     this.set('textItem',textItemP.instantiate());
-    this.textItem.unselectable = true;
+    this.textItem.neverselectable = true;
   }
   core.setProperties(this.textItem,this.textProperties,textProperties);
 
@@ -39,7 +39,7 @@ item.updateText = function (text,e0,e1) {
 item.update = function () {
   if (!this.shaft) {
     this.set("shaft",this.lineP.instantiate());
-    this.shaft.unselectable = true;
+    this.shaft.neverselectable = true;
     this.shaft.text = '';
     this.shaft.role = 'line';
     this.shaft.show();
@@ -96,7 +96,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.transferState(src.textItem,own);
   }

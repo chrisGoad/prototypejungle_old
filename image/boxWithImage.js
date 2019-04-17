@@ -2,6 +2,8 @@
 
 core.require('/image/imageContainer.js','/border/decorated1.js',function (container,outlineP) {
 
+alert('obsolete image/boxWithImage');
+
 var item = container.instantiate();
 let outline = outlineP.instantiate();
 item.set('outline',outline);

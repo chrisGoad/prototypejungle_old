@@ -40,7 +40,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.transferState(src.textItem,own);
   }
@@ -85,7 +85,7 @@ item.update = function () {
       proto.headP = core.installPrototype('headP',this.initialHeadPP);
     }
     this.set('head',this.headP.instantiate()).show();
-    this.head.unselectable = true;
+    this.head.neverselectable = true;
   }
   if (!this.shaft) {
     let proto = Object.getPrototypeOf(this);
@@ -93,13 +93,13 @@ item.update = function () {
       proto.shaftP = core.installPrototype('shaft',this.initialLinePP);
     }
     this.set('shaft',this.shaftP.instantiate()).show();
-    this.shaft.unselectable = true;
+    this.shaft.neverselectable = true;
     this.shaft.role = 'line';
 
   }
    if (this.doubleEnded && (!this.tail)) {
       this.set('tail',this.headP.instantiate());
-      this.tail.unselectable = true;
+      this.tail.neverselectable = true;
       this.tail.show();
     }     
   let e0 = this.end0;
@@ -155,7 +155,7 @@ item.update = function () {
   if (this.text) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textProperties.__hideInUI = false;
     let proto = Object.getPrototypeOf(this);

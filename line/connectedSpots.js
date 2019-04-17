@@ -57,7 +57,7 @@ item.update = function () {
         }
       } else {
         spot = this.set(nm,spotP.instantiate()).show();
-        spot.unselectable = true;
+        spot.neverselectable = true;
         if (i>0) {
           let lnm = 'l'+(i-1);
           let line = this.set(lnm,svg.Element.mk('<line/>'));

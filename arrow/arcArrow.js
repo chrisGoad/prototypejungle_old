@@ -49,7 +49,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.transferState(src.textItem,own);
   }
@@ -65,12 +65,12 @@ item.role = 'edge';
 
 item.set("shaft",svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 
-item.shaft.unselectable = true;
+item.shaft.neverselectable = true;
 item.shaft.show();
 
 
 item.set('head',arrowHeadP.instantiate());
-item.head.unselectable = true;
+item.head.neverselectable = true;
 
 
 let center,tailPoint,headPoint,aHead,aTail;
@@ -218,7 +218,7 @@ item.update = function () {
      if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
       //this.textItem.show();
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textProperties.__hideInUI = false;
     let proto = Object.getPrototypeOf(this);

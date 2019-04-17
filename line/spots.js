@@ -59,7 +59,7 @@ item.update = function () {
         spot.show();
       } else {
         spot = this.set(nm,spotP.instantiate()).show();
-        spot.unselectable = true;
+        spot.neverselectable = true;
         spot.undraggable = true;
         spot.__hideInUI = true;
       }

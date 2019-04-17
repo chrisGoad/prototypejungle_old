@@ -41,7 +41,7 @@ item.resizable = true; //should be turned off in most charts (but not, eg timeli
 item.coverageLB= 100;
 item.coverageUB = 300;
 item.set("theLabels",labelsP.instantiate());
-item.theLabels.unselectable = true;
+item.theLabels.neverselectable = true;
 item.theLabels.set("data",core.ArrayNode.mk());
 //item.theLabels.data.set("elements",core.ArrayNode.mk());
 

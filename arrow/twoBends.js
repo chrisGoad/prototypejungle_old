@@ -55,7 +55,7 @@ item.update = function () {
       proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
     }
     this.set('head',this.arrowHeadP.instantiate()).show();
-    this.head.unselectable = true;
+    this.head.neverselectable = true;
   }
   if (!this.shaft) {
     let proto = Object.getPrototypeOf(this);
@@ -63,7 +63,7 @@ item.update = function () {
       proto.shaftP = core.installPrototype('shaft',shaftPP);
     }
     this.set('shaft',this.shaftP.instantiate()).show();
-    this.shaft.unselectable = true;
+    this.shaft.neverselectable = true;
   }
   
  // let x1 = e1.x;
@@ -102,7 +102,7 @@ item.update = function () {
     let textItem = this.textItem;
     if (!textItem) {
       textItem = this.set('textItem',textItemP.instantiate()).show();
-      textItem.unselectable = true;
+      textItem.neverselectable = true;
       textItem.sep = 7;
       textItem['font-size'] = 8;
       
@@ -173,7 +173,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate()).show();
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.transferState(src.textItem,own);
   }

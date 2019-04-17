@@ -1,6 +1,7 @@
 // rectangleWithImage
 
 core.require('/image/imageContainer.js','/shape/rectangle.js',function (container,outlineP) {
+alert('obsolete: image/rectangleWithImage');
 
 var item = container.instantiate();
 let outline = outlineP.instantiate();

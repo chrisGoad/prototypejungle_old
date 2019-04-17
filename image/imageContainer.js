@@ -4,6 +4,7 @@
 
 core.require('/text/textarea.js',
             // 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg/220px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg',
+    alert('obsolete: image/imageContainer');
     function (textareaP) {
 
 /* the box is always enlarged enough vertically to contain the text. */

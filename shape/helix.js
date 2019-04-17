@@ -4,7 +4,7 @@ core.require('/text/attachedText.js',function (textItemP) {
 
 let item = svg.Element.mk('<g/>');
 item.set('content',svg.Element.mk('<path fill="none" stroke="black"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>'));
-item.content.unselectable = true;
+item.content.neverselectable = true;
 
 
 /* adjustable parameters */
@@ -99,7 +99,7 @@ item.update = function () {
   if (this.text) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.update();
   }
@@ -156,7 +156,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate());
-      this.textItem.unselectable = true;
+      this.textItem.neverselectable = true;
     }
     this.textItem.transferState(src.textItem,own);
   }

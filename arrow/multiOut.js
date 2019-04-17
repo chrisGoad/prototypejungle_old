@@ -25,7 +25,7 @@ item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
 item.set('armDirections',core.ArrayNode.mk());
 item.armDirections.push(Point.mk(0,-1));
 item.set("arrowHeads", core.ArrayNode.mk());
-item.arrowHeads.unselectable = true;
+item.arrowHeads.neverselectable = true;
 item.role = 'multiOut';
 item.outCount = item.ends.length;
 item.includeEndControls = true;
@@ -61,7 +61,7 @@ item.buildArrowHeads= function () {
   let lns = arrowHeads.length;
   for (let i=lns;i<ln;i++) {
     let arrowHead = this.arrowHeadP.instantiate();
-    arrowHead.unselectable = true;
+    arrowHead.neverselectable = true;
     arrowHead.show();
     arrowHeads.push(arrowHead);
   }

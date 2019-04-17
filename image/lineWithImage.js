@@ -1,5 +1,6 @@
 core.require('/image/imageContainer.js','/shape/bracketForInterval.js',function (container,outlineP) {
 
+alert('obsolete: image/lineWithImage');
 var item = container.instantiate();
 let outline = outlineP.instantiate();
 item.set('outline',outline);
