@@ -116,6 +116,7 @@ item.armPointsPositive = function (n,midPoint) { // the nth arm
 }
 
 item.update = function () {
+  debugger;
   let i;
   let vertical = this.vertical;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
@@ -133,6 +134,12 @@ item.update = function () {
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
+  
+  if ((!this.includeArrow) && (this.head)) {
+    this.head.remove();
+    this.head = undefined;
+  }
+  
   let head = this.head;
 
   core.setProperties(this.elbowP,this,['stroke-width','stroke','elbowWidth']);
@@ -264,6 +271,7 @@ item.dropControlPoint = function (idx,droppedOver) {
   ui.unselect();
 }
 
+item.setFieldType('includeArrow','boolean');
 
 
 ui.hide(item,['helper','head','shaft','singleEnd','end1','direction','shafts','ends','joinX','e01','end0x',

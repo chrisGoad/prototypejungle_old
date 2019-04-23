@@ -67,6 +67,16 @@ item.buildArrowHeads= function () {
   }
 }
 
+item.removeArrowHeads = function () {
+  debugger;
+  let arrowHeads = this.arrowHeads;
+  let ln = arrowHeads.length;
+  if (ln > 0) {
+    arrowHeads.remove();
+    this.set('arrowHeads',core.ArrayNode.mk());
+  }
+}
+
 
 
 item.initializeDirections = function () {
@@ -141,6 +151,8 @@ item.update = function () {
   this.buildShafts();
   if (this.includeArrows) {
     this.buildArrowHeads();
+  } else {
+    this.removeArrowHeads();
   }
   let {singleEnd,ends,shafts,arrowHeads} = this;
   let ln = ends.length;
@@ -280,6 +292,7 @@ item.dropControlPoint = function (idx,droppedOver) {
 }
 
 
+item.setFieldType('includeArrows','boolean');
 
 ui.hide(item,['helper','head','shaft','singleEnd','end1','shafts','ends','joinX','e01','end0x',
               'elbowP','arrowHeadP','arrowHeadPName','arrowHeads','outConnections','vertices','inConnection',

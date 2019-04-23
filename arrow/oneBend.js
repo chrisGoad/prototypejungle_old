@@ -38,6 +38,10 @@ item.update = function () {
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
+  if ((!this.includeArrow) && (this.head)) {
+    this.head.remove();
+    this.head = undefined;
+  }
   if (!this.shaft) {
     let proto = Object.getPrototypeOf(this);
     if (!proto.shaftP) {
@@ -159,6 +163,9 @@ item.transferState = function (src,own) { //own = consider only the own properti
 graph.installEdgeOps(item);
 
 item.connectionType = 'UpDown'; 
+
+item.setFieldType('includeArrow','boolean');
+
 
 ui.hide(item,['head','shaft','direction','elbowPlacement','end0','end1']);
 item.setFieldType('solidHead','boolean');

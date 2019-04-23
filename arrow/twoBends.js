@@ -57,6 +57,10 @@ item.update = function () {
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
+  if ((!this.includeArrow) && (this.head)) {
+    this.head.remove();
+    this.head = undefined;
+  }
   if (!this.shaft) {
     let proto = Object.getPrototypeOf(this);
     if (!proto.shaftP) {
@@ -74,6 +78,7 @@ item.update = function () {
   let vertical = this.vertical;
   this.connectionType = vertical?"EastWest":"UpDown"; 
   shaft.vertical = vertical;
+  core.setProperties(this.shaft,this,['stroke-width','stroke','depth','elbowWidth']);
   let positiveDir0 = this.pointsPositive(0);
   let dir0 = (vertical?Point.mk(1,0):Point.mk(0,1)).times(positiveDir0?1:-1);
   this.direction0.copyto(dir0);
@@ -83,7 +88,6 @@ item.update = function () {
   let shaftEnd = (includeArrow&&head.solidHead)?e1.plus(this.direction1.times(-this.headLength)):e1;
   this.shaft.end0.copyto(e0);
   this.shaft.end1.copyto(shaftEnd);
-  core.setProperties(this.shaft,this,['stroke-width','stroke','depth','elbowWidth']);
   this.shaft.update();
   //thhead.headPoint.copyto(e1);
   //this.head.direction.copyto(this.direction.times(flip?-1:1));
@@ -163,7 +167,7 @@ item.updateControlPoint = function (idx,rpos) {
 }
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
-  core.setProperties(this,src,['stroke','stroke-width','headLength','headWidth'],own);
+  core.setProperties(this,src,['stroke','stroke-width','headLength','headWidth','depth','end0','end1'],own);
   /*if (this.head && src.head) {
     if ((this.head.__sourceUrl !== src.head.__sourceUrl)) {
       this.set('head',Object.getPrototypeOf(src.head).instantiate());
@@ -180,6 +184,7 @@ item.transferState = function (src,own) { //own = consider only the own properti
  
 }
 
+item.setFieldType('includeArrow','boolean');
 
 graph.installEdgeOps(item);
 

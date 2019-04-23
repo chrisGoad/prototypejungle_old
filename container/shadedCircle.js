@@ -8,17 +8,23 @@ let item = svg.Element.mk('<g/>');
 /*adjustable parameters  */
 
 item.dimension = 35;
-item.shadeStart = 10;
-item.shadeOpacity = 0.5;
-item.outerFill = 'black';
+item.midpoint = 0.7;
+item.midOpacity = 0.7;
+item.finalOpacity = 1;
+
+//item.outerFill = 'black';
+item.outerFill = 'rgb(50,100,100)';
+
 item.innerFill = 'red';
 item.stroke = 'black';
 item['stroke-width'] = 1;
+item.fx = 0.2;
+item.fy = 0.2;
 /* end adjustable parameters */
 
 
 // properties to be transferred to the border */
-item.set('borderProperties',core.lift(['stroke','stroke-width','shadeStart','shadeOpacity','innerFill','outerFill']));
+item.set('borderProperties',core.lift(['midpoint','midOpacity','finalOpacity','stroke','stroke-width','innerFill','outerFill','fx','fy']));
 
 item.role = 'vertex';
 item.resizable = true;
