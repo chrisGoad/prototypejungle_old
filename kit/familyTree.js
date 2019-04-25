@@ -19,35 +19,87 @@ item.editMode = true;
 item.resizable = false;
 item.isKit = true;
 
+// knd = the kind of the initial child (L or R)
+item.newFamily = function () {
+  let rs = svg.Element.mk('<g/>');
+  rs.set('multi',core.installPrototype('multiInP',multiInPP));
+  this.multiInP.vertical = true;  
+  let child = this.addNode();
+  rs.set('children',core.ArrayNode.mk());
+  rs.children.plainPush(child);
+  //this.families.push(rs);
+  return rs;
+}
+
+item.addChild(person) {
+  let node = person.nodeOf;
+  let which;
+  if (node.leftPerson === person) {
+    which = 'left';
+  } else if ((node.leftSpouse === person) || (node.rightSpouse === person)) {
+    which = 'center';
+  } else {
+    which = 'right';
+  }
+  let familyProp = which==='left'?'leftFamily':(which === 'center'?'mainFamily':'rightFamily';
+  let family = node[familyProp];
+  if (!family) {
+    family = this.newFamily();
+    node.set(familyProp,family);
+  }
+  let child = this.newNode();
+  family.children.plainPush(child);
+  return child;
+}
+    
+    
+  
+  
+// a node might involve four people
+// leftPartner leftSpouse rightSpouse rightPartner; heteronormative family: leftSpouse = wife, rightSpouse = husband
+
 // a node is a principle [0], and set of partners, horizontally posisionted
+// node first added is always the right spouse, if a family should develop
 item.addNode  = function () {
   let nodes = this.nodes;
   let newNode = svg.Element.mk('<g/>');
   nodes.push(newNode);
-  let principle = this.personP.instantiate().show();
-  principle.text = 'd'+ (this.nameCount++);
+  let person = this.personP.instantiate().show();
+  person.text = 'd'+ (this.nameCount++);
 
  // let bracket = this.multiInP.instantiate().show();
   //bracket.unselectable = true;
  // bracket.ends.push(Point.mk(0,0));
   //newNode.set('principle',principle);
   //principle.text = 'name';
-  newNode.set('partners',core.ArrayNode.mk());
-  newNode.partners.push(principle);
+  newNode.set('rightSpouse',person);
+  person.nodeOf = newNode;
   newNode.set('lines',core.ArrayNode.mk());
-  newNode.set('multis',core.ArrayNode.mk([null])); 
-  newNode.set('families',core.ArrayNode.mk([null]));
-  newNode.set('familyRelxs',core.ArrayNode.mk()); 
-  newNode.set('descendants',core.ArrayNode.mk());
   newNode.set('position',Point.mk(0,0));
   return newNode;
   // later add texts
 };
 
 item.nameCount = 0;
-item.addPartner = function (node) {
+item.addSpouse = function (node) {
   debugger;
-  let partners = node.partners;
+  let left = node.leftSpouse;
+  let right = node.rightSpouse;
+  if (right && left) {
+    return;
+  }
+  if (right) {
+    left = node.set('leftSpouse',this.personP.instantiate().show());
+    left.nodeOf = node;
+  } else {
+    right = node.set('rightSpouse',this.personP.instantiate().show());
+    right.nodeOf = node;
+  }
+  let line = this.lineP.instantiate().show();
+  node.set('centralLine',line);
+  graph.connect1end(line,0,left,'periphery');
+  graph.connect1end(line,1,right,'periphery');
+  /*let partners = node.partners;
   let prevPartner;
   let ln = partners.length;
   //if (ln > 0) {
@@ -76,24 +128,45 @@ item.addPartner = function (node) {
     toLayout = node.parents;
   }
   this.layoutNode(toLayout,toLayout.position);
+  */
 };
   
-
-item.multiConnectPoint = function (node,partnerNum) {
-  if (node.partners === 0) {
-    // compute periphery
-    return Point.mk(0,0);
+item.addPartner = function (kind) {
+  debugger;
+  let person = this.personP.instantiate().show();
+  if (kind === 'L') {
+    spouse = node.leftSpouse;
+    if ((!spouse) ||node.leftPartner) {
+      return;
+    }
+    partner = node.set('leftPartner',person);
   } else {
-    debugger;
-    let lines = node.lines;
-    let line = lines[partnerNum];
-    let e0 = line.end0;
-    let e1 = line.end1;
-    return e0.plus(e1).times(0.5);
+    spouse = node.rightSpouse;
+    if ((!spouse) || node.rightPartner) {
+      return;
+    }
+    partner = node.set('rightPartner',person);
   }
+  let line = this.lineP.instantiate().show();
+  if (kind === 'L') {
+    node.set('leftLine',line);
+    graph.connect1end(partner,0,spouse,'periphery');
+  } else {
+    node.set('rightLine',line);
+    graph.connect1end(spouse,0,partner,'periphery');
+  }
+}
+item.multiConnectPoint = function (node,kind) { // kind = L C R
+  let line = (kind === 'L')?node.leftLine:((kind === 'C')?node.centerLine:node.rightLine);
+  let e0 = line.end0;
+  let e1 = line.end1;
+  return e0.plus(e1).times(0.5);
 };
   
 item.initialize = function () {
+  this.set('nodes',core.ArrayNode.mk());
+  this.set('families',core.ArrayNode.mk());
+  
   this.multiInP = core.installPrototype('multiInP',multiInPP);
   this.multiInP.vertical = true;
   this.lineP = core.installPrototype('lineP',linePP);
@@ -102,6 +175,104 @@ item.initialize = function () {
   this.personP.height = 20;
   this.personP.draggableInKit = true;
 };
+
+item.relLayoutNode = function(node) { // computes relative positions (in x) to left end
+  let LP = node.leftPartner;
+  let LS = node.leftSpouse;
+  let RS = node.rightSpouse;
+  let RP = node.rightPartner;
+  let partnerSep = this.partnerSep;
+  let cx = 0;
+  if (LP) {
+    LP.relX = cx;
+    cx = cx + partnerSep;
+  }
+  LS.relX = cx;
+  cx = cx + partnerSep;
+  RS.relX = cx;
+  if (RP) {
+    cx = cx + partnerSep;
+    RP.relX = cx;
+  }
+  node.width = cx;
+}
+
+item.absLayoutNode = function (node,pos) { // computes absolute positions given relative ones, and moves people
+  let LP = node.leftPartner;
+  let LS = node.leftSpouse;
+  let RS = node.rightSpouse;
+  let RP = node.rightPartner;
+  let cx = -0.5*(node.width);
+  const movePerson = (person) => {
+    if (person) {
+      person.moveto(pos.plus(Point.mk(person.relX,0)));
+    }
+  }
+  movePerson(LP);
+  movePerson(LS);
+  movePerson(RS);
+  movePerson(RP);
+}
+
+
+item.layoutTree = function() {
+  this.relLayoutNode(this.root,Point.mk(0,0));
+  this.absLayoutNode(this.root,Point.mk(0,0));
+}
+  
+
+item.firstUpdate = true;
+
+item.update = function () {
+  debugger;
+  if (this.firstUpdate) {
+    this.root = this.addNode('R');
+    this.addSpouse(this.root);
+    this.firstUpdate = false;
+    this.layoutTree();
+  }
+  //this.layout();
+}
+
+item.addLeftPartner = function (node) {
+  this.addPartner(node,'L');
+  this.layoutTree();
+  
+}
+
+
+item.addRightPartner = function (node) {
+  this.addPartner(node,'R');
+  this.layoutTree();
+}
+
+item.actions = function (node) {
+  let rs = [];
+  if (!node) return;
+  if (node.role === 'vertex') {
+     rs.push({title:'Select Kit Root',action:'selectTree'});
+   //  rs.push({title:'Add Child',action:'addChild'});
+     rs.push({title:'Add Left Partner',action:'addLeftPartner'});
+     rs.push({title:'Add Right Partner',action:'addRightPartner'});
+              
+   /* if (node.parentVertex) {
+      rs.push({title:'Add Sibling',action:'addSibling'});
+    }
+    rs.push({title:'Reposition Subtree',action:'reposition'});*/
+  }
+  return rs;
+  if (node === this) {
+    rs.push({title:'Reposition Tree',action:'layoutTree'});
+  }
+  return rs;
+}
+
+
+item.selectTree = function () {
+  this.__select('svg');
+}
+
+return item;
 
 item.addDescendant = function (node,partnerNum) { //0 = principle
   debugger;
@@ -277,12 +448,6 @@ item.absLayoutNode = function (node,pos) { // computes absolute positions given 
   }
 }
 
-item.layoutNode = function(node,pos) {
-  this.relLayoutNode(node);
-  debugger;
-  this.absLayoutNode(node,pos);
-}
-  
   
 item.positionMultis = function (node) {
   let multis = node.multis;

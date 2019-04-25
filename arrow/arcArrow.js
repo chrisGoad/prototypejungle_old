@@ -381,7 +381,6 @@ graph.installEdgeOps(item);
 
 
 item.updateConnectedEnds = function (vertex0,vertex1) {
-  debugger;
   let updated = [0,0];
   let {end0,end1} = this;
   this.computeDirections();
