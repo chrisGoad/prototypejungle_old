@@ -11,6 +11,7 @@ item.textPad = 5;
 item['font-size'] = 8;
 item.editMode = true;
 item.resizable = true;
+item.isKit = true;
 
 
 item.addNode  = function (layerNum,right) {
@@ -138,6 +139,22 @@ item.update = function () {
 }
 
 item.setFieldType('editMode','boolean');
+
+
+item.popInstructions = function () {
+  debugger;
+  editor.popInfo('way back when <b>upon</b> the river<br/> the boat sank');
+}
+item.actions = function (node) {
+  let rs = [];
+  if (!node) return;
+ 
+  rs.push({title:'Bracket Instructions',action:'popInstructions'});
+   
+  return rs;
+ 
+}
+
 
 return item;
 });
