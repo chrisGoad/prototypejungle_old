@@ -2,12 +2,12 @@ core.require('/arrow/multiIn.js','/connector/line.js','/container/rectangle.js',
   
 let item = svg.Element.mk('<g/>');
 
-item.partnerSeparation = 20;
-item.siblingSeparation = 20;
+item.partnerSep = 40;
+item.siblingSep = 50;
 
 item.familySep = 20;
 
-item.descendantSeparation = 60;
+item.descendantSep = 60;
 item.numLevels = 2;
 item.height = 140;
 item.width = 200;
@@ -19,38 +19,15 @@ item.editMode = true;
 item.resizable = false;
 item.isKit = true;
 item.partnerCount = 0;
-
-item.personWidth = function (person) {
-  return person.dimension?person.dimension:person.width;
-}
-
-
-item.personHeight = function (person) {
-  return person.dimension?person.dimension:person.height;
-}
-
-item.partnerSep = function () {
-  let wd = this.personWidth(this.personP);
-  return wd + this.partnerSeparation;
-}
-
-
-item.siblingSep = function () {
-  let wd = this.personWidth(this.personP);
-  return wd + this.siblingSeparation;
-}
-
-
-item.descendantSep = function () {
-  let ht = this.personHeight(this.personP);
-  return ht + this.descendantSeparation;
-}
-
+item.Node = svg.Element.mk('<g/>');
+item.Family = svg.Element.mk('<g/>');
 
 
 // knd = the kind of the initial child (L or R)
 item.newFamily = function () {
-  let rs = svg.Element.mk('<g/>');
+  //let rs = svg.Element.mk('<g/>');
+  let rs = this.Family.instantiate();//svg.Element.mk('<g/>');
+
   this.families.push(rs);
 
   rs.set('multi',this.multiInP.instantiate().show());
@@ -68,14 +45,10 @@ item.addChild = function (person,ichild) {
   let partners = node.partners;
   let families = node.families;
   let ln = partners.length;
-  if (ln == 1) {
-    editor.popInfo('Add a partner before adding a child');
-    return;
-  }
   let famIdx = 0;
   let multi;
   if (ln > 2) {  // add to family to the left of the person
-    let pidx = partners.findIndex((x)=>(x===person));
+    let pidx = partners.findIndex((x) => (x === person));
     famIdx = Math.max(0,pidx-1);
   }
   let family = families[famIdx];
@@ -118,8 +91,9 @@ item.addChild = function (person,ichild) {
 // node first added is always the right spouse, if a family should develop
 item.newNode  = function () {
   let nodes = this.nodes;
-  let newNode = svg.Element.mk('<g/>');
+  let newNode = this.Node.instantiate();//svg.Element.mk('<g/>');
   nodes.push(newNode);
+  newNode.isNew  = 'yes';
   let person = this.personP.instantiate().show();
   person.nodeOf = newNode;
   let partners =  core.ArrayNode.mk();
@@ -134,6 +108,34 @@ item.newNode  = function () {
 };
 
 item.nameCount = 0;
+item.Node.addPartner = function () {
+   debugger;
+  let node = this;
+  let kit = node.__parent.__parent;
+  let line = kit.lineP.instantiate().show();
+  node.lines.push(line);
+  node.families.push(null);
+  let right =  kit.personP.instantiate().show();
+  right.text = 'p'+ (kit.partnerCount++);
+  right.nodeOf = node;
+  let partners = node.partners;
+  let ln = partners.length;
+  if (ln === 1) {
+    let handle = kit.handleP.instantiate().show();
+    node.set('handle',handle);
+  }
+  partners.push(right);
+  right.update();
+  let left  = partners[ln-1];
+  graph.connectVertices(line,left,right);
+  let family = node.inFamily;
+  if (family) {
+    let pr = family.parents;
+    kit.layoutTree(pr);
+  } else {
+    kit.layoutTree(node);
+  }
+}
 item.addPartner = function (node) {
   debugger;
   let line = this.lineP.instantiate().show();
@@ -162,20 +164,14 @@ item.addPartner = function (node) {
 };
 
 item.addParents = function (person) {
-  if (person.inFamily) {
-    editor.popInfo('This person already has parents');
-    return;
-  }
   let parentsNode = this.newNode();
-  this.addPartner(parentsNode);
+  parentsNode.addPartner();
   let parents = parentsNode.partners;
   this.addChild(parents[0],person);
   let pos = person.getTranslation();
-  let partnerSep = this.partnerSep();
-  let descendantSep = this.descendantSep();
-  parentsNode.position.copyto(pos.plus(Point.mk(0,-descendantSep)));
-  parents[0].moveto(pos.plus(Point.mk(-0.5*partnerSep,-descendantSep)));
-  parents[1].moveto(pos.plus(Point.mk(0.5*partnerSep,-descendantSep)));
+  parentsNode.position.copyto(pos.plus(Point.mk(0,-this.descendantSep)));
+  parents[0].moveto(pos.plus(Point.mk(-0.5*this.partnerSep,-this.descendantSep)));
+  parents[1].moveto(pos.plus(Point.mk(0.5*this.partnerSep,-this.descendantSep)));
   return parentsNode;
 }
   
@@ -189,11 +185,10 @@ item.initialize = function () {
   this.multiInP.vertical = true;
   this.lineP = core.installPrototype('lineP',linePP);
   this.personP = core.installPrototype('personP',personPP);
-  this.personP.width = 40;
+  this.personP.width = 30;
   this.personP.height = 20;
-  this.personP.textProperties['font-size'] = 8;
   this.handleP = core.installPrototype('handleP',personPP);
-  this.handleP.width = 10;
+  this.handleP.width = 5;
   this.handleP.height = 5;
   this.handleP.isHandle = true;
   this.handleP.fill = "red";
@@ -201,13 +196,16 @@ item.initialize = function () {
   this.handleP.draggableInKit = true;
 };
 
-item.relLayoutFamily = function (family) {
+item.Family.relLayout = function () {
+  debugger;
+  let family = this;
   let children = family.children;
   let cx = 0;
-  let siblingSep = this.siblingSep();
+  let siblingSep = this.siblingSep;
   let cwd;
   children.forEach( (child) => {
-    this.relLayoutNode(child);
+    child.relLayout();
+    //this.relLayoutNode(child);
     let wd = child.width;
     child.relX = cx + 0.5*wd;
     cwd = cx + wd;
@@ -217,57 +215,52 @@ item.relLayoutFamily = function (family) {
 }
 
 
-item.absLayoutFamily = function (family,pos) {
+item.Family.absLayout = function (pos) {
   debugger;
+  let family = this;
+  let kit = this.__parent.__parent;
   family.position.copyto(pos);
   let children = family.children;
   let wd = family.width;
   let mhwd = -0.5*wd;
-  let descendantSep = this.descendantSep();
+  let descendantSep = kit.descendantSep;
   children.forEach((child) => {
     let cpos = pos.plus(Point.mk(mhwd+child.relX,descendantSep));
-    this.absLayoutNode(child,cpos);
+    child.absLayout(cpos);
   });
 }
 
   
   
 
-item.relLayoutNode = function(node) { // computes relative positions (in x) to left end
+item.Node.relLayout = function() { // computes relative positions (in x) to left end
+  let node = this;
+  let kit = this.__parent.__parent;
   let partners = node.partners;
   let families = node.families;
-  let partnerSep = this.partnerSep();
+  let partnerSep = kit.partnerSep;
   let cx = 0;
   let ln = partners.length;
   partners[0].relX = 0;
-  let familyCount =  0;
-  families.forEach( (family) => {
-    if (family) {
-      familyCount++;
-    }
-  });
-    
   for (let i=1;i<ln;i++) {
     let partner = partners[i];
     let family = families[i-1];
     let famwd = 0;
-    // todo put familes to right option
     if (family) {
-      this.relLayoutFamily(family);
+      family.relLayout();
       famwd = family.width;
     }
-    //let wd = ln>2?Math.max(famwd,partnerSep):partnerSep;
-    
-    let wd = familyCount>1?famwd+partnerSep:partnerSep;
+    let wd = ln>2?Math.max(famwd,partnerSep):partnerSep;
     cx = cx + wd;
     partner.relX = cx;
   }
   node.width = cx;
 }
 
-item.absLayoutNode = function (node,pos) { // computes absolute positions given relative ones, and moves people
+item.Node.absLayout = function (pos) { // computes absolute positions given relative ones, and moves people
   debugger;
-  node.position.copyto(pos)
+  let node = this;
+  node.position = pos;
   let partners = node.partners;
   let families = node.families;
   let handle = node.handle;
@@ -281,9 +274,8 @@ item.absLayoutNode = function (node,pos) { // computes absolute positions given 
     let family = families[i-1];
     if (family) {
       let fpos = pos.plus(Point.mk(mhwd + 0.5*(lastPartner.relX + partner.relX),0));
-      this.absLayoutFamily(family,fpos);
+      family.absLayout(fpos);
     }
-    lastPartner = partner;
   }
 }
 
@@ -294,17 +286,18 @@ item.layoutTree = function(inode) {
   debugger;
   let node = inode?inode:this.root;
   let pos = node&&node.position?node.position:Point.mk(0,0);
-  this.relLayoutNode(node,pos);
-  this.absLayoutNode(node,pos);
+  node.relLayout();
+ // this.relLayoutNode(node,pos);
+  node.absLayout(pos);
   // two updates needed to get arms pointing right direction (to do with armDirections)
   graph.graphUpdate();
   graph.graphUpdate();
-  ui.updateControlBoxes();
   this.layout();
   this.draw();
 }
 
-item.moveNode = function (node,pos) {
+item.Node.move_to = function (pos) {
+  let node = this;
   let partners = node.partners;
   let cpos = node.position;
   let rpos = pos.difference(cpos);
@@ -316,20 +309,21 @@ item.moveNode = function (node,pos) {
   families.forEach((family) => {
     if (family) {
       let fpos = family.position;
-      this.moveFamily(family,fpos.plus(rpos));
+      family.move_to(fpos.plus(rpos));
     }
   });
   node.position.copyto(pos);
 }
 
 
-item.moveFamily = function (family,pos) {
+item.Family.move_to = function (pos) {
+  let family = this;
   let children = family.children;
   let fpos = family.position;
   let rpos = pos.difference(fpos);
   children.forEach( (child) => {
     let cpos = child.position;
-    this.moveNode(child,cpos.plus(rpos));
+    child.move_to(cpos.plus(rpos));
   });
 }
 
@@ -379,12 +373,8 @@ item.update = function () {
   debugger;
   if (this.firstUpdate) {
     this.root = this.newNode('R');
-    this.addPartner(this.root);
-    let p0 = this.root.partners[0];
-    p0.text = 'parent';
-    this.root.partners[1].text = 'parent';
-   // let child =  this.addChild(p0);
-   // child.partners[0].text = 'child'
+    this.root.addPartner();
+    //this.addPartner(this.root);
     this.firstUpdate = false;
     this.layoutTree();
   }
@@ -424,7 +414,7 @@ item.dragStep = function (x,pos) {
     let rpos = localPos.difference(this.startOfDrag);
     node = x.__parent;
     x.moveto(localPos);
-    this.moveNode(node, opos.plus(rpos));
+    node.move_to(opos.plus(rpos));
     graph.graphUpdate();
     this.layout();
   }
@@ -433,8 +423,8 @@ item.dragStep = function (x,pos) {
 item.addPartnerAction = function (person) {
   debugger;
   let node = person.nodeOf;
-  this.addPartner(node,'L');
-  ui.updateControlBoxes();
+  node.addPartner();
+  //this.addPartner(node,'L');
   this.layoutTree();
   
 }
@@ -450,14 +440,11 @@ item.addChildAction = function (person) {
 
 item.addParentsAction = function (person) {
   debugger;
-  
   let parents = this.addParents(person);
   core.updateParts(parents);
    // two graph updates needed to get arms pointing right direction (to do with armDirections)
-   this.layout();
   graph.graphUpdate();
   graph.graphUpdate();
-  ui.updateControlBoxes();
   this.update();
   this.draw();
   dom.svgMain.fitContentsIfNeeded();
