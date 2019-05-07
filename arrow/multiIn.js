@@ -17,6 +17,7 @@ item.headWidth = 8;
 item.stroke = "black";
 item.elbowWidth = 10;
 item.joinY = 25; // distance from join to end1
+item.controlOnlyJoin = false;
 item.set('singleEnd',item.vertical?Point.mk(0,15):Point.mk(15,0));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,-15):Point.mk(-15,0));
@@ -116,7 +117,6 @@ item.armPointsPositive = function (n,midPoint) { // the nth arm
 }
 
 item.update = function () {
-  debugger;
   let i;
   let vertical = this.vertical;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
@@ -146,7 +146,8 @@ item.update = function () {
   let positiveDir = this.singlePointsPositive();
   this.singleDirection.copyto(vertical?Point.mk(0,positiveDir?1:-1):Point.mk(positiveDir?1:-1,0));
   let end0 = ends[0];
-  let depth =vertical? -(singleEnd.y - end0.y)/2 :  -(singleEnd.x - end0.x)/2;
+  let  ep = this.elbowPlacement;
+  let depth =vertical? -(singleEnd.y - end0.y)*ep :  -(singleEnd.x - end0.x)*ep;
   this.depth = depth;
   let  middle = vertical?Point.mk(singleEnd.x,singleEnd.y+depth):Point.mk(singleEnd.x+depth,singleEnd.y);
   this.middle = middle;
@@ -166,7 +167,7 @@ item.update = function () {
     let shaftEnd = (head && head.solidHead)?singleEnd.plus(this.direction.times((positiveDir?-0.5:0.5)*this.headLength)):singleEnd;
     shaft.end0.copyto(shaftEnd);
     shaft.end1.copyto(ends[i]);
-    shaft.elbowPlacement = this.elbowPlacement;
+    //shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
   }
@@ -191,6 +192,12 @@ item.removeEnd = function (idx) {
 
 item.controlPoints = function () {
   let e0 = this.singleEnd;
+  if (this.controlOnlyJoin) {
+    let oe = this.ends[0];
+    let d = this.vertical? e0.y - oe.y : e0.x - oe.x;
+    let ep = this.elbowPlacement;
+    return [e0.plus(this.vertical?Point.mk(0,-ep*d):Point.mk(ep * d,0))];
+  }
   let rs = [];
   if (this.includeEndControls) {
     rs.push(e0);
@@ -220,16 +227,13 @@ item.connected = function (idx) {
 item.updateControlPoint = function (idx,pos) {
   let vertical = this.vertical;
   let idxOff=(this.head)?1:0;
-  if (idx === 110) {
-    this.joinV = vertical? this.ends[0].x - pos.x : this.ends[0].y - pos.y;
-    this.elbowPlacement = Math.max(0,1 - (this.joinV)/(this.e01));
-    if (!this.singleVertex) {
-      if (vertical) {
-        this.singleEnd.y = pos.y;
-      } else {
-        this.singleEnd.x = pos.x;
-      }
-    }
+  if (this.controlOnlyJoin) {
+    let se = this.singleEnd;
+    let e0 = this.ends[0];
+    let td =  vertical? e0.y - se.y:e0.x - se.x;
+    let d = vertical? pos.y - se.y  :pos.x - se.x;
+    console.log('d',d,'td',td,'d/td',d/td);
+    this.elbowPlacement = Math.max(0,d/td);
   } else  if (idx === 0) {
      if (this.singleVertex) {
       graph.mapEndToPeriphery(this,this.singleEnd,this.singleVertex,'outConnection',pos);

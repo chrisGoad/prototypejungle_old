@@ -68,7 +68,6 @@ item.buildArrowHeads= function () {
 }
 
 item.removeArrowHeads = function () {
-  debugger;
   let arrowHeads = this.arrowHeads;
   let ln = arrowHeads.length;
   if (ln > 0) {

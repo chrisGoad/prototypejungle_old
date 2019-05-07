@@ -62,8 +62,26 @@ item.newFamily = function () {
   return rs;
 }
 
+item.childrenOf = function(person) {
+  let node = person.nodeOf;
+  let partners = node.partners;
+  let families = node.families;
+  let ln = partners.length;
+  if (ln == 1) {
+    return null;
+  }
+  let famIdx = 0;
+  if (ln > 2) {  // relevant family is to left of person
+    let pidx = partners.findIndex((x)=>(x===person));
+    famIdx = Math.max(0,pidx-1);
+  }
+  let family = families[famIdx];
+  return family?family.children:null;
+}
+  
+  
 // max num partners = 4.Add child to 
-item.addChild = function (person,ichild) {
+item.addChild = function (person,ichild,isLeft) {
   let node = person.nodeOf;
   let partners = node.partners;
   let families = node.families;
@@ -102,9 +120,18 @@ item.addChild = function (person,ichild) {
     child.text = 'c'+ (this.partnerCount++);
   }
 
-   debugger;
   graph.connectMultiVertex(multi,family.children.length,child);
-  family.children.plainPush(childNode);
+  let children = family.children;
+  if (isLeft) {
+    let ln = children.length;
+    children.plainPush(null);
+    for (let i=ln;i>0;i--) {
+      children[i] = children[i-1];
+    }
+    children[0] = childNode;
+  } else {
+    family.children.plainPush(childNode);
+  }
   return childNode;
 }
     
@@ -122,9 +149,10 @@ item.newNode  = function () {
   nodes.push(newNode);
   let person = this.personP.instantiate().show();
   person.nodeOf = newNode;
+  this.people.push(person);
   let partners =  core.ArrayNode.mk();
   newNode.set('partners',partners);
-  partners.push(person);
+  partners.plainPush(person);
   newNode.set('families',core.ArrayNode.mk());
 
   newNode.set('lines',core.ArrayNode.mk());
@@ -134,26 +162,54 @@ item.newNode  = function () {
 };
 
 item.nameCount = 0;
-item.addPartner = function (node) {
-  debugger;
-  let line = this.lineP.instantiate().show();
-  node.lines.push(line);
-  node.families.push(null);
-  let right =  this.personP.instantiate().show();
-  right.text = 'p'+ (this.partnerCount++);
-  right.nodeOf = node;
+item.addPartner = function (node,toLeft) {
+  let left,right;
   let partners = node.partners;
+  let families = node.families;
+  let lines = node.lines;
   let ln = partners.length;
+  let line = this.lineP.instantiate().show();
+  this.lines.push(line);
+  //line.nodeOf = node;
+  this.draw();
+  line.ignoreClick = true;
+  //node.lines.plainPush(line);
+  //node.families.push(null);
+  let person =  this.personP.instantiate().show();
+  this.people.push(person);
+  person.text = 'p'+ (this.partnerCount++);
+  person.nodeOf = node;
   if (ln === 1) {
     let handle = this.handleP.instantiate().show();
     node.set('handle',handle);
+    handle.nodeOf = node;
   }
-  partners.push(right);
-  right.update();
-  let left  = partners[ln-1];
+  if (toLeft) {
+    partners.push(null);
+    families.push(null);
+    lines.push(null);
+    for (let i = ln;i>0;i--) {
+      partners[i] = partners[i-1];
+      if (i > 1) {
+        families[i-1] = families[i-2];
+        lines[i-1] = lines[i-2];
+      }
+    }
+    partners[0] = person;
+    families[0] = null;
+    lines[0] = line;
+    left = person;
+    right = partners[1];
+  } else {
+    partners.plainPush(person);
+    families.plainPush(null);
+    lines.plainPush(line);
+    left = partners[ln-1];
+    right = partners[ln];
+  }
   graph.connectVertices(line,left,right);
   let family = node.inFamily;
-  if (family) {
+  if (0 && family) {
     let pr = family.parents;
     this.layoutTree(pr);
   } else {
@@ -180,14 +236,26 @@ item.addParents = function (person) {
 }
   
   
-  
+item.initializePositionStore = function () {
+  if (this.positionStore) {
+    return;
+  }
+  this.set('positionStore',core.ArrayNode.mk()); // used in dragging
+  for (let i=0;i<5;i++) {
+    this.positionStore.push(Point.mk(0,0));
+  }
+}
   
 item.initialize = function () {
+  this.set('lines',core.ArrayNode.mk());
   this.set('nodes',core.ArrayNode.mk());
   this.set('families',core.ArrayNode.mk());
+  this.set('people',core.ArrayNode.mk());
   this.multiInP = core.installPrototype('multiInP',multiInPP);
   this.multiInP.vertical = true;
+  this.multiInP.controlOnlyJoin = true;
   this.lineP = core.installPrototype('lineP',linePP);
+  this.lineP.isHandle = true;
   this.personP = core.installPrototype('personP',personPP);
   this.personP.width = 40;
   this.personP.height = 20;
@@ -199,6 +267,7 @@ item.initialize = function () {
   this.handleP.fill = "red";
   this.personP.draggableInKit = true;
   this.handleP.draggableInKit = true;
+  
 };
 
 item.relLayoutFamily = function (family) {
@@ -218,7 +287,6 @@ item.relLayoutFamily = function (family) {
 
 
 item.absLayoutFamily = function (family,pos) {
-  debugger;
   family.position.copyto(pos);
   let children = family.children;
   let wd = family.width;
@@ -266,7 +334,6 @@ item.relLayoutNode = function(node) { // computes relative positions (in x) to l
 }
 
 item.absLayoutNode = function (node,pos) { // computes absolute positions given relative ones, and moves people
-  debugger;
   node.position.copyto(pos)
   let partners = node.partners;
   let families = node.families;
@@ -291,7 +358,6 @@ item.absLayoutNode = function (node,pos) { // computes absolute positions given 
   
 
 item.layoutTree = function(inode) {
-  debugger;
   let node = inode?inode:this.root;
   let pos = node&&node.position?node.position:Point.mk(0,0);
   this.relLayoutNode(node,pos);
@@ -336,9 +402,13 @@ item.moveFamily = function (family,pos) {
 
 
 item.midPoint = function (line) { // kind = L C R
-  let e0 = line.end0;
-  let e1 = line.end1;
-  return e0.plus(e1).times(0.5);
+  if (line) {
+    let e0 = line.end0;
+    let e1 = line.end1;
+    return e0.plus(e1).times(0.5);
+  } else {
+    debugger;
+  }
 };
  
 item.positionMultis = function (node) {
@@ -351,7 +421,9 @@ item.positionMultis = function (node) {
       let handle = node.handle;
       let line = node.lines[0];
       let mp = this.midPoint(line);
-      handle.moveto(mp);
+      if (mp) {
+        handle.moveto(mp);
+      }
     }
     let family = families[i-1];
     if (family) {
@@ -366,7 +438,6 @@ item.positionMultis = function (node) {
 }
 
  item.layout = function () {
-  debugger;
   let nodes = this.nodes;
   nodes.forEach( (nd) => {
     this.positionMultis(nd);
@@ -376,15 +447,15 @@ item.positionMultis = function (node) {
 item.firstUpdate = true;
 
 item.update = function () {
-  debugger;
   if (this.firstUpdate) {
     this.root = this.newNode('R');
     this.addPartner(this.root);
     let p0 = this.root.partners[0];
     p0.text = 'parent';
     this.root.partners[1].text = 'parent';
-   // let child =  this.addChild(p0);
-   // child.partners[0].text = 'child'
+    let child =  this.addChild(p0);
+    child.partners[0].text = 'child';
+    this.firstChild = child;
     this.firstUpdate = false;
     this.layoutTree();
   }
@@ -402,51 +473,127 @@ item.dragStart = function (x,pos) {
   //console.log('drag start',pos.x,pos.y);
   let localPos = this.toLocalCoords(pos,true);
   this.startOfDrag.copyto(localPos);
-  if (x.isHandle) {
-    let node = x.__parent
+  if (x.nodeOf) {
+    let node = x.nodeOf;
     this.nodePosAtStartDrag.copyto(node.position);
+    let partners = node.partners;
+    let ln = partners.length;
+    if (ln > 1) {
+      this.initializePositionStore();
+      let pstore = this.positionStore;
+      for (let i=0;i<ln;i++) {
+        pstore[i].copyto(partners[i].getTranslation());
+      }
+    }
   }
 }
 
 item.dragStep = function (x,pos) {
   //console.log(pos.x,pos.y);
+  let beenDragged = this.beenDragged;
   let localPos = this.toLocalCoords(pos,true);
-
-  if (Math.abs(localPos.y) > 0.1) {
-    debugger;
-  }
   let node = x.nodeOf;
   if (node) {
-    x.moveto(localPos);
-    this.positionMultis(node);
-  } else if (x.isHandle)  {
     let opos = this.nodePosAtStartDrag;
     let rpos = localPos.difference(this.startOfDrag);
-    node = x.__parent;
-    x.moveto(localPos);
-    this.moveNode(node, opos.plus(rpos));
+   
+    if (x.isHandle) {
+      x.moveto(localPos);
+      this.moveNode(node, opos.plus(rpos));
+    } else {
+      opos = this.startOfDrag;
+      let pstore = this.positionStore;
+      let partners = node.partners;
+      let ln = partners.length;
+      if (ln === 1) {
+        this.moveNode(node, opos.plus(rpos));
+      } else {
+        let dy = rpos.y;
+        console.log('dy',dy);
+       // x.moveto(opos.plus(Point.mk(rpos.x,0)));
+        x.moveto(opos.plus(rpos));
+        let partners =node.partners;
+        for (let i=0;i<ln;i++) {
+           let person = partners[i];
+            if (person !== x) {
+              let pp = pstore[i];
+              let np = pp.plus(Point.mk(0,dy));
+              person.moveto(np);
+          }
+        }
+          
+      }
+      let dist = rpos.length();
+      if ((dist > 10000) && (!beenDragged)) {
+        this.beenDragged = true;
+        editor.popInfo('Auto-layout turned off. From now on, use "Layout Family" when desired. <br/> Undo this drag to bring Auto-layout back');
+      }
+    }
     graph.graphUpdate();
     this.layout();
   }
 }
 
-item.addPartnerAction = function (person) {
+
+item.nodeToLayout = function(person) {
+  let family = person.inFamily;
+  if (family) {
+    return family.parents;
+  } else {
+    return person.nodeOf;
+  }
+}
+
+  
+item.addPartnerLeftAction = function (person) {
   debugger;
   let node = person.nodeOf;
-  this.addPartner(node,'L');
+  this.addPartner(node,true);
+  if (!this.beenDragged) {
+    this.layoutTree(this.nodeToLayout(person));
+  }
   ui.updateControlBoxes();
-  this.layoutTree();
-  
+  this.afterAdd();
 }
 
 
-item.addChildAction = function (person) {
+item.addPartnerRightAction = function (person) {
   debugger;
-  this.addChild(person);
-  this.layoutTree(person.nodeOf);
+  let node = person.nodeOf;
+  this.addPartner(node,false);
+  if (!this.beenDragged) {
+    this.layoutTree(this.nodeToLayout(person));
+  }
+  ui.updateControlBoxes();
+  this.afterAdd();
+}
+
+
+
+
+item.afterAdd = function () {
   dom.svgMain.fitContentsIfNeeded();
+  core.saveState('add');
+  editor.setSaved(false);
+}
+
+
+item.addChildLeftAction = function (person) {
+  debugger;
+  this.addChild(person,null,true);
+  this.layoutTree(person.nodeOf);
+  this.afterAdd(person.nodeOf);
 
 }
+
+  
+item.addChildRightAction = function (person) {
+  debugger;
+  this.addChild(person,null,false);
+  this.layoutTree(person.nodeOf);
+  this.afterAdd(person.nodeOf);
+}
+
 
 item.addParentsAction = function (person) {
   debugger;
@@ -469,20 +616,25 @@ item.layoutTreeAction = function (person) {
   this.layoutTree(person.nodeOf);
 }
 
-item.actions = function (node) {
+item.actions = function (person) {
   let rs = [];
-  if (!node) return;
-  if (node.role === 'vertex') {
-     rs.push({title:'Select Kit Root',action:'selectTree'});
-     rs.push({title:'Add Child',action:'addChildAction'});
-     rs.push({title:'Add Partner',action:'addPartnerAction'});
-     rs.push({title:'Add Parents',action:'addParentsAction'});
-     rs.push({title:'Layout Family',action:'layoutTreeAction'});
+  if (!person) return;
+  debugger;
+  let modified = editor.fileModified;
+  if (person.role === 'vertex') {
+    let children = this.childrenOf(person);
+    rs.push({title:'Select Kit Root',action:'selectTree'});
+    if (children && modified) {
+      rs.push({title:'Add Child Left',action:'addChildLeftAction'});
+      rs.push({title:'Add Child Right',action:'addChildRightAction'});
+    } else {
+      rs.push({title:'Add Child',action:'addChildRightAction'});
+    }
+    rs.push({title:'Add Partner Left',action:'addPartnerLeftAction'});
+    rs.push({title:'Add Partner Right',action:'addPartnerRightAction'});
+    rs.push({title:'Add Parents',action:'addParentsAction'});
+    rs.push({title:'Layout Family',action:'layoutTreeAction'});
               
-  }
-  return rs;
-  if (node === this) {
-    rs.push({title:'Reposition Tree',action:'layoutTree'});
   }
   return rs;
 }
@@ -492,6 +644,19 @@ item.selectTree = function () {
   this.__select('svg');
 }
 
+
+item.__delete = function (vertex) {
+  editor.popInfo('Deletion is not supported for family trees. Note that "undo" is available.');
+}
+
+item.afterLoad = function () {
+  //this.layoutTree(person.nodeOf);
+  debugger;
+  editor.setSaved(true);
+  this.root.partners[1].__select('svg');
+  dom.svgMain.fitContents(0.5);
+
+}
 return item;
 
 });
