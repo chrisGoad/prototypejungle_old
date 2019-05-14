@@ -59,9 +59,11 @@ item.updateControlPoint = function (idx,pos) {
 
 graph.installRectanglePeripheryOps(item);
 
+
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,ui.stdTransferredProperties,own);
 }
+
 
 return item;
 });

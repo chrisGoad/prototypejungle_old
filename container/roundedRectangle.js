@@ -29,7 +29,7 @@ contentsPP.installContainerMethods(item,borderPP,contentsPP);
 item.update = function () {
   this.stdUpdate();
 }
-
+	
 
 item.controlPoints = function () {
   return this.border.controlPoints();
@@ -38,6 +38,7 @@ item.controlPoints = function () {
 item.updateControlPoint = function (idx,pos) {
   this.border.updateControlPoint(idx,pos);
 }
+
 
 graph.installRectanglePeripheryOps(item);
 

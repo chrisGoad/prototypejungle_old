@@ -233,7 +233,7 @@ item.updateControlPoint = function (idx,pos) {
     let td =  vertical? e0.y - se.y:e0.x - se.x;
     let d = vertical? pos.y - se.y  :pos.x - se.x;
     console.log('d',d,'td',td,'d/td',d/td);
-    this.elbowPlacement = Math.max(0,d/td);
+    this.elbowPlacement = Math.min(0.9,Math.max(0.1,d/td));
   } else  if (idx === 0) {
      if (this.singleVertex) {
       graph.mapEndToPeriphery(this,this.singleEnd,this.singleVertex,'outConnection',pos);

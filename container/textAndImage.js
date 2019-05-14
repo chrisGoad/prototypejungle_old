@@ -183,6 +183,7 @@ item.containerSetImage = function (image) {
 
 
 item.containerTransferState = function (src,own) { //own = consider only the own properties of src
+debugger;
   core.setProperties(this,src,['text'],own);
   if (own) {
     let im = src.__get('image');
@@ -195,6 +196,13 @@ item.containerTransferState = function (src,own) { //own = consider only the own
   let borderProperties = this.borderProperties;
   if (borderProperties) {
     core.setProperties(this,src,borderProperties,own);
+  }
+  // to avoid disappearance eg of a rectangle when swapped for a shaded circle
+  const invis = function (vl) {
+    return (typeof vl === undefined) || (vl === 'transparent');
+  }
+  if (invis(this.stroke) && invis(this.fill)){ 
+    this.stroke = 'black';
   }
   if (src.textProperties) {
     core.setProperties(this.textProperties,src.textProperties,dom.textProperties,own);

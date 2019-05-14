@@ -148,6 +148,7 @@ item.newNode  = function () {
   let newNode = svg.Element.mk('<g/>');
   nodes.push(newNode);
   let person = this.personP.instantiate().show();
+  person.text = 'p'+ (this.partnerCount++);
   person.nodeOf = newNode;
   this.people.push(person);
   let partners =  core.ArrayNode.mk();
@@ -218,6 +219,7 @@ item.addPartner = function (node,toLeft) {
 };
 
 item.addParents = function (person) {
+  debugger;
   if (person.inFamily) {
     editor.popInfo('This person already has parents');
     return;
@@ -649,6 +651,7 @@ item.__delete = function (vertex) {
   editor.popInfo('Deletion is not supported for family trees. Note that "undo" is available.');
 }
 
+item.hideAdvancedButtons = true;
 item.afterLoad = function () {
   //this.layoutTree(person.nodeOf);
   debugger;
