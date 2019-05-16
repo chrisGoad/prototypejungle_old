@@ -280,7 +280,7 @@ item.relLayoutFamily = function (family) {
   children.forEach( (child) => {
     this.relLayoutNode(child);
     let wd = child.width;
-    child.relX = cx + 0.5*wd;
+    child.__relX = cx + 0.5*wd;
     cwd = cx + wd;
     cx = cx +  wd + siblingSep;
   });
@@ -295,7 +295,7 @@ item.absLayoutFamily = function (family,pos) {
   let mhwd = -0.5*wd;
   let descendantSep = this.descendantSep();
   children.forEach((child) => {
-    let cpos = pos.plus(Point.mk(mhwd+child.relX,descendantSep));
+    let cpos = pos.plus(Point.mk(mhwd+child.__relX,descendantSep));
     this.absLayoutNode(child,cpos);
   });
 }
@@ -309,7 +309,7 @@ item.relLayoutNode = function(node) { // computes relative positions (in x) to l
   let partnerSep = this.partnerSep();
   let cx = 0;
   let ln = partners.length;
-  partners[0].relX = 0;
+  partners[0].__relX = 0;
   let familyCount =  0;
   families.forEach( (family) => {
     if (family) {
@@ -330,7 +330,7 @@ item.relLayoutNode = function(node) { // computes relative positions (in x) to l
     
     let wd = familyCount>1?famwd+partnerSep:partnerSep;
     cx = cx + wd;
-    partner.relX = cx;
+    partner.__relX = cx;
   }
   node.width = cx;
 }
@@ -346,10 +346,10 @@ item.absLayoutNode = function (node,pos) { // computes absolute positions given 
   lastPartner.moveto(pos.plus(Point.mk(mhwd,0)));
   for (let i=1;i<ln;i++) {
     let partner = partners[i];
-    partner.moveto(pos.plus(Point.mk(mhwd + partner.relX,0)));
+    partner.moveto(pos.plus(Point.mk(mhwd + partner.__relX,0)));
     let family = families[i-1];
     if (family) {
-      let fpos = pos.plus(Point.mk(mhwd + 0.5*(lastPartner.relX + partner.relX),0));
+      let fpos = pos.plus(Point.mk(mhwd + 0.5*(lastPartner.__relX + partner.__relX),0));
       this.absLayoutFamily(family,fpos);
     }
     lastPartner = partner;
@@ -618,20 +618,29 @@ item.layoutTreeAction = function (person) {
   this.layoutTree(person.nodeOf);
 }
 
-item.actions = function (person) {
+item.actions = function (itm) {
   let rs = [];
-  if (!person) return;
+  let person;
+  if (!itm) return;
   debugger;
-  let modified = editor.fileModified;
-  if (person.role === 'vertex') {
+  let isHandle = itm.isHandle;
+ // let modified = editor.fileModified;
+  if ((itm.role === 'vertex')||isHandle) {
+    if (isHandle) {
+      let nd = itm.nodeOf;
+      let prts = nd.partners;
+      person = prts[1];
+    }  else {
+      person = itm;
+    }
     let children = this.childrenOf(person);
     rs.push({title:'Select Kit Root',action:'selectTree'});
-    if (children && modified) {
-      rs.push({title:'Add Child Left',action:'addChildLeftAction'});
-      rs.push({title:'Add Child Right',action:'addChildRightAction'});
-    } else {
-      rs.push({title:'Add Child',action:'addChildRightAction'});
-    }
+  //  if (children && modified) {
+    rs.push({title:'Add Child Left',action:'addChildLeftAction'});
+    rs.push({title:'Add Child Right',action:'addChildRightAction'});
+    //} else {
+    //  rs.push({title:'Add Child',action:'addChildRightAction'});
+   // }
     rs.push({title:'Add Partner Left',action:'addPartnerLeftAction'});
     rs.push({title:'Add Partner Right',action:'addPartnerRightAction'});
     rs.push({title:'Add Parents',action:'addParentsAction'});
@@ -660,6 +669,7 @@ item.afterLoad = function () {
   dom.svgMain.fitContents(0.5);
 
 }
+
 return item;
 
 });

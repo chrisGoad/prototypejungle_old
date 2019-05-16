@@ -3,34 +3,46 @@ core.require('/arrow/multiIn.js','/shape/textPlain.js',function (multiInPP,textP
 let item = svg.Element.mk('<g/>');
 
 item.numLevels = 2;
-item.height = 140;
-item.width = 200;
-item.bracketWidth = 50;
-item.textUp = 4;
-item.textPad = 5;
+item.height = 200;
+item.width = 300;
+item.bracketWidth = 530;//computed
+item.textUp = 10;
+item.textPad = 0;
 item['font-size'] = 8;
 item.editMode = true;
 item.resizable = true;
 item.isKit = true;
-
+item.textWidth = 60;
 
 item.addNode  = function (layerNum,right) {
+  debugger;
+  let lastLayer = layerNum === this.numLevels;
   let nodes = this.nodes;
   let newNode = svg.Element.mk('<g/>');
   newNode.unselectable = true;
+  newNode.lastLayer = lastLayer;
+  newNode.firstLayer = layerNum === 1;
   newNode.right = right;
   nodes.push(newNode);
   let bracket = this.multiInP.instantiate().show();
+  bracket.elbowPlacement = lastLayer?0.3:0.5;
   bracket.unselectable = true;
   bracket.ends.push(Point.mk(0,0));
   newNode.set('bracket',bracket);
   newNode.set('winner',this.textP.instantiate().show());
-  newNode.winner.text = 'winner';
-  if (layerNum === this.numLevels) {
+  newNode.winner.text = 'name';
+  newNode.winner.width = this.textWidth;
+  newNode.winner.update();
+  if (lastLayer) {
+    debugger;
     newNode.set('topText',this.textP.instantiate().show());
-    newNode.topText.text = 'entry';
+    newNode.topText.text = 'name';
+    newNode.topText.width = this.textWidth;
+    newNode.topText.update();
     newNode.set('bottomText',this.textP.instantiate().show());
-    newNode.bottomText.text = 'entry';
+    newNode.bottomText.text = 'name';
+    newNode.bottomText.width = this.textWidth;
+    newNode.bottomText.update();
   }
   newNode.layer = layerNum;
   return newNode;
@@ -53,8 +65,8 @@ item.addDescendants = function (node,layerNum) {
   debugger;
   let right = node.right;
   let nextLayer = layerNum+1;
-  let top = node.set('topChild',this.addNode(nextLayer,right));
-  let bottom = node.set('bottomChild',this.addNode(nextLayer,right));
+  let top = node.set('topChild',this.addNode(layerNum,right));
+  let bottom = node.set('bottomChild',this.addNode(layerNum,right));
   if (layerNum === this.numLevels) {
     return;
   }
@@ -65,19 +77,40 @@ item.addDescendants = function (node,layerNum) {
   
 item.layout = function (node,height) {
   debugger;
+  let lastLayer = node.lastLayer;
   let texts = [node.winner];
-  if (node.topText) {
+  if (lastLayer) {
     texts.push(node.topText);
     texts.push(node.bottomText);
   }
   let right = node.right;
   let bracket = node.bracket;
   let pos = bracket.singleEnd;
-  let wd = this.bracketWidth;
+  let wd = node.lastLayer?1.5*this.bracketWidth:this.bracketWidth;
   bracket.singleEnd.copyto(pos);
   let top = pos.plus(Point.mk(right?wd:-wd,-0.25 * height));
   let bottom = pos.plus(Point.mk(right?wd:-wd,0.25 * height));
-  node.winner.moveto(pos.plus(right?this.textOffsetR:this.textOffsetL));
+  let winner = node.winner;
+  let wbnds = winner.bounds();
+  let mhww = -0.5*wbnds.extent.x;
+  if (node.firstLayer) {
+    debugger;
+    node.winner.moveto(right?Point.mk(0,this.textUp):Point.mk(0,-this.textUp)) 
+  } else {
+    node.winner.moveto(pos.plus(right?this.textOffsetR:this.textOffsetL));
+  }
+  
+  if (lastLayer) {
+    debugger;
+    let topText = node.topText;
+    let topBnds = topText.bounds();
+    let htopX = Point.mk(0.5*topBnds.extent.x,0);
+    topText.moveto(top.plus(right?this.textOffsetR.difference(htopX):this.textOffsetL.plus(htopX)));
+    let bottomText = node.bottomText;
+    let bottomBnds = bottomText.bounds();
+    let hbottomX = Point.mk(0.5*bottomBnds.extent.x,0);
+    bottomText.moveto(bottom.plus(right?this.textOffsetR.difference(hbottomX):this.textOffsetL.plus(hbottomX)));
+  }
   if (this.editMode) {
     texts.forEach((txti) => {
       txti.show();
