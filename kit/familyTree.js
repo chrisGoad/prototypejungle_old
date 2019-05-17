@@ -219,7 +219,6 @@ item.addPartner = function (node,toLeft) {
 };
 
 item.addParents = function (person) {
-  debugger;
   if (person.inFamily) {
     editor.popInfo('This person already has parents');
     return;
@@ -408,9 +407,7 @@ item.midPoint = function (line) { // kind = L C R
     let e0 = line.end0;
     let e1 = line.end1;
     return e0.plus(e1).times(0.5);
-  } else {
-    debugger;
-  }
+  } 
 };
  
 item.positionMultis = function (node) {
@@ -548,7 +545,6 @@ item.nodeToLayout = function(person) {
 
   
 item.addPartnerLeftAction = function (person) {
-  debugger;
   let node = person.nodeOf;
   this.addPartner(node,true);
   if (!this.beenDragged) {
@@ -560,7 +556,6 @@ item.addPartnerLeftAction = function (person) {
 
 
 item.addPartnerRightAction = function (person) {
-  debugger;
   let node = person.nodeOf;
   this.addPartner(node,false);
   if (!this.beenDragged) {
@@ -581,7 +576,6 @@ item.afterAdd = function () {
 
 
 item.addChildLeftAction = function (person) {
-  debugger;
   this.addChild(person,null,true);
   this.layoutTree(person.nodeOf);
   this.afterAdd(person.nodeOf);
@@ -590,16 +584,13 @@ item.addChildLeftAction = function (person) {
 
   
 item.addChildRightAction = function (person) {
-  debugger;
   this.addChild(person,null,false);
   this.layoutTree(person.nodeOf);
   this.afterAdd(person.nodeOf);
 }
 
 
-item.addParentsAction = function (person) {
-  debugger;
-  
+item.addParentsAction = function (person) {  
   let parents = this.addParents(person);
   core.updateParts(parents);
    // two graph updates needed to get arms pointing right direction (to do with armDirections)
@@ -622,7 +613,6 @@ item.actions = function (itm) {
   let rs = [];
   let person;
   if (!itm) return;
-  debugger;
   let isHandle = itm.isHandle;
  // let modified = editor.fileModified;
   if ((itm.role === 'vertex')||isHandle) {
@@ -663,7 +653,6 @@ item.__delete = function (vertex) {
 item.hideAdvancedButtons = true;
 item.afterLoad = function () {
   //this.layoutTree(person.nodeOf);
-  debugger;
   editor.setSaved(true);
   this.root.partners[1].__select('svg');
   dom.svgMain.fitContents(0.5);

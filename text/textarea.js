@@ -195,7 +195,7 @@ item.arrangeWords = function (text,constraint) { //,inewLines) {
       for (i=0;i<numLines;i++) {
         cIndex = lines[i];
         nxtIndex = (i+1===numLines)?ln:lines[i+1];
-        cy =top + i*lineSpacing + 0.33*textHt;
+        cy =top + i*lineSpacing;// + 0.33*textHt;
         for (j=cIndex;j<nxtIndex;j++) {
           ct = words.selectMark(j);
           tr = ct.getTranslation();

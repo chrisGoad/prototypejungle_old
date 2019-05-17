@@ -28,7 +28,6 @@ let textProperties =
 
 
 item.updateCombo = function (itm,whichExtent,dealWithImage) {
- // debugger;
    if (!itm.__element) { // not yet in DOM
     return;
   }
@@ -83,7 +82,8 @@ item.updateCombo = function (itm,whichExtent,dealWithImage) {
       singleLine.fill = itm.stroke;
       let fs = itm['font-size'];
       singleLine['font-size'] = fs;
-      singleLine.y = fs/3; // nudge down for vertical centering
+      //singleLine.y = fs/3; // nudge down for vertical centering
+      singleLine.y = 0;
       textItem = singleLine;
       if (textarea) {
         textarea.hide();
