@@ -13,6 +13,7 @@ item.editMode = true;
 item.resizable = true;
 item.isKit = true;
 item.textWidth = 60;
+item.hideAdvancedButtons = true;
 
 item.addNode  = function (layerNum,right) {
   debugger;
@@ -21,7 +22,8 @@ item.addNode  = function (layerNum,right) {
   let newNode = svg.Element.mk('<g/>');
   newNode.unselectable = true;
   newNode.lastLayer = lastLayer;
-  newNode.firstLayer = layerNum === 1;
+  let firstLayer = layerNum === 0;
+  newNode.firstLayer = firstLayer;
   newNode.right = right;
   nodes.push(newNode);
   let bracket = this.multiInP.instantiate().show();
@@ -29,10 +31,12 @@ item.addNode  = function (layerNum,right) {
   bracket.unselectable = true;
   bracket.ends.push(Point.mk(0,0));
   newNode.set('bracket',bracket);
-  newNode.set('winner',this.textP.instantiate().show());
-  newNode.winner.text = 'name';
-  newNode.winner.width = this.textWidth;
-  newNode.winner.update();
+  if ((!firstLayer) || (firstLayer && !right)) {
+    newNode.set('winner',this.textP.instantiate().show());
+    newNode.winner.text = 'name';
+    newNode.winner.width = this.textWidth;
+    newNode.winner.update();
+  }
   if (lastLayer) {
     debugger;
     newNode.set('topText',this.textP.instantiate().show());
@@ -78,7 +82,11 @@ item.addDescendants = function (node,layerNum) {
 item.layout = function (node,height) {
   debugger;
   let lastLayer = node.lastLayer;
-  let texts = [node.winner];
+  let texts = [];
+  let winner = node.winner;
+  if (winner) {
+    texts.push(winner);
+  }
   if (lastLayer) {
     texts.push(node.topText);
     texts.push(node.bottomText);
@@ -90,14 +98,15 @@ item.layout = function (node,height) {
   bracket.singleEnd.copyto(pos);
   let top = pos.plus(Point.mk(right?wd:-wd,-0.25 * height));
   let bottom = pos.plus(Point.mk(right?wd:-wd,0.25 * height));
-  let winner = node.winner;
-  let wbnds = winner.bounds();
-  let mhww = -0.5*wbnds.extent.x;
-  if (node.firstLayer) {
-    debugger;
-    node.winner.moveto(right?Point.mk(0,this.textUp):Point.mk(0,-this.textUp)) 
-  } else {
-    node.winner.moveto(pos.plus(right?this.textOffsetR:this.textOffsetL));
+  //let wbnds = winner.bounds();
+  //let mhww = -0.5*wbnds.extent.x;
+  if (winner) {
+    if (node.firstLayer) {
+      debugger;
+      node.winner.moveto(right?Point.mk(0,this.textUp):Point.mk(0,-this.textUp)) 
+    } else {
+      node.winner.moveto(pos.plus(right?this.textOffsetR:this.textOffsetL));
+    }
   }
   
   if (lastLayer) {
@@ -150,14 +159,14 @@ item.update = function () {
       this.nodes.remove();
     }
     this.set('nodes',core.ArrayNode.mk());
-    this.rootLeft = this.addNode(1);
-    this.rootRight = this.addNode(1);
+    this.rootLeft = this.addNode(0,0);
+    this.rootRight = this.addNode(0,1);
     this.rootLeft.bracket.singleEnd.copyto(Point.mk(0,0));
     this.rootRight.bracket.singleEnd.copyto(Point.mk(0,0));  
     this.rootLeft.right = false;
     this.rootRight.right = true;
-    this.addDescendants(this.rootRight,2);
-    this.addDescendants(this.rootLeft,2);
+    this.addDescendants(this.rootRight,1);
+    this.addDescendants(this.rootLeft,1);
     this.set('textOffsetR',Point.mk(0,0));
     this.set('textOffsetL',Point.mk(0,0));
     this.firstUpdate = false;
@@ -178,10 +187,15 @@ item.popInstructions = function () {
   debugger;
   editor.popInfo('way back when <b>upon</b> the river<br/> the boat sank');
 }
+
+item.selectKit = function () {
+  this.__select('svg');
+}
+
 item.actions = function (node) {
   let rs = [];
   if (!node) return;
- 
+  rs.push({title:'Select Kit Root',action:'selectKit'});
   rs.push({title:'Bracket Instructions',action:'popInstructions'});
    
   return rs;

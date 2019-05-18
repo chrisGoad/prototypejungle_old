@@ -8,6 +8,7 @@ kit.vertical = true;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
 kit.includeArrows = true;
+kit.hideAdvancedButtons = true;
 
 
 // the layout operator takes across tree and out tree spacing arguments, and these little functions generate those parameters from orientation
@@ -224,6 +225,14 @@ kit.transferElementState = function (dst,src,own) {
 }
 kit.isKit = true;
 ui.hide(kit,['edges','vertices']);
+
+kit.afterLoad = function () {
+  //this.layoutTree(person.nodeOf);
+  editor.setSaved(true);
+  this.root.__select('svg');
+  dom.svgMain.fitContents(0.5);
+
+}
 
 return kit;
 });

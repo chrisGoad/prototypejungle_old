@@ -5,20 +5,21 @@ let item = svg.Element.mk('<g/>');
 item.partnerSeparation = 20;
 item.siblingSeparation = 20;
 
-item.familySep = 20;
+//item.familySep = 20;
 
 item.descendantSeparation = 60;
 item.numLevels = 2;
 item.height = 140;
 item.width = 200;
-item.bracketWidth = 50;
-item.textUp = 4;
-item.textPad = 5;
-item['font-size'] = 8;
-item.editMode = true;
+//item.textUp = 4;
+//item.textPad = 5;
+//item['font-size'] = 8;
+//item.editMode = true;
 item.resizable = false;
 item.isKit = true;
 item.partnerCount = 0;
+item.hideAdvancedButtons = true;
+
 
 item.personWidth = function (person) {
   return person.dimension?person.dimension:person.width;
@@ -446,6 +447,7 @@ item.positionMultis = function (node) {
 item.firstUpdate = true;
 
 item.update = function () {
+  debugger;
   if (this.firstUpdate) {
     this.root = this.newNode('R');
     this.addPartner(this.root);
@@ -650,7 +652,6 @@ item.__delete = function (vertex) {
   editor.popInfo('Deletion is not supported for family trees. Note that "undo" is available.');
 }
 
-item.hideAdvancedButtons = true;
 item.afterLoad = function () {
   //this.layoutTree(person.nodeOf);
   editor.setSaved(true);
@@ -658,6 +659,8 @@ item.afterLoad = function () {
   dom.svgMain.fitContents(0.5);
 
 }
+ui.hide(item,['families','hideAdvancedButtons','firstUpdate','lines','nodes','height','nameCount',
+              'numLevels','partnerCount','people','positionStore','height','width']);
 
 return item;
 
