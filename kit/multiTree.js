@@ -7,7 +7,7 @@ let kit = svg.Element.mk('<g/>');
 kit.vertical = true;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-kit.includeArrows = true;
+kit.includeArrows = false;
 kit.hideAdvancedButtons = true;
 
 
@@ -96,6 +96,7 @@ kit.addSibling = function (vertex,doUpdate=true) {
 }
 
 kit.addChild = function (vertex) {
+  debugger;
   this.addDescendant(vertex,-1);
   graph.graphUpdate();
   core.saveState();
@@ -232,6 +233,11 @@ kit.afterLoad = function () {
   this.root.__select('svg');
   dom.svgMain.fitContents(0.5);
 
+}
+kit.update = function () {
+  debugger;
+  this.multiP.includeArrows = this.includeArrows;
+  graph.graphUpdate();
 }
 
 return kit;

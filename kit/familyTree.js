@@ -447,7 +447,6 @@ item.positionMultis = function (node) {
 item.firstUpdate = true;
 
 item.update = function () {
-  debugger;
   if (this.firstUpdate) {
     this.root = this.newNode('R');
     this.addPartner(this.root);

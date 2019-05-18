@@ -1,4 +1,4 @@
-core.require('/arrow/multiIn.js','/shape/textPlain.js',function (multiInPP,textPP) {
+core.require('/arrow/multiIn.js','/shape/textPlain.js','/shape/rectangle.js',function (multiInPP,textPP,rectPP) {
   
 let item = svg.Element.mk('<g/>');
 
@@ -58,6 +58,7 @@ item.initialize = function () {
   this.multiInP = core.installPrototype('multiInP',multiInPP);
   this.multiInP.vertical = false;
   this.textP = core.installPrototype('textP',textPP);
+  this.rectP = core.installPrototype('rectP',rectPP);
   /*this.set('nodes', core.ArrayNode.mk());
   this.rootLeft = this.addNode(1);
   this.rootRight = this.addNode(1);
@@ -158,6 +159,8 @@ item.update = function () {
     if (this.nodes) {
       this.nodes.remove();
     }
+    this.set('background',this.rectP.instantiate().show());
+    this.background.unselectable = true;
     this.set('nodes',core.ArrayNode.mk());
     this.rootLeft = this.addNode(0,0);
     this.rootRight = this.addNode(0,1);
@@ -172,7 +175,9 @@ item.update = function () {
     this.firstUpdate = false;
     this.builtLevels = this.numLevels;
   }
-  this.bracketWidth = this.width/(2 * this.numLevels);
+  this.bracketWidth = this.width/(2 * (this.numLevels+1)+1.0);
+  this.background.width = this.width;
+  this.background.height = this.height;
   this.textOffsetL.copyto(Point.mk(this.textPad,-this.textUp));
   this.textOffsetR.copyto(Point.mk(-this.textPad,-this.textUp));
   core.setProperties(this.textP,this,['font-size']);
