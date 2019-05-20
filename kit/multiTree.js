@@ -7,7 +7,7 @@ let kit = svg.Element.mk('<g/>');
 kit.vertical = true;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-kit.includeArrows = false;
+kit.includeArrows = true;
 kit.hideAdvancedButtons = true;
 
 
@@ -85,15 +85,26 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
   return newVertex;
 }
 
-kit.addSibling = function (vertex,doUpdate=true) {
+
+kit.addSibling = function (vertex,toLeft,doUpdate=true) {
   let parent = vertex.parentVertex;
   if (parent) {
     let idx = descendants(parent).indexOf(vertex);
-    this.addDescendant(parent,idx+1,doUpdate);
+    this.addDescendant(parent,toLeft?idx:idx+1,doUpdate);
     core.saveState();
     vertex.__select('svg');
   }
 }
+
+kit.addSiblingLeft = function (vertex) {
+   this.addSibling(vertex,true);
+}
+
+
+kit.addSiblingRight = function (vertex) {
+   this.addSibling(vertex,false);
+}
+
 
 kit.addChild = function (vertex) {
   debugger;
@@ -189,7 +200,10 @@ kit.dragStart = function () {
 }
 
 
-kit.reposition = function (root) { treeLib.reposition(root,this.vertical,this.acrossSpacing(),this.outSpacing());}
+kit.reposition = function (root) { 
+debugger;
+   treeLib.reposition(root,this.vertical,this.acrossSpacing(),this.outSpacing());
+   this.update();}
 
 kit.repositionTree = function () {
   this.reposition(this.root);
@@ -207,9 +221,10 @@ kit.actions = function (node) {
      rs.push({title:'Select Kit Root',action:'selectTree'},
                {title:'Add Child',action:'addChild'});
     if (node.parentVertex) {
-      rs.push({title:'Add Sibling',action:'addSibling'});
+      rs.push({title:'Add Sibling Left',action:'addSiblingLeft'});
+      rs.push({title:'Add Sibling',action:'addSiblingRight'});
     }
-    rs.push({title:'Reposition Subtree',action:'reposition'});
+    rs.push({title:'Repositiocccn Subtree',action:'reposition'});
   }
   if (node === this) {
     rs.push({title:'Reposition Tree',action:'repositionTree'});
@@ -239,6 +254,10 @@ kit.update = function () {
   this.multiP.includeArrows = this.includeArrows;
   graph.graphUpdate();
 }
+
+kit.setFieldType('includeArrows','boolean');
+ui.hide(kit,['hideAdvancedButtons','multis']);
+ui.hide(kit,['hideAdvancedButtons','multis']);
 
 return kit;
 });

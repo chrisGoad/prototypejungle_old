@@ -2,18 +2,24 @@ core.require('/arrow/multiIn.js','/shape/textPlain.js','/shape/rectangle.js',fun
   
 let item = svg.Element.mk('<g/>');
 
-item.numLevels = 2;
-item.height = 200;
-item.width = 300;
+item.numLevels = 3;
+item.height = 300;
+item.width = 500;
 item.bracketWidth = 530;//computed
 item.textUp = 10;
 item.textPad = 0;
-item['font-size'] = 8;
 item.editMode = true;
 item.resizable = true;
 item.isKit = true;
 item.textWidth = 60;
 item.hideAdvancedButtons = true;
+
+
+let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
+textPropertyValues['font-size'] = 8;
+let textProperties = Object.getOwnPropertyNames(textPropertyValues);
+item.set('textProperties',textPropertyValues);
+
 
 item.addNode  = function (layerNum,right) {
   debugger;
@@ -22,7 +28,7 @@ item.addNode  = function (layerNum,right) {
   let newNode = svg.Element.mk('<g/>');
   newNode.unselectable = true;
   newNode.lastLayer = lastLayer;
-  let firstLayer = layerNum === 0;
+  let firstLayer = layerNum === 1;
   newNode.firstLayer = firstLayer;
   newNode.right = right;
   nodes.push(newNode);
@@ -160,29 +166,37 @@ item.update = function () {
       this.nodes.remove();
     }
     this.set('background',this.rectP.instantiate().show());
+    this.background.stroke = "transparent";
     this.background.unselectable = true;
     this.set('nodes',core.ArrayNode.mk());
-    this.rootLeft = this.addNode(0,0);
-    this.rootRight = this.addNode(0,1);
+    this.rootLeft = this.addNode(1,0);
+    this.rootRight = this.addNode(1,1);
     this.rootLeft.bracket.singleEnd.copyto(Point.mk(0,0));
     this.rootRight.bracket.singleEnd.copyto(Point.mk(0,0));  
     this.rootLeft.right = false;
     this.rootRight.right = true;
-    this.addDescendants(this.rootRight,1);
-    this.addDescendants(this.rootLeft,1);
+    this.addDescendants(this.rootRight,2);
+    this.addDescendants(this.rootLeft,2);
     this.set('textOffsetR',Point.mk(0,0));
     this.set('textOffsetL',Point.mk(0,0));
-    this.firstUpdate = false;
     this.builtLevels = this.numLevels;
   }
-  this.bracketWidth = this.width/(2 * (this.numLevels+1)+1.0);
+  core.setProperties(this.textP,this.textProperties,textProperties);
+
+  this.bracketWidth = this.width/(2 * this.numLevels +1.0);
   this.background.width = this.width;
   this.background.height = this.height;
   this.textOffsetL.copyto(Point.mk(this.textPad,-this.textUp));
   this.textOffsetR.copyto(Point.mk(-this.textPad,-this.textUp));
-  core.setProperties(this.textP,this,['font-size']);
+  //core.setProperties(this.textP,this,['font-size']);
   this.layout(this.rootRight,this.height);
   this.layout(this.rootLeft,this.height);
+  this.draw();
+  if (this.firstUpdatee) {
+     dom.svgMain.fitContentsIfNeeded();
+    //dom.svgMain.fitContents(0.9);
+  }
+  this.firstUpdate = false;
 }
 
 item.setFieldType('editMode','boolean');
@@ -206,8 +220,15 @@ item.actions = function (node) {
   return rs;
  
 }
+ui.hide(item,['background','bracketWidth','builtLevels','editMode','firstUpdate','height','hideAdvancedButtons']);
 
 
+item.afterLoad = function () {
+  //this.layoutTree(person.nodeOf);
+ 
+  dom.svgMain.fitContents(0.9);
+
+}
 return item;
 });
      

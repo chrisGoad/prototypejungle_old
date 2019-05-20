@@ -136,8 +136,34 @@ item.addChild = function (person,ichild,isLeft) {
   return childNode;
 }
     
-    
-  
+   
+item.addSibling = function (person,onLeft) {
+  debugger;
+  let nd = person.nodeOf;
+  let family = person.inFamily;
+  if (!family) {
+    editor.popInfo("This person's parents are not in the tree");
+    return;
+  }
+  let ch = family.children;
+  let idx = ch.indexOf(nd);
+  let iidx = onLeft?idx:idx+1;
+  let sibNode = this.newNode();
+  let sib = sibNode.partners[0];
+  sib.inFamily = family;
+  let multi = family.multi;
+  multi.ends.push(Point.mk(0,0)); // a new branch on the multi
+  multi.update();
+  let ln = ch.length;
+  graph.connectMultiVertex(multi,ln,sib);
+  if (1 || (iidx < ln)) {
+    ch.splice(iidx,0,sibNode);
+  } else {
+    ch.plainPush(sibNode);
+  }
+  return sibNode;
+
+}
   
 // a node might involve four people
 // leftPartner leftSpouse rightSpouse rightPartner; heteronormative family: leftSpouse = wife, rightSpouse = husband
@@ -591,6 +617,30 @@ item.addChildRightAction = function (person) {
 }
 
 
+
+
+item.addSiblingLeftAction = function (person) {
+  debugger;
+  this.addSibling(person,true);
+  this.layoutTree(person.inFamily.parents.nodeOf);
+  this.afterAdd(person.nodeOf);
+
+}
+
+  
+item.addSiblingRightAction = function (person) {
+  this.addSibling(person,false);
+  this.layoutTree(person.inFamily.parents.nodeOf);
+  this.afterAdd(person.nodeOf);
+}
+
+
+
+
+
+  
+
+
 item.addParentsAction = function (person) {  
   let parents = this.addParents(person);
   core.updateParts(parents);
@@ -629,6 +679,8 @@ item.actions = function (itm) {
   //  if (children && modified) {
     rs.push({title:'Add Child Left',action:'addChildLeftAction'});
     rs.push({title:'Add Child Right',action:'addChildRightAction'});
+    rs.push({title:'Add Sibling Left',action:'addSiblingLeftAction'});
+    rs.push({title:'Add Sibling Right',action:'addSiblingRightAction'});
     //} else {
     //  rs.push({title:'Add Child',action:'addChildRightAction'});
    // }

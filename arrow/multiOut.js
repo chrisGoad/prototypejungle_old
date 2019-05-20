@@ -148,6 +148,7 @@ item.update = function () {
   let vertical = this.vertical;
   this.initializeNewEnds();
   this.buildShafts();
+  debugger;
   if (this.includeArrows) {
     this.buildArrowHeads();
   } else {
