@@ -4,10 +4,10 @@ let kit = svg.Element.mk('<g/>');
 
 
 
-kit.vertical = true;
+kit.vertical = false;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-kit.includeArrows = true;
+kit.includeArrows = false;
 kit.hideAdvancedButtons = true;
 
 
@@ -58,7 +58,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
   } else {
     ds.plainSplice(index,0,newVertex);
   }
-  newVertex.parentVertex = vertex;
+  newVertex.__parentVertex = vertex;
   let multi = vertex.outMulti;
   let ln = ds.length;
   if (multi) {
@@ -87,7 +87,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true,addMulti=true) {
 
 
 kit.addSibling = function (vertex,toLeft,doUpdate=true) {
-  let parent = vertex.parentVertex;
+  let parent = vertex.__parentVertex;
   if (parent) {
     let idx = descendants(parent).indexOf(vertex);
     this.addDescendant(parent,toLeft?idx:idx+1,doUpdate);
@@ -107,7 +107,6 @@ kit.addSiblingRight = function (vertex) {
 
 
 kit.addChild = function (vertex) {
-  debugger;
   this.addDescendant(vertex,-1);
   graph.graphUpdate();
   core.saveState();
@@ -123,7 +122,7 @@ kit.addVertices = function (parent,childrenData) {
     if (cd.text) {
       newVertex.text = cd.text;
     }
-    newVertex.parentVertex = parent;
+    newVertex.__parentVertex = parent;
     newVertex.updateAndDraw();
     if (cd.d) {
       this.addVertices(newVertex,cd.d);
@@ -201,7 +200,6 @@ kit.dragStart = function () {
 
 
 kit.reposition = function (root) { 
-debugger;
    treeLib.reposition(root,this.vertical,this.acrossSpacing(),this.outSpacing());
    this.update();}
 
@@ -215,16 +213,17 @@ kit.selectTree = function () {
 }
  
 kit.actions = function (node) {
+  let vertical = this.vertical
   let rs = [];
   if (!node) return;
   if (node.role === 'vertex') {
      rs.push({title:'Select Kit Root',action:'selectTree'},
                {title:'Add Child',action:'addChild'});
-    if (node.parentVertex) {
-      rs.push({title:'Add Sibling Left',action:'addSiblingLeft'});
-      rs.push({title:'Add Sibling',action:'addSiblingRight'});
+    if (node.__parentVertex) {
+      rs.push({title:`Add Sibling ${vertical?'Left':'Above'}`,action:'addSiblingLeft'});
+      rs.push({title:`Add Sibling ${vertical?'Right':'Below'}`,action:'addSiblingRight'});
     }
-    rs.push({title:'Repositiocccn Subtree',action:'reposition'});
+    rs.push({title:'Reposition Subtree',action:'reposition'});
   }
   if (node === this) {
     rs.push({title:'Reposition Tree',action:'repositionTree'});
@@ -245,19 +244,17 @@ ui.hide(kit,['edges','vertices']);
 kit.afterLoad = function () {
   //this.layoutTree(person.nodeOf);
   editor.setSaved(true);
-  this.root.__select('svg');
+  //this.root.__select('svg');
   dom.svgMain.fitContents(0.5);
 
 }
 kit.update = function () {
-  debugger;
   this.multiP.includeArrows = this.includeArrows;
   graph.graphUpdate();
 }
 
 kit.setFieldType('includeArrows','boolean');
-ui.hide(kit,['hideAdvancedButtons','multis']);
-ui.hide(kit,['hideAdvancedButtons','multis']);
+ui.hide(kit,['hideAdvancedButtons','multis','vertical']);
 
 return kit;
 });

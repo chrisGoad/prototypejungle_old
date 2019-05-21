@@ -11,7 +11,7 @@ item.height = 35;
 item.fill = 'black';
 item['font-style'] = "normal";
 item['font-size'] = "12";
-item.minDimension = 10; // a standard value conveyed up to the container
+//item.minDimension = 10; // a standard value conveyed up to the container
 item.topPadding = 0;
 item.vSep = 5; // between image and text
 item.bottomPadding = 0;
@@ -80,7 +80,7 @@ item.update = function (whichExtent) {
 
 
 let minBorderProperties = ['width','height','dimension','stroke','fill','stroke-width'];
-let contentProperties = ['sidePadding','topPadding','vSep','bottomPadding','minDimension'];
+let contentProperties = ['sidePadding','topPadding','vSep','bottomPadding'];
 let borderPP,contentsPP;
 
 

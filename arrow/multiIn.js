@@ -134,7 +134,6 @@ item.update = function () {
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
-  debugger;
   if ((!this.includeArrow) && (this.head)) {
     this.head.remove();
     this.head = undefined;

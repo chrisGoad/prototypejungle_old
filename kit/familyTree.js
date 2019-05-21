@@ -138,7 +138,6 @@ item.addChild = function (person,ichild,isLeft) {
     
    
 item.addSibling = function (person,onLeft) {
-  debugger;
   let nd = person.nodeOf;
   let family = person.inFamily;
   if (!family) {
@@ -246,10 +245,6 @@ item.addPartner = function (node,toLeft) {
 };
 
 item.addParents = function (person) {
-  if (person.inFamily) {
-    editor.popInfo('This person already has parents');
-    return;
-  }
   let parentsNode = this.newNode();
   this.addPartner(parentsNode);
   let parents = parentsNode.partners;
@@ -602,15 +597,9 @@ item.afterAdd = function () {
 }
 
 
-item.addChildLeftAction = function (person) {
-  this.addChild(person,null,true);
-  this.layoutTree(person.nodeOf);
-  this.afterAdd(person.nodeOf);
-
-}
 
   
-item.addChildRightAction = function (person) {
+item.addChildAction = function (person) {
   this.addChild(person,null,false);
   this.layoutTree(person.nodeOf);
   this.afterAdd(person.nodeOf);
@@ -620,9 +609,8 @@ item.addChildRightAction = function (person) {
 
 
 item.addSiblingLeftAction = function (person) {
-  debugger;
   this.addSibling(person,true);
-  this.layoutTree(person.inFamily.parents.nodeOf);
+  this.layoutTree(person.inFamily.parents);
   this.afterAdd(person.nodeOf);
 
 }
@@ -630,7 +618,7 @@ item.addSiblingLeftAction = function (person) {
   
 item.addSiblingRightAction = function (person) {
   this.addSibling(person,false);
-  this.layoutTree(person.inFamily.parents.nodeOf);
+  this.layoutTree(person.inFamily.parents);
   this.afterAdd(person.nodeOf);
 }
 
@@ -642,6 +630,10 @@ item.addSiblingRightAction = function (person) {
 
 
 item.addParentsAction = function (person) {  
+ if (person.inFamily) {
+    editor.popInfo('This person already has parents');
+    return;
+  }
   let parents = this.addParents(person);
   core.updateParts(parents);
    // two graph updates needed to get arms pointing right direction (to do with armDirections)
@@ -652,6 +644,8 @@ item.addParentsAction = function (person) {
   this.update();
   this.draw();
   dom.svgMain.fitContentsIfNeeded();
+ // person.__select('svg');
+  editor.redrawActionPanel(person); // sibling addition becomes available
 
  // parents.draw();
 }
@@ -675,12 +669,15 @@ item.actions = function (itm) {
       person = itm;
     }
     let children = this.childrenOf(person);
+    let infam = itm.inFamily;
+
     rs.push({title:'Select Kit Root',action:'selectTree'});
   //  if (children && modified) {
-    rs.push({title:'Add Child Left',action:'addChildLeftAction'});
-    rs.push({title:'Add Child Right',action:'addChildRightAction'});
-    rs.push({title:'Add Sibling Left',action:'addSiblingLeftAction'});
-    rs.push({title:'Add Sibling Right',action:'addSiblingRightAction'});
+    rs.push({title:'Add Child',action:'addChildAction'});
+    if (infam) {
+      rs.push({title:'Add Sibling Left',action:'addSiblingLeftAction'});
+      rs.push({title:'Add Sibling Right',action:'addSiblingRightAction'});
+    }
     //} else {
     //  rs.push({title:'Add Child',action:'addChildRightAction'});
    // }
@@ -706,7 +703,7 @@ item.__delete = function (vertex) {
 item.afterLoad = function () {
   //this.layoutTree(person.nodeOf);
   editor.setSaved(true);
-  this.root.partners[1].__select('svg');
+//  this.root.partners[1].__select('svg');
   dom.svgMain.fitContents(0.5);
 
 }

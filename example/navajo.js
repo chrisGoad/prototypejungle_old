@@ -2,7 +2,6 @@
 
 
 core.require('/kit/multiTree.js','/data/navajo.json',function (treeP,data) {
-  debugger;
 let item = treeP.instantiate();//svg.Element.mk('<g/>');
 let tree = item;
 //var tree =  item.set('tree',treeP.instantiate());

@@ -15,6 +15,7 @@ item.tailGap = 0; // arrow tail is this distance away from end0
 item.includeEndControls = true; // turned on when added, and off when connected
 item.text = '';
 item.doubleEnded = false;
+item.includeHead = false;
 /*end adjustable parameters */
 
 
@@ -78,14 +79,17 @@ item.middle = function () {
 }
 
 item.update = function () {
+  let includeHead =  this.includeHead;
   this.computeParams();
-  if (!this.head) {
+  if ((!this.head) && includeHead) {
     let proto = Object.getPrototypeOf(this);
     if (!proto.headP) {
       proto.headP = core.installPrototype('headP',this.initialHeadPP);
     }
     this.set('head',this.headP.instantiate()).show();
     this.head.neverselectable = true;
+  } else if ((this.head) && (!includeHead)) {
+    this.head.remove();
   }
   if (!this.shaft) {
     let proto = Object.getPrototypeOf(this);
@@ -97,7 +101,7 @@ item.update = function () {
     this.shaft.role = 'line';
 
   }
-   if (this.doubleEnded && (!this.tail)) {
+   if (includeHead && this.doubleEnded && (!this.tail)) {
       this.set('tail',this.headP.instantiate());
       this.tail.neverselectable = true;
       this.tail.show();
@@ -105,10 +109,13 @@ item.update = function () {
   let e0 = this.end0;
   let e0p = this.computeEnd0(this.tailGap);
   let e1p = this.computeEnd1(-this.headGap);
-  let shaftEnd = (this.head.solidHead  && !this.headInMiddle)?this.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
-  let shaftStart = (this.doubleEnded && this.tail.solidHead)?this.computeEnd0(0.5*this.headLength+this.tailGap):e0p;
-  let headPoint = this.headInMiddle?
+  let shaftEnd = (includeHead && this.head.solidHead  && !this.headInMiddle)?this.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
+  let shaftStart = (includeHead && this.doubleEnded && this.tail.solidHead)?this.computeEnd0(0.5*this.headLength+this.tailGap):e0p;
+  let headPoint;
+  if (includeHead) {
+    headPoint = this.headInMiddle?
       (e0.plus(e1p).times(0.5)).plus(this.direction.times(this.headLength*0.5)):e1p;
+  }
   let tailPoint;      
   if (this.doubleEnded) {
     tailPoint = e0p;
@@ -120,37 +127,36 @@ item.update = function () {
     this.shaft.update();
   }
   
-  if (this.head.headPoint && this.head.headPoint.copyto) {
+  if (includeHead && this.head.headPoint && this.head.headPoint.copyto) {
     this.head.headPoint.copyto(headPoint);
     this.head.direction.copyto(this.direction);
   }
-  if (this.doubleEnded && this.tail.headPoint && this.tail.headPoint.copyto) {
+  if (includeHead && this.doubleEnded && this.tail.headPoint && this.tail.headPoint.copyto) {
     this.tail.headPoint.copyto(tailPoint);
     this.tail.direction.copyto(this.direction.times(-1));
   }
-  if (this.head.solidHead) {
+  if (includeHead && this.head.solidHead) {
     this.head.fill = this.stroke;
     if (this.doubleEnded) {
       this.tail.fill = this.stroke;
     }
-  } else {
+  } else if (includeHead) {
     core.setProperties(this.head,this,['stroke','stroke-width']);
     if (this.doubleEnded) {
       core.setProperties(this.tail,this,['stroke','stroke-width']);
     }
   }
-
-  core.setProperties(this.head,this,['headLength','headWidth']);
-  if (this.doubleEnded) {
-    core.setProperties(this.tail,this,['headLength','headWidth']);
-  }
-
-  if (this.head.update) {
-    this.head.update();
-  }
-  
-  if (this.doubleEnded && this.tail.update) {
-    this.tail.update();
+  if (includeHead) {
+    core.setProperties(this.head,this,['headLength','headWidth']);
+    if (this.doubleEnded) {
+      core.setProperties(this.tail,this,['headLength','headWidth']);
+    }
+    if (this.head.update) {
+      this.head.update();
+    }
+    if (this.doubleEnded && this.tail.update) {
+      this.tail.update();
+    }
   }
   if (this.text) {
     if (!this.textItem) {
@@ -169,18 +175,20 @@ item.update = function () {
 
 item.controlPoints = function () {
   this.computeParams();
-  let headControlPoint = this.head.controlPoint();
   let rs =  [];
   if (this.includeEndControls) {
     rs.push(this.end0);
     rs.push(this.end1);
   }
-  rs.push(headControlPoint);
+  if (this.includeHead) {
+    let headControlPoint = this.head.controlPoint();
+    rs.push(headControlPoint);
+  }
   return rs;
 }
 
 item.updateControlPoint = function (idx,rpos) {
-  let headControlIndex = this.includeEndControls?2:0;
+  let headControlIndex = (this.includeHead)?(this.includeEndControls?2:0):-1;
   switch (idx) {
     case headControlIndex:
       this.head.updateControlPoint(rpos);
@@ -215,6 +223,8 @@ ui.hide(item,['head','direction',"text",'textItem','includeEndControls',//shaft,
               'headInMiddle','end0','end1']);
 
 item.setFieldType('stroke','svg.Rgb');
+item.setFieldType('doubleEnded','boolean');
+item.setFieldType('includeHead','boolean');
 
 graph.installEdgeOps(item);
 

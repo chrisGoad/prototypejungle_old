@@ -22,7 +22,6 @@ item.set('textProperties',textPropertyValues);
 
 
 item.addNode  = function (layerNum,right) {
-  debugger;
   let lastLayer = layerNum === this.numLevels;
   let nodes = this.nodes;
   let newNode = svg.Element.mk('<g/>');
@@ -44,7 +43,6 @@ item.addNode  = function (layerNum,right) {
     newNode.winner.update();
   }
   if (lastLayer) {
-    debugger;
     newNode.set('topText',this.textP.instantiate().show());
     newNode.topText.text = 'name';
     newNode.topText.width = this.textWidth;
@@ -60,7 +58,6 @@ item.addNode  = function (layerNum,right) {
 }
   
 item.initialize = function () {
-  debugger;
   this.multiInP = core.installPrototype('multiInP',multiInPP);
   this.multiInP.vertical = false;
   this.textP = core.installPrototype('textP',textPP);
@@ -73,7 +70,6 @@ item.initialize = function () {
 }
 
 item.addDescendants = function (node,layerNum) {
-  debugger;
   let right = node.right;
   let nextLayer = layerNum+1;
   let top = node.set('topChild',this.addNode(layerNum,right));
@@ -87,7 +83,6 @@ item.addDescendants = function (node,layerNum) {
 
   
 item.layout = function (node,height) {
-  debugger;
   let lastLayer = node.lastLayer;
   let texts = [];
   let winner = node.winner;
@@ -109,7 +104,6 @@ item.layout = function (node,height) {
   //let mhww = -0.5*wbnds.extent.x;
   if (winner) {
     if (node.firstLayer) {
-      debugger;
       node.winner.moveto(right?Point.mk(0,this.textUp):Point.mk(0,-this.textUp)) 
     } else {
       node.winner.moveto(pos.plus(right?this.textOffsetR:this.textOffsetL));
@@ -117,7 +111,6 @@ item.layout = function (node,height) {
   }
   
   if (lastLayer) {
-    debugger;
     let topText = node.topText;
     let topBnds = topText.bounds();
     let htopX = Point.mk(0.5*topBnds.extent.x,0);
@@ -160,7 +153,6 @@ item.layout = function (node,height) {
 item.firstUpdate = true;
 
 item.update = function () {
-  debugger;
   if ((this.numLevels) !== (this.builtLevels)) {
     if (this.nodes) {
       this.nodes.remove();
@@ -203,7 +195,6 @@ item.setFieldType('editMode','boolean');
 
 
 item.popInstructions = function () {
-  debugger;
   editor.popInfo('way back when <b>upon</b> the river<br/> the boat sank');
 }
 

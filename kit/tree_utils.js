@@ -92,9 +92,11 @@ item.layout2 = function (root,vertical,hSpacing,vSpacing) {
        return vertex.treeWidth;
     }
     let totalWidth = 0;
+    let firstChild = children[0];
+    let lastChild = children[children.length - 1];
     children.forEach(function (child) {
       let wd = recurse(child);
-      totalWidth += wd + hSpacing;
+      totalWidth += wd +  hSpacing;
     });
     totalWidth -= hSpacing;
     vertex.treeWidth = totalWidth;
@@ -211,7 +213,7 @@ item.deleteSubtree = function (vertex) {
         recurse(child);
       });
     }
-    let parent = vertex.parentVertex;
+    let parent = vertex.__parentVertex;
     let connectedEdges = vertex.connectedEdges;
     connectedEdges.forEach((edge) => {
       let isMulti = edge.__sourceUrl === '/arrow/multiOut.js';
@@ -248,7 +250,9 @@ item.deleteSubtree = function (vertex) {
         let connectedEdges = parent.connectedEdges;
         let idx = connectedEdges.indexOf(edgeToRemoveFromConnectedEdges);
         connectedEdges.splice(idx,1);
-        parent.outMulti = undefined;
+        if (parent.outMulti) {
+          parent.outMulti = undefined;
+        }
       }
     }
     verticesToRemove.push(vertex);

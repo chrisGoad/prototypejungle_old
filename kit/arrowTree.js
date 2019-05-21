@@ -4,8 +4,10 @@ let kit = svg.Element.mk('<g/>');
 
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-
+kit.includeArrows = false;
+kit.vertical = true;
 /* a tree is a special kind of graph, of course, and is so implemented*/
+kit.hideAdvancedButtons = true;
 
 kit.resizable = true;
 
@@ -21,16 +23,33 @@ kit.__delete = function (vertex) {
   treeLib.deleteVertex(vertex);
 }
 
+kit.update = function () {
+  let edges = this.edges;
+  let props = Object.getOwnPropertyNames(edges);
+  props.forEach((p) => {
+    if (p[0] === 'E') {
+      let edge = edges[p];
+      if ((edge.includeHead !== this.includeArrows) && (edge.update)) {
+        edge.includeHead = this.includeArrows;
+        edge.update();
+      }
+    }
+  });
+}
 //index = index at which to insert the descendant
  
 kit.addDescendant = function (vertex,index=0,doUpdate=true) {
   let edgeP = this.edgeP;
   let newEdge = edgeP.instantiate().show();
+  newEdge.includeHead = this.includeArrowsl
   this.edges.add(newEdge,'e');
   newEdge.__treeEdge = true;
   let vertexP = this.vertexP;
   let newVertex=  vertexP.instantiate().show();
+  
   this.vertices.add(newVertex,'x');
+  newVertex.update();
+  newVertex.draw();
   if (doUpdate) {
     let vertexPos = vertex.getTranslation();
     let newPos = vertexPos.plus(this.vertical?geom.Point.mk(0,this.vSpacing):geom.Point.mk(this.vSpacing,0));
@@ -38,7 +57,7 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true) {
   }
   graph.connectVertices(newEdge,vertex,newVertex);
   descendants(vertex).plainSplice(index,0,newVertex);
-  newVertex.parentVertex = vertex;
+  newVertex.__parentVertex = vertex;
   if (doUpdate) {
     treeLib.layout2(vertex,this.vertical,this.hSpacing,this.vSpacing);
     treeLib.positionvertices(vertex);
@@ -50,13 +69,17 @@ kit.addDescendant = function (vertex,index=0,doUpdate=true) {
 }
 
 
-kit.addSibling = function (vertex,doUpdate=true) {
-  let parent = vertex.parentVertex;
+kit.addSibling = function (vertex,toLeft,doUpdate=true) {
+  let parent = vertex.__parentVertex;
   if (parent) {
     let idx = descendants(parent).indexOf(vertex);
-    this.addDescendant(parent,idx+1,doUpdate);
+    this.addDescendant(parent,toLeft?idx:idx+1,doUpdate);
     vertex.__select('svg');
   }
+}
+
+kit.addSiblingLeft = function (vertex) {
+  this.addSibling(vertex,true);
 }
 
 
@@ -89,7 +112,7 @@ kit.buildFromData = function (data) {
     }
     let vid = dataForVertex.id;
     let vertex = vertices[vid];
-    vertex.parentVertex = parent;
+    vertex.__parentVertex = parent;
     if (parentDescendants) { // only the root lacks these
       parentDescendants.plainPush(vertex);
     }
@@ -137,8 +160,9 @@ kit.actions = function (node) {
   if (node.role === 'vertex') {
      rs.push({title:'Select Kit Root',action:'selectTree'},
                {title:'Add Child',action:'addChild'});
-    if (node.parentVertex) {
-      rs.push({title:'Add Sibling',action:'addSibling'});
+    if (node.__parentVertex) {
+      rs.push({title:'Add Sibling Right',action:'addSibling'});
+      rs.push({title:'Add Sibling Left',action:'addSiblingLeft'});
     }
     rs.push({title:'Reposition Subtree',action:'reposition'});
   }
@@ -155,8 +179,18 @@ kit.transferElementState = function (dst,src,own) {
                     '__relPosition'],own,true);       // dontCopy = true
   } 
 }
+
+kit.afterLoad = function () {
+  //this.layoutTree(person.nodeOf);
+  editor.setSaved(true);
+//  this.root.partners[1].__select('svg');
+  dom.svgMain.fitContents(0.8);
+
+}
 kit.isKit = true;
-ui.hide(kit,['edges','vertices']);
+
+ui.hide(kit,['edges','vertices','hideAdvancedButtons','vertical']);
+kit.setFieldType('includeArrows','boolean');
 
 return kit;
 });
