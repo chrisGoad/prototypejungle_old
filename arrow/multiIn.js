@@ -192,6 +192,9 @@ item.removeEnd = function (idx) {
 item.controlPoints = function () {
   let e0 = this.singleEnd;
   if (this.controlOnlyJoin) {
+    if (this.inCount < 2) {
+      return [];
+    }
     let oe = this.ends[0];
     let d = this.vertical? e0.y - oe.y : e0.x - oe.x;
     let ep = this.elbowPlacement;
@@ -231,7 +234,6 @@ item.updateControlPoint = function (idx,pos) {
     let e0 = this.ends[0];
     let td =  vertical? e0.y - se.y:e0.x - se.x;
     let d = vertical? pos.y - se.y  :pos.x - se.x;
-    console.log('d',d,'td',td,'d/td',d/td);
     this.elbowPlacement = Math.min(0.9,Math.max(0.1,d/td));
   } else  if (idx === 0) {
      if (this.singleVertex) {
@@ -277,9 +279,12 @@ item.dropControlPoint = function (idx,droppedOver) {
 item.setFieldType('includeArrow','boolean');
 
 
-ui.hide(item,['helper','head','shaft','singleEnd','end1','direction','shafts','ends','joinX','e01','end0x',
-              'elbowP','arrowHeadP','arrowHeadPName','arrowHeads','outConnections','vertices','inConnection',
-              'elbowWidth','end1x','includeEndControls','numHeads']);
+ui.hide(item,
+  ['helper','head','shaft','singleEnd','end1','direction','shafts','ends','joinX','e01','end0x',
+   'elbowP','arrowHeadP','arrowHeadPName','arrowHeads','outConnections','vertices',
+   'inConnection','armDirections','controlOnlyJoin','depth','end1v','end1y','headLength',
+   'headWidth','outCount','singleDirection','vertical','inConnections','joinY',
+   'elbowWidth','end1x','includeEndControls','numHeads']);
 
 return item;
 

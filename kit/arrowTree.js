@@ -155,14 +155,15 @@ kit.selectTree = function () {
 }
  
 kit.actions = function (node) {
+  let vertical = this.vertical;
   let rs = [];
   if (!node) return;
   if (node.role === 'vertex') {
      rs.push({title:'Select Kit Root',action:'selectTree'},
                {title:'Add Child',action:'addChild'});
     if (node.__parentVertex) {
-      rs.push({title:'Add Sibling Right',action:'addSibling'});
-      rs.push({title:'Add Sibling Left',action:'addSiblingLeft'});
+       rs.push({title:'Add Sibling '+(vertical?'Left':'Above'),action:'addSiblingLeft'});
+     rs.push({title:'Add Sibling '+(vertical?'Right':'Below'),action:'addSibling'});
     }
     rs.push({title:'Reposition Subtree',action:'reposition'});
   }

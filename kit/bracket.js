@@ -11,7 +11,7 @@ item.textPad = 0;
 item.editMode = true;
 item.resizable = true;
 item.isKit = true;
-item.textWidth = 60;
+item.textWidth = 60; //computed
 item.hideAdvancedButtons = true;
 
 
@@ -93,6 +93,7 @@ item.layout = function (node,height) {
     texts.push(node.topText);
     texts.push(node.bottomText);
   }
+  texts.forEach((text) => text.width = this.textWidth);
   let right = node.right;
   let bracket = node.bracket;
   let pos = bracket.singleEnd;
@@ -176,11 +177,22 @@ item.update = function () {
   core.setProperties(this.textP,this.textProperties,textProperties);
 
   this.bracketWidth = this.width/(2 * this.numLevels +1.0);
+  this.textWidth =  0.9 * this.bracketWidth;
   this.background.width = this.width;
   this.background.height = this.height;
   this.textOffsetL.copyto(Point.mk(this.textPad,-this.textUp));
   this.textOffsetR.copyto(Point.mk(-this.textPad,-this.textUp));
   //core.setProperties(this.textP,this,['font-size']);
+  /*this.nodes.forEach((node) => 
+    {  
+      debugger;
+      if (node.winner) {
+        node.winner.width = this.textWidth;
+      } else {
+        node.topText.width = this.textWidth;
+      }
+    });
+    */
   this.layout(this.rootRight,this.height);
   this.layout(this.rootLeft,this.height);
   this.draw();
@@ -211,7 +223,8 @@ item.actions = function (node) {
   return rs;
  
 }
-ui.hide(item,['background','bracketWidth','builtLevels','editMode','firstUpdate','height','hideAdvancedButtons']);
+ui.hide(item,['background','bracketWidth','builtLevels','editMode','firstUpdate','height','hideAdvancedButtons',
+              'nodes','textOffsetL','textOffsetR','textPad','width','textWidth']);
 
 
 item.afterLoad = function () {

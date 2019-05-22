@@ -118,7 +118,7 @@ item.addChild = function (person,ichild,isLeft) {
   }
   child.inFamily = family;
   if (!ichild) {
-    child.text = 'c'+ (this.partnerCount++);
+    child.text = 'p'+ (this.partnerCount++);
   }
 
   graph.connectMultiVertex(multi,family.children.length,child);
@@ -530,7 +530,7 @@ item.dragStep = function (x,pos) {
         this.moveNode(node, opos.plus(rpos));
       } else {
         let dy = rpos.y;
-        console.log('dy',dy);
+  //      console.log('dy',dy);
        // x.moveto(opos.plus(Point.mk(rpos.x,0)));
         x.moveto(opos.plus(rpos));
         let partners =node.partners;
