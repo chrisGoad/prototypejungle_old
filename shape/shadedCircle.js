@@ -1,4 +1,3 @@
-//okok
 //shadedCircle
 // this code implements the shaded circle element in the shape catalog
 core.require(function () {
@@ -10,23 +9,13 @@ item.dimension = 100;
 item.midpoint = 0.7;
 item.midOpacity = 0.7;
 item.finalOpacity = 1;
-
 item.outerFill = 'rgb(100,100,240)';
 item.innerFill = "rgb(230,230,230)";
 item.stroke = 'transparent';
 item.fx = 0.2;
 item.fy = 0.2;
 /* end adjustable parameters */
-/*
-item.outerFill = 'black';
-item.innerFill = 'red';
-item.midpoint = 0.8;item.finalOpacity = 0.5;
 
-item.midOpacity = 0.2;
-
-item.fx = 0.5;
-item.fy = 0.5;
-*/
 item.role = 'vertex'; // in a network diagram, this can play the role of vertex
 item.resizable = true;
 
@@ -60,8 +49,6 @@ item.update = function () {
   gradient.stop1['stop-color'] =this.outerFill;
   gradient.stop1.offset = this.midpoint;
   gradient.stop1['stop-opacity'] = this.midOpacity;
-
-  //gradient.stop1.offset = 0.8;
   gradient.stop2['stop-color'] = this.outerFill;
   gradient.stop2['stop-opacity'] = this.finalOpacity;
   circle.fill = 'url(#'+id+')'
@@ -71,8 +58,6 @@ item.update = function () {
 // Needed for positioning connectors (eg arrows) running to or from this item
 graph.installCirclePeripheryOps(item);
 
- // UI configuration for this item. Show the color widget for the fills, and
- // hide the r,__contents,defs properties
 item.setFieldType('outerFill','svg.Rgb');
 item.setFieldType('innerFill','svg.Rgb');
 ui.hide(item,['fill','r','__contents','defs']);

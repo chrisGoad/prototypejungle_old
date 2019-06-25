@@ -1,13 +1,25 @@
 
 
 
-core.require('/connector/connector0.js','/line/connectedSpots.js',function (connectorP,lineP) {
-
-core.standsAlone('/line/connectedSpots.js');  // suitable for loading into code editor
-
+core.require('/connector/connector0.js','/line/connectedSpots.js',function (connectorP,linePP) {
+  
 let rs = connectorP.instantiate();
-core.replacePrototype(rs,'lineP',lineP);
-//core.setProperties(rs,lineP,lineP.adjustableProperties);
-//ui.hide(rs,['shaft','stroke-width']);
+
+/* adjustable parameters */
+rs.interval = 20;
+rs['stroke-width'] = 4;
+rs.stroke = 'black';
+rs.lineStroke = 'black';
+rs.lineWidth = 1;
+/* end adjustable parameters */
+
+rs.initializePrototype = function () {  
+  core.assignPrototype(this,'lineP',linePP);
+}
+
+rs.shaftProperties = core.lift(['interval','stroke-width','stroke','lineStroke','lineWidth']);
+rs.setFieldType('stroke','svg.Rgb');
+rs.setFieldType('lineStroke','svg.Rgb');
+
 return rs;
 });

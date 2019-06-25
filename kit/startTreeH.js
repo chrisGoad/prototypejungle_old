@@ -1,5 +1,4 @@
-core.require('/kit/arrowTree.js','/arrow/arrow.js','/container/circle.js',function (treeP,arrowPP,circlePP) {
-//core.require('/kit/arrowTree.js','/arrow/arrow.js','/shape/textPlain.js',function (treeP,arrowPP,circlePP) {
+core.require('/kit/arrowTree.js','/connector/line.js','/container/circle.js',function (treeP,arrowPP,circlePP) {
 let tree = treeP.instantiate();
 
 let dataString ='{"d":[{},{}]}';
@@ -20,10 +19,9 @@ tree.initialize = function () {
   this.hSpacing = 100;
   this.vSpacing = 100;
   this.__internalDataString=dataString;
-  //this.data =
   this.vertexP = vertexP;
   this.edgeP = edgeP;
- // this.buildFromData(null,vertexP,edgeP);
+  this.hideProperties();
   let data = core.getData(this);
   this.buildFromData(data);
 }

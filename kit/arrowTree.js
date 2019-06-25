@@ -4,8 +4,8 @@ let kit = svg.Element.mk('<g/>');
 
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-kit.includeArrows = false;
 kit.vertical = true;
+
 /* a tree is a special kind of graph, of course, and is so implemented*/
 kit.hideAdvancedButtons = true;
 
@@ -24,29 +24,16 @@ kit.__delete = function (vertex) {
 }
 
 kit.update = function () {
-  let edges = this.edges;
-  let props = Object.getOwnPropertyNames(edges);
-  props.forEach((p) => {
-    if (p[0] === 'E') {
-      let edge = edges[p];
-      if ((edge.includeHead !== this.includeArrows) && (edge.update)) {
-        edge.includeHead = this.includeArrows;
-        edge.update();
-      }
-    }
-  });
 }
 //index = index at which to insert the descendant
  
 kit.addDescendant = function (vertex,index=0,doUpdate=true) {
   let edgeP = this.edgeP;
   let newEdge = edgeP.instantiate().show();
-  newEdge.includeHead = this.includeArrowsl
-  this.edges.add(newEdge,'e');
+  this.edges.add(newEdge,'E');
   newEdge.__treeEdge = true;
   let vertexP = this.vertexP;
   let newVertex=  vertexP.instantiate().show();
-  
   this.vertices.add(newVertex,'x');
   newVertex.update();
   newVertex.draw();
@@ -112,6 +99,7 @@ kit.buildFromData = function (data) {
     }
     let vid = dataForVertex.id;
     let vertex = vertices[vid];
+    vertex.update();
     vertex.__parentVertex = parent;
     if (parentDescendants) { // only the root lacks these
       parentDescendants.plainPush(vertex);
@@ -150,17 +138,13 @@ kit.repositionTree = function () {
   this.reposition(this.root);
 }
 
-kit.selectTree = function () {
-  this.__select('svg');
-}
  
 kit.actions = function (node) {
   let vertical = this.vertical;
   let rs = [];
   if (!node) return;
   if (node.role === 'vertex') {
-     rs.push({title:'Select Kit Root',action:'selectTree'},
-               {title:'Add Child',action:'addChild'});
+    rs.push({title:'Add Child',action:'addChild'});
     if (node.__parentVertex) {
        rs.push({title:'Add Sibling '+(vertical?'Left':'Above'),action:'addSiblingLeft'});
      rs.push({title:'Add Sibling '+(vertical?'Right':'Below'),action:'addSibling'});
@@ -181,17 +165,15 @@ kit.transferElementState = function (dst,src,own) {
   } 
 }
 
-kit.afterLoad = function () {
-  //this.layoutTree(person.nodeOf);
-  editor.setSaved(true);
-//  this.root.partners[1].__select('svg');
-  dom.svgMain.fitContents(0.8);
 
+kit.hideProperties = function () {
+  this.vertexP.set('hiddenProperties',core.ObjectNode.mk());
+  this.vertexP.hiddenProperties.treeWidth  = 1;
 }
+
 kit.isKit = true;
 
 ui.hide(kit,['edges','vertices','hideAdvancedButtons','vertical']);
-kit.setFieldType('includeArrows','boolean');
 
 return kit;
 });

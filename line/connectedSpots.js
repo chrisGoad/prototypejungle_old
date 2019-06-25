@@ -1,23 +1,35 @@
-//okok
+//connectedSpots
 
 core.require('/shape/circle.js','/line/utils.js',function (spotPP,utils) {
 
 let item = svg.Element.mk('<g/>');
 
-item.spotP = core.installPrototype('spot',spotPP);
 utils.setup(item);
 
-item.spotP.fill = 'black';
-item.spotP.dimension = 5;
+/* adjustable parameters */
+item.interval = 20;
+item['stroke-width'] = 4;
+item.stroke = 'black';
+item.lineStroke = 'black';
+item.lineWidth = 1;
+/* end adjustable parameters */
+
+item.shaftProperties = core.lift(['interval','stroke-width','stroke','lineStroke','lineWidth']);
+
+
+
+item.initializePrototype = function () {
+  core.assignPrototypes(this,'spotP',spotPP);
+  let spotP = this.spotP
+  spotP.stroke = 'transparent';
+  spotP.fill = 'black';
+  spotP.dimension = 5;
+}
+
 item.role = 'line';
-//item.spotP.width = 10;
-//item.spotP.height = 10;
 item.numSpots = 5;
 item.actualNumSpots = 0;
 item.shownSpots = 0;
-item.interval = 20;
-item.lineStroke = 'black';
-item.lineWidth = 1;
 item.omitAtEnd0 = 0;
 item.omitAtEnd1 = 0;
 
@@ -70,9 +82,7 @@ item.update = function () {
     this.spotP = Object.getPrototypeOf(lastSpot); // there may have been a swap
     this.actualNumSpots = Math.max(actualNum,numSpots);
     this.shownSpots = numSpots;
- // } else if (numSpots < shownSpots) { 
    } else if (numSpots < actualNum) { // until swapprototype preserves hiddens status
-   // for (let i=numSpots;i<shownSpots;i++) {
     for (let i=numSpots;i<actualNum;i++) {
        let nm = 's'+i;
        let spot = this[nm];
@@ -85,7 +95,6 @@ item.update = function () {
 
   }
   let angle = Math.atan2(vec.y,vec.x) * (180/Math.PI);
-  //let ln = vec.length();
   let step = vec.times(1/(numSpots-1));
   let pos = this.end0;
   let lastPos;
@@ -94,6 +103,8 @@ item.update = function () {
   for (let i=0;i<numSpots;i++) {
     let nm = 's'+i;
     let spot = this[nm];
+    spot.fill = this.stroke;
+    spot.dimension = this['stroke-width'];
     spot.show();
     spot.update();
     spot.moveto(pos,angle);
@@ -111,6 +122,7 @@ item.update = function () {
       line.setDomAttribute('y1',fromPoint.y);
       line.setDomAttribute('x2',toPoint.x);
       line.setDomAttribute('y2',toPoint.y);
+      line.draw();
     }
   }
    if (this.omitAtEnd0) {
@@ -140,7 +152,6 @@ item.update = function () {
     this.__parent.updateText(this.text);
    }
   }
- // utils.fromParent(this);
 }
 
 item.controlPoints = function () {
@@ -153,8 +164,6 @@ item.updateControlPoint = function (idx,rpos) {
 
 ui.hide(item,['end0','end1']);
 item.setFieldType('lineStroke','svg.Rgb');
-
-
 
 return item;
 });

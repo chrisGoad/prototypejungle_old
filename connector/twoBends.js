@@ -1,9 +1,11 @@
+removeThis
 
 
 
 
 core.require('/connector/connector0.js','/shape/twoBends.js',function (connectorP,lineP) {
-core.standsAlone('/shape/twoBends.js');  // suitable for loading into code editor
+
+
 
 let rs = connectorP.instantiate();
 

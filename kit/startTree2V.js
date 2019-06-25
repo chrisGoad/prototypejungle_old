@@ -11,14 +11,7 @@ tree.initialize = function () {
   vertexP.fill = "transparent";
   vertexP.stroke = "black";
   vertexP.width = 40;
-   vertexP.height = 30;
- /*
-  edgeP.headGap = 5;
-  edgeP.tailGap = 7;
-  edgeP['stroke-width'] = 3;
-  edgeP.headWidth = 15;
-  edgeP.headLength = 12;
-  */
+  vertexP.height = 30;
   this.hSpacing = 30;
   this.vSpacing = 70;
   this.__internalDataString=dataString;
@@ -26,6 +19,7 @@ tree.initialize = function () {
   this.vertexP = vertexP;
   this.multiP = multiP;
  // this.buildFromData(null,vertexP,edgeP);
+  this.hideProperties();
   let data = core.getData(this);
   this.buildFromData(data);
 }

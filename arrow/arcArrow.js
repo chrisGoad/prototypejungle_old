@@ -3,7 +3,6 @@
 
 core.require('/arrow/solidHead.js','/text/attachedText.js',function (arrowHeadP,textItemP) {
   
-core.standsAlone(['/arrow/solidHead.js']);  // suitable for loading into code editor
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -21,7 +20,6 @@ item.set("end0",Point.mk(0,0));
 item.set("end1",Point.mk(35,0));
 item.includeEndControls = true;
 item.followsCenter = true;// follows the center of the connected shape
-
 /* end adjustable parameters */
 
 
@@ -150,7 +148,7 @@ item.computeEnds = function () {
   let a1 = Math.atan2(e12c.y,e12c.x);
   aTail = a0 - (this.clockwise?-1:1) * this.totalTailGap/radius;
   aHead = a1 + (this.clockwise?-1:1) * this.totalHeadGap/radius;
-  //core.aTaild = aTail*toDeg;
+  //core.aTaild = aTail*toDeg; For debugging
   //core.aHeadd = aHead * toDeg;
   tailPoint = this.pointAtAngle(aTail);//center.plus(tailVFC);
   headPoint = this.pointAtAngle(aHead);
@@ -263,14 +261,8 @@ item.controlPoints = function () {
 item.updateControlPoint = function (idx,pos) {  
   let toAdjust,middle,v,dist,hwdist,delta,newMiddle,mx,my,vx,vy,cx,cy,hx,hy,ss,t,maxRadius;
   let cidx = 0;
-  let end0idx  = -1;
-  let end1idx = -1;
- // if (!this.end0vertex || peripheryMovement) {
-    end0idx = cidx++;
- // }
- // if (!this.end1vertex || peripheryMovement) {
-    end1idx = cidx++;
- // }
+  let end0idx = cidx++;
+  let end1idx = cidx++;
   let headIdx = cidx++;
   let centerIdx = cidx++;
   switch (idx) {
@@ -279,16 +271,13 @@ item.updateControlPoint = function (idx,pos) {
       ui.updateInheritors(ui.whatToAdjust);
       return;
     case end0idx:
-    //case 0:
       if (this.end0vertex) {
         graph.mapEndToPeriphery(this,this.end0,this.end0vertex,'end0connection',pos);
       } else {
         this.end0.copyto(pos);
       } 
-    //  this.end0.copyto(pos);
       break;
     case end1idx:
-   // case 1:
       if (this.end1vertex) {
         graph.mapEndToPeriphery(this,this.end1,this.end1vertex,'end1connection',pos);
       } else {
@@ -384,9 +373,12 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   let updated = [0,0];
   let {end0,end1} = this;
   this.computeDirections();
-  let tr = this.getTranslation();
+ // let tr = this.getTranslation();
+  let tr = this.toGlobalCoords();
+  
   if (vertex0 && (this.end0connection==='periphery')) {
-    let vertex0pos = vertex0.getTranslation();
+    let vertex0pos = vertex0.toGlobalCoords();//vertex0.getTranslation();
+    //let vertex0pos = vertex0.toAncestorCoords(undefined,vertex0.__parent.__parent);//in coordinates of the graph
     end0.copyto(vertex0pos.difference(tr));
     let tailPeriphery = vertex0.peripheryAtDirection(this.tailDirection);
     this.svEnd0 = vertex0pos.difference(tailPeriphery.intersection).difference(tr);
@@ -394,7 +386,7 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
     updated[0]=1;
   }
   if (vertex1 && (this.end1connection==='periphery')) {
-    let vertex1pos = vertex1.getTranslation();
+    let vertex1pos = vertex1.toGlobalCoords();//vertex1.getTranslation();
     end1.copyto(vertex1pos.difference(tr));
     let headPeriphery = vertex1.peripheryAtDirection(this.headDirection);
      this.svEnd1 = vertex1pos.difference(headPeriphery.intersection).difference(tr);
@@ -403,6 +395,27 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   }
   return updated;
 }
+
+
+
+const updateEnd = function (edge,end,vertex,direction,connectionType) {
+   let localPpnt;
+   let sticky = connectionType.indexOf(',') > -1;
+   if (!direction  && !sticky) {
+     return;
+   }
+   if (!sticky) {
+     localPpnt = vertex.peripheryAtDirection(direction.times(-1)).intersection;
+   } else {
+     let split = connectionType.split(',');
+     let side = Number(split[1]);
+     let fractionAlong = Number(split[2]);
+     localPpnt = vertex.alongPeriphery(side,fractionAlong);
+   }
+   let ppnt = localPpnt.plus(vertex.toGlobalCoords());
+   let edgePpnt = edge.toLocalCoords(ppnt,true);
+   end.copyto(edgePpnt);
+ }
 
 
 

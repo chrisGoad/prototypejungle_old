@@ -1,19 +1,17 @@
-//okok
 //Wavy line
 
 core.require('/line/line0.js',function (lineP) {
 
 let item = lineP.instantiate();
+
 // adjustable parameters
 item.waveLength = 20;
 item.waveAmplitude = 10; 
 item.cornerFraction = 0.4; // the fraction of the wave taken up by  corners
 /* end adjustable parameters */
-//item.adjustableProperties = lineP.adjustableProperties.concat(['waveLength','waveAmplitude','cornerFraction']);
 
 
 item.update = function () {
-  //this.fromParent();
   let thisHere = this;
   let e0 = this.end0,e1 = this.end1;
   let v = e1.difference(e0);
@@ -22,7 +20,6 @@ item.update = function () {
   const p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
-  
   const pathForHalfWave = function (startPoint,endPoint,up) {
     let delta = endPoint.difference(startPoint);
     let a = 0.5 * thisHere.waveAmplitude;

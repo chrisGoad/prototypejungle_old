@@ -1,8 +1,6 @@
 //spiral
 
-
 core.require(function () {
-
 
 var item = svg.Element.mk('<g/>');
 

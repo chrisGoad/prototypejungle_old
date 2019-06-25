@@ -15,7 +15,7 @@ item.tailGap = 0; // arrow tail is this distance away from end0
 item.includeEndControls = true; // turned on when added, and off when connected
 item.text = '';
 item.doubleEnded = false;
-item.includeHead = false;
+item.includeHead = true;
 /*end adjustable parameters */
 
 
@@ -82,20 +82,12 @@ item.update = function () {
   let includeHead =  this.includeHead;
   this.computeParams();
   if ((!this.head) && includeHead) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.headP) {
-      proto.headP = core.installPrototype('headP',this.initialHeadPP);
-    }
     this.set('head',this.headP.instantiate()).show();
     this.head.neverselectable = true;
   } else if ((this.head) && (!includeHead)) {
     this.head.remove();
   }
   if (!this.shaft) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.shaftP) {
-      proto.shaftP = core.installPrototype('shaft',this.initialLinePP);
-    }
     this.set('shaft',this.shaftP.instantiate()).show();
     this.shaft.neverselectable = true;
     this.shaft.role = 'line';

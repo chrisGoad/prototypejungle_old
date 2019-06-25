@@ -9,6 +9,8 @@ let item =  svg.Element.mk('<path fill="none" stroke="black"  stroke-opacity="1"
 item.numRays = 20;
 item.dimension = 50;
 item.innerRatio= 0.9;
+kit.includeArrows = false;
+
 /* end adjustable parameters */
 
 item.role = 'vertex';

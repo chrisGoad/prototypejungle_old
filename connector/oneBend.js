@@ -1,9 +1,8 @@
-
+ removeThis
 
 
 
 core.require('/connector/connector0.js','/shape/oneBend.js',function (connectorP,lineP) {
-core.standsAlone('/shape/oneBend.js');  // suitable for loading into code editor
 
 let rs = connectorP.instantiate();
 

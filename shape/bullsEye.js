@@ -1,10 +1,8 @@
-//okok
-// circle
+// bulls eye
 
 core.require(function () {
   
 let item =  svg.Element.mk('<g/>');
-
 
 /* adjustable parameters */
 item.dimension = 30;
@@ -19,7 +17,6 @@ item.circlesBuilt = 0;
 item.role = 'spot';
 item.resizable = true;
 
-
 item.update =  function () {
   let built = this.circlesBuilt;
   let numCircles = this.numCircles; 
@@ -29,8 +26,7 @@ item.update =  function () {
       let c = this['c'+i];
       core.setProperties(c,this,['stroke','stroke-width','fill']);
       c.r = (this.dimension * (built-i))/(2*built);
-    }
-    
+    } 
     return;
   }
   if (built > numCircles) {

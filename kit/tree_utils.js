@@ -13,15 +13,6 @@ do the "logical" positions (where width means "across the tree" turn into x,y po
 where each di is a descendant descriptor having the form of a vertex, or an edge
 {k:"e",id:<string>,end1:<vertex>,....}
 */
-/*
- 
-let d = {d:[{},{d:[{},{}]}]};
-
-core.root.main.layoutTree(d,7,20);
-
-let g = core.root.main.toGraphData(d);
-
-*/
 
 let item = core.ObjectNode.mk();
 
@@ -284,7 +275,6 @@ item.deleteVertex = function (vertex) {
   ui.vars.setSaved(false);
   core.saveState();
 }
-
 
      
   return item;

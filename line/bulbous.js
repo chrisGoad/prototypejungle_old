@@ -1,6 +1,4 @@
-//okok
 //bulbous line
-
 
 core.require('/line/utils.js',function (utils) {
 
@@ -8,8 +6,10 @@ let item = svg.Element.mk('<path  stroke="black"  stroke-opacity="1" stroke-line
 
 utils.setup(item);
 
+/*adjustable parameters */
 item.bulbWidth0 = 5;
 item.bulbWidth1 = 10;
+/*end adjustable parameters */
 
 item.adjustableProperties = utils.adjustableProperties.concat(['bulbWidth0','bulbWidth1']);
 
@@ -24,7 +24,6 @@ item.update = function () {
   this.fill = this.stroke;
   let bulbWidth0 = this.bulbWidth0;
   let bulbWidth1 = this.bulbWidth1;
-
   const genPath = function (end0,end1) {
     const p2str = function (letter,point,after) {
       return letter+' '+point.x+' '+point.y+after;
@@ -39,7 +38,6 @@ item.update = function () {
     let bulbTop0 = end0.difference(nvec.times(bulbWidth0/2));
     let controlLeft0 = bulbTop0.difference(halfScaledNormal0);
     let controlRight0 = bulbTop0.plus(halfScaledNormal0);
-
     let scaledNormal1 = normal.times(bulbWidth1/2);
     let halfScaledNormal1= scaledNormal1.times(0.5);
     let bulbLeft1 = end1.difference(scaledNormal1);
@@ -47,8 +45,7 @@ item.update = function () {
     let bulbTop1 = end1.plus(nvec.times(bulbWidth1/2));
     let controlLeft1 = bulbTop1.difference(halfScaledNormal1);
     let controlRight1 = bulbTop1.plus(halfScaledNormal1);
-   
-   let path = p2str('M',bulbLeft0,' ') + p2str('L',bulbLeft1,' ') +
+    let path = p2str('M',bulbLeft0,' ') + p2str('L',bulbLeft1,' ') +
         p2str('C',controlLeft1,',') +  p2str(' ',controlRight1,',')  + p2str(' ',bulbRight1,' ') +
         p2str('L',bulbRight0,' ') +
         p2str('C',controlRight0,',') +  p2str(' ',controlLeft0,',')  + p2str(' ',bulbLeft0,' ') +

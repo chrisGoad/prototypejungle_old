@@ -1,5 +1,4 @@
-//elbow
-
+//oneBend
 
 core.require(function () {
 
@@ -15,7 +14,6 @@ item.elbowWidth = 5;
 
 
 item.role = 'edge';
-
 item.set("end0",Point.mk(0,0));
 item.set("end1",Point.mk(50,50));
 
@@ -52,18 +50,6 @@ item.update = function () {
   let bend = geom.Point.mk(bx,by); // the bend point
   let bendStart = bend.difference(geom.Point.mk(right?ew:-ew,0));;
   let bendEnd = bend.plus(geom.Point.mk(0,up?-eh:eh));
-  
-  /*let ipx = x0 + w;
-  //let ew0 = Math.min(this.elbowWidth,Math.abs(w),yDelta/2);
-  let e0right = w > 0;
-  let e1right = ipx>x1;
-  let elbow0a = geom.Point.mk(ipx + (e0right?-ew0:ew0),y0);
-  let controlPoint0 = geom.Point.mk(ipx,y0);
-  let elbow0b = geom.Point.mk(ipx,y0 + (up?-ew0:ew0));
-  let elbow1a = geom.Point.mk(ipx,y1 + (up?ew1:-ew1));
-  let controlPoint1 = geom.Point.mk(ipx,y1);
-  let elbow1b = geom.Point.mk(ipx + (e1right?-ew1:ew1),y1);
-*/
   let path = p2str('M',e0,' ');
   path += p2str('L',bendStart,' ');
   path += p2str('C',bend,',');

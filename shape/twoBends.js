@@ -1,5 +1,4 @@
-//elbow
-
+//twoBends
 
 core.require(function () {
 
@@ -10,14 +9,11 @@ item.vertical = false; // the part between bends is vertical, as in a C
 item.stroke = "black";
 item['stroke-width'] = 0.2;
 item.elbowWidth = 5;
-//item.depth = 25; // from end0
-
 /* end adjustable parameters */
 
 
 item.role = 'edge';
 if (item.vertical) {
-  
   item.set("end0",Point.mk(0,0));
   item.set("end1",Point.mk(0,50));
 } else {
@@ -116,15 +112,6 @@ item.middlePoint =  function () {
 
 
 item.controlPoints = function () {
- /* let e0 = this.end0;
-  let e1 = this.end1;
-  let middlePoint;
-  let x0 = e0.x;
-  let x1 = e1.x;
-  let y0 = e0.y;
-  let y1 = e1.y;
-  middlePoint = (this.vertical)?geom.Point.mk(x0+this.depth,(y0+y1)/2):
-                                    geom.Point.mk((x0+x1)/2,y0+this.depth);*/
   return [this.end0,this.end1,this.middlePoint()];
 }
 

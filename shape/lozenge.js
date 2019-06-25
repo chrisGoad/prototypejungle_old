@@ -1,4 +1,4 @@
-//okok
+//lozenge.js
 
 core.require(function () {
 
@@ -16,7 +16,6 @@ item['stroke-width'] = 1;
 item.role = 'vertex';
 item.resizable = true;
 item.setComputedProperties(['d']);
-
 
 item.update = function () {
   let p2str = function (letter,point,after) {
@@ -52,7 +51,6 @@ item.update = function () {
   let seg2end1 = segment2.pointAlong(1 - fractionFromCorner);
   let seg3end0 = segment3.pointAlong(fractionFromCorner);
   let seg3end1 = segment3.pointAlong(1 - fractionFromCorner);
- 
   let path = p2str('M',seg0end0,' ');
   path += p2str('L',seg0end1,' ');
   //path += p2str('L',seg1end0,' ');
@@ -72,12 +70,10 @@ item.update = function () {
   path += p2str('',right,',');
   path += p2str('',seg0end0,' ');  
   this.d = path;
-  
 }
 
 ui.hide(item,['d']);
 graph.installLozengePeripheryOps(item);
-
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,ui.stdTransferredProperties,own);

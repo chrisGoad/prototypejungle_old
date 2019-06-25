@@ -1,4 +1,7 @@
+//polygon
 // coded by Olivier Bauer Simon
+
+//regular polygon
 
 core.require(function () {
 let item =  svg.Element.mk('<polygon/>');
@@ -16,7 +19,6 @@ item.role = 'spot';
 item.dimension = 30;
 item.setComputedProperties(['points']);
 
-
 item.update = function () {
   let p2str = function (point,after) {
     return point.x+' '+point.y+after;
@@ -33,7 +35,6 @@ item.update = function () {
 
 ui.hide(item,['points']);
 graph.installCirclePeripheryOps(item);
-
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,ui.stdTransferredProperties,own);

@@ -2,10 +2,15 @@ core.require('/container/circle.js','/arrow/arcArrow.js',function (vertexPP,arro
   
 let item = svg.Element.mk('<g/>');
 
+// adjustable parameters
 item.numNodes = 5;
 item.dimension = 150;
+// end adjustable parameters
+
 
 item.resizable = true;
+item.hideAdvancedButtons = true;
+
 item.isKit = true;
 
 
@@ -71,23 +76,9 @@ item.update = function () {
  addEdge(v0,v1);
  this.numNodesBuilt = numNodes;
 }
-ui.hide(item,['builtDimension','vertices','edges','numNodesBuilt']);
+ui.hide(item,['builtDimension','vertices','edges','numNodesBuilt','hideAdvancedButtons']);
 
 
-
-item.selectRoot = function () {
-  this.__select('svg');
-}
- 
-
-item.actions = function (node) {
-  let rs = [];
-  if (!node) return;
-  if (node.role === 'vertex') {
-     rs.push({title:'Select Kit Root',action:'selectRoot'});
-  }
-  return rs;
-}
 
 return item;
 });

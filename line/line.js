@@ -1,5 +1,3 @@
-//okok
-
 core.require('/line/utils.js',function (utils) {
 
 let item = svg.Element.mk('<line/>');
@@ -20,7 +18,6 @@ item.setEnds = function (e0,e1) {
 }
 
 item.update = function () {
- // utils.fromParent(this);
   this.setDomAtts(this.__element);
   if (this.text  && this.__parent.updateText) {
     this.__parent.updateText(this.text);
@@ -36,8 +33,6 @@ item.updateControlPoint = function (idx,rpos) {
 }
 
 ui.hide(item,['end0','end1','x1','x2','y1','y2']);
-
-
 
 return item;
 });

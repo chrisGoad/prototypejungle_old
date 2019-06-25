@@ -1,4 +1,3 @@
-//okok
 
 core.require(function () {
 
@@ -13,7 +12,7 @@ item['stroke-width'] = 1;
 
 item.resizable = true;
 item.role = 'vertex';
-//A rectangle plays the role of a vertex in graphs.
+//A square plays the role of a vertex in graphs.
 
 
 
@@ -23,15 +22,15 @@ item.update =  function () {
 }
 
 /*
- Installs the functionality needed for management of arrows connected to the rectangle;
+ Installs the functionality needed for management of arrows connected to the square;
  in particular, for dragging the arrow around so as to maintain the connection.
 */
 
 graph.installRectanglePeripheryOps(item);
 
 /*
-When the rectangle is swapped for some other shape,
-this handles transferring the rectangle's state to that new shape.
+When the square is swapped for some other shape,
+this handles transferring the square's state to that new shape.
 */
 
 item.transferState = function (src,own) { //own = consider only the own properties of src

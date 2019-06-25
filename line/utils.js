@@ -1,12 +1,8 @@
-//okok
-
-
 core.require(function () {
 
 let item = core.ObjectNode.mk();
 
 item.setup = function (line) {
-/* adjustable parameters */
   line.set('end0',Point.mk(-25,0));
   line.set('end1', Point.mk(25,0));
   line.stroke = 'black';
@@ -42,7 +38,6 @@ item.updateControlPoint = function (line,idx,rpos) {
 item.transferState = function (line,src,own) { //own = consider only the own properties of src
   core.setProperties(line,src,['unselectable','neverselectable','stroke','stroke-width'],own);
 }
-
 
 item.fromParent = function (line) {
   if (!line.unselectable) {

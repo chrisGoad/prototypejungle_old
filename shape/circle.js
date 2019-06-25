@@ -1,11 +1,10 @@
-//okok
 // circle
 
 core.require(function () {
 let item =  svg.Element.mk('<circle/>');
 
 /* adjustable parameters */
-item.dimension = 30; //either 
+item.dimension = 30;  
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width']  = 1;
@@ -27,7 +26,6 @@ graph.installCirclePeripheryOps(item);
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,ui.stdTransferredProperties,own);
 }
-
 
 return item;
 });

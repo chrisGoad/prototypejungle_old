@@ -1,4 +1,4 @@
-// line, implemented as a graph edge with text
+// common code for line-like connectors, with attached text
 
 core.require('/text/attachedText.js',function (textItemP) {
 
@@ -11,9 +11,9 @@ item.set('end1',Point.mk(50,0));
 
 item.role = 'edge';
 item.text = '';
-item.lineP = core.installPrototype('line',core.ObjectNode.mk());
+//item.initialize = function ()
+//item.lineP = core.installPrototype('line',core.ObjectNode.mk());
 item.__deleteLevel = true; // deletes from the interface propogate to here
-
 let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
 textPropertyValues.lineSep = 20;
 let textProperties = Object.getOwnPropertyNames(textPropertyValues);
@@ -33,12 +33,15 @@ item.updateText = function (text,e0,e1) {
     this.textItem.neverselectable = true;
   }
   core.setProperties(this.textItem,this.textProperties,textProperties);
-
   this.textItem.update();
 }
+
 item.update = function () {
   if (!this.shaft) {
     this.set("shaft",this.lineP.instantiate());
+    if (this.shaft.initialize) {
+       this.shaft.initialize();
+    }
     this.shaft.neverselectable = true;
     this.shaft.text = '';
     this.shaft.role = 'line';
@@ -46,7 +49,7 @@ item.update = function () {
   }
   this.shaft.setEnds(this.end0,this.end1);
   let shaftProperties = this.shaftProperties;
- if (shaftProperties) {
+  if (shaftProperties) {
     core.setProperties(this.shaft,this,shaftProperties);
   }
   this.shaft.update();
@@ -60,13 +63,11 @@ item.update = function () {
   }
    
 }
-// the next two functions support dragging the ends around. See https://protopedia.org/doc/code.html#controllers
+// the next two functions support dragging the ends around. See https://prototypejungle.org/doc/code.html#controllers
 
 item.controlPoints = function () {
   return [this.end0,this.end1];
 }
-
-
 
 item.updateControlPoint = function (idx,rpos) {
   switch (idx) {
@@ -89,7 +90,7 @@ item.updateControlPoint = function (idx,rpos) {
   this.draw();
 }
 
-// used in swapping. See https://protopedia.org/doc/code.html#roles
+// used in swapping. See https://prototypejungle.org/doc/code.html#roles
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,['stroke','stroke-width','text'],own);
@@ -106,9 +107,8 @@ item.transferState = function (src,own) { //own = consider only the own properti
 ui.hide(item,['end0','end1','text','textItem']);
 
 // support for the use of this item as an edge
-// See https://protopedia.org/doc/code.html#graph
+// See https://prototypejungle.org/doc/code.html#graph
 graph.installEdgeOps(item);
-
 
 return item;
 });

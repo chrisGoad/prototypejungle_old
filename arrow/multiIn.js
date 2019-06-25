@@ -2,21 +2,16 @@
 
 core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
   
-core.standsAlone(['/shape/twoBends.js','/arrow/solidHead.js']);  // suitable for loading into code editor
-
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
-//item.pointsDown = true; 
 item.vertical = true;
 item.includeArrow = false;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
 item.headWidth = 8;
-item.stroke = "black";
 item.elbowWidth = 10;
-item.joinY = 25; // distance from join to end1
 item.controlOnlyJoin = false;
 item.set('singleEnd',item.vertical?Point.mk(0,15):Point.mk(15,0));
 item.set("ends",core.ArrayNode.mk());
@@ -30,6 +25,10 @@ item.role = 'multiIn';
 item.inCount = item.ends.length;
 item.includeEndControls = true;
 
+item.initializePrototype = 	function () {
+  core.assignPrototypes(this,'elbowP',elbowPP,'arrowHeadP',arrowHeadPP);
+}
+    
 item.set("shafts",core.ArrayNode.mk());
 
 item.set('direction',Point.mk(0,0));
@@ -38,10 +37,6 @@ item.elbowPlacement = 0.5;
 // each prototype of this multiIn should have its own associated elbow prototype
 
 item.buildShafts = function () {
-  let proto = Object.getPrototypeOf(this);
-  if (!proto.elbowP) {
-    proto.elbowP = core.installPrototype('elbowP',elbowPP);
-  }
   this.elbowP.vertical = !this.vertical;
   let ln = this.ends.length;
   let lns = this.shafts.length;
@@ -81,7 +76,7 @@ item.initializeNewEnds = function () {
   this.e01 = this.end1v - (vertical?this.singleEnd.y:this.singleEnd.x);
 
   if (numNew <= 0) {
-    this.outCount = currentLength; // removing ends not supported
+    this.inCount = currentLength; // removing ends not supported
     return;
   }
   ui.unselect();
@@ -96,7 +91,7 @@ item.initializeNewEnds = function () {
     interval = (lastV - firstV)/(numNew+1);
     cv = firstV+interval;
   }
-  for (let i=currentLength;i<this.outCount;i++) {
+  for (let i=currentLength;i<this.inCount;i++) {
     ends.push(vertical?Point.mk(cv,this.end1v):Point.mk(this.end1v,cv));
     cv += interval;
   }
@@ -117,6 +112,7 @@ item.armPointsPositive = function (n,midPoint) { // the nth arm
 }
 
 item.update = function () {
+  let stm = performance.now();
   let i;
   let vertical = this.vertical;
   this.direction.copyto(vertical?Point.mk(0,1):Point.mk(1,0));
@@ -127,10 +123,6 @@ item.update = function () {
   let ln = ends.length;
   
   if (this.includeArrow && (!this.head)) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.arrowHeadP) {
-      proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-    }
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
@@ -166,7 +158,6 @@ item.update = function () {
     let shaftEnd = (head && head.solidHead)?singleEnd.plus(this.direction.times((positiveDir?-0.5:0.5)*this.headLength)):singleEnd;
     shaft.end0.copyto(shaftEnd);
     shaft.end1.copyto(ends[i]);
-    //shaft.elbowPlacement = this.elbowPlacement;
     shaft.update();
     shaft.draw();
   }
@@ -175,20 +166,9 @@ item.update = function () {
     head.direction.copyto(this.direction.times(positiveDir?1:-1));
     head.update();
   }
-}
-
-item.removeEnd = function (idx) {
-  let ends = this.ends;
-  if (idx >= ends.length) {
-    error('out of bounds in removeEnd');
-  }
-  ends[idx].remove();
-  this.shafts[idx].remove();
-  this.vertices.splice(idx,1);
-  this.outCount = ends.length;
+  core.advanceTimer("multiIn", performance.now() -stm);
 }
   
-
 item.controlPoints = function () {
   let e0 = this.singleEnd;
   if (this.controlOnlyJoin) {
@@ -282,9 +262,9 @@ item.setFieldType('includeArrow','boolean');
 ui.hide(item,
   ['helper','head','shaft','singleEnd','end1','direction','shafts','ends','joinX','e01','end0x',
    'elbowP','arrowHeadP','arrowHeadPName','arrowHeads','outConnections','vertices',
-   'inConnection','armDirections','controlOnlyJoin','depth','end1v','end1y','headLength',
-   'headWidth','outCount','singleDirection','vertical','inConnections','joinY',
-   'elbowWidth','end1x','includeEndControls','numHeads']);
+   'inConnection','armDirections','controlOnlyJoin','depth','end1v','end1y',
+   'singleDirection','vertical','inConnections',
+   'end1x','includeEndControls','numHeads']);
 
 return item;
 

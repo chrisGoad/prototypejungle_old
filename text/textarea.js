@@ -1,4 +1,3 @@
-//okok
 /*
  * Textarea. Used only in the context of textbox - not directly visible in the UI
  */
@@ -17,20 +16,14 @@ item.numLines = 0;
 item.addLineBreaks = true; // the false option for this is only partially implemented: as far as displayWords
 item.textP['font-size'] = 10;
 item.textP['font-family'] = 'Verdana';
-
 /* end adjustable parameters */
 
 
 let textProperties = ['font-size','font-style','font-family','font-weight','fill','text-anchor'];
-
-
-
 item.resizable = true;
-
 item.set("words",codeRoot.Spread.mk());
 item.textP.unselectable = true;
 item.words.unselectable = true;
-
 
 item.words.generator = function (parent,name,data) {
   let rs = this.__parent.textP.instantiate().show();
@@ -256,7 +249,9 @@ item.update = function (constraint) {
   // the breaking of words into lines is preserved unless the controlls have been dragged
   this.textP.__editPanelName = 'All words in this caption';
   core.setProperties(this.textP,this,textProperties);
+  let stm = performance.now();
   let newExtent = this.arrangeWords(this.text,constraint);
+  core.advanceTimer('arrabgeWords',performance.now() - stm);
   this.width = newExtent.x;
   this.height = newExtent.y;
   this.lastText = this.text;

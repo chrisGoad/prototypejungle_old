@@ -2,24 +2,19 @@ core.require('/arrow/multiIn.js','/shape/textPlain.js','/shape/rectangle.js',fun
   
 let item = svg.Element.mk('<g/>');
 
+/*adjustable parameters */
 item.numLevels = 3;
+item.textUp = 10;
 item.height = 300;
 item.width = 500;
+/* end adjustable parameters */
+
 item.bracketWidth = 530;//computed
-item.textUp = 10;
 item.textPad = 0;
-item.editMode = true;
 item.resizable = true;
 item.isKit = true;
 item.textWidth = 60; //computed
 item.hideAdvancedButtons = true;
-
-
-let textPropertyValues = core.lift(dom.defaultTextPropertyValues);
-textPropertyValues['font-size'] = 8;
-let textProperties = Object.getOwnPropertyNames(textPropertyValues);
-item.set('textProperties',textPropertyValues);
-
 
 item.addNode  = function (layerNum,right) {
   let lastLayer = layerNum === this.numLevels;
@@ -54,7 +49,6 @@ item.addNode  = function (layerNum,right) {
   }
   newNode.layer = layerNum;
   return newNode;
-  // later add texts
 }
   
 item.initialize = function () {
@@ -62,11 +56,6 @@ item.initialize = function () {
   this.multiInP.vertical = false;
   this.textP = core.installPrototype('textP',textPP);
   this.rectP = core.installPrototype('rectP',rectPP);
-  /*this.set('nodes', core.ArrayNode.mk());
-  this.rootLeft = this.addNode(1);
-  this.rootRight = this.addNode(1);
-  this.rootLeft.right = false;
-  this.rootRight.right = true;*/
 }
 
 item.addDescendants = function (node,layerNum) {
@@ -99,10 +88,9 @@ item.layout = function (node,height) {
   let pos = bracket.singleEnd;
   let wd = node.lastLayer?1.5*this.bracketWidth:this.bracketWidth;
   bracket.singleEnd.copyto(pos);
+  bracket.update();
   let top = pos.plus(Point.mk(right?wd:-wd,-0.25 * height));
   let bottom = pos.plus(Point.mk(right?wd:-wd,0.25 * height));
-  //let wbnds = winner.bounds();
-  //let mhww = -0.5*wbnds.extent.x;
   if (winner) {
     if (node.firstLayer) {
       node.winner.moveto(right?Point.mk(0,this.textUp):Point.mk(0,-this.textUp)) 
@@ -121,23 +109,12 @@ item.layout = function (node,height) {
     let hbottomX = Point.mk(0.5*bottomBnds.extent.x,0);
     bottomText.moveto(bottom.plus(right?this.textOffsetR.difference(hbottomX):this.textOffsetL.plus(hbottomX)));
   }
-  if (this.editMode) {
-    texts.forEach((txti) => {
-      txti.show();
-      if (txti.text === '') {
-        txti.text = 'blank';
-      }
-    });
-  } else {
-    texts.forEach((txti) => {
-      let txt = txti.text;
-      if ((txt === 'winner') || (txt === 'entry') || (txt === 'blank'))  {
-        txti.hide();
-      } else {
-        txti.show();
-      }
-    });
-  }
+  texts.forEach((txti) => {
+    txti.show();
+    if (txti.text === '') {
+      txti.text = 'blank';
+    }
+  });
   bracket.ends[0].copyto(top);
   bracket.ends[1].copyto(bottom);
   if (node.topChild) {
@@ -174,56 +151,26 @@ item.update = function () {
     this.set('textOffsetL',Point.mk(0,0));
     this.builtLevels = this.numLevels;
   }
-  core.setProperties(this.textP,this.textProperties,textProperties);
-
+  this.textP.__update();
   this.bracketWidth = this.width/(2 * this.numLevels +1.0);
   this.textWidth =  0.9 * this.bracketWidth;
   this.background.width = this.width;
   this.background.height = this.height;
   this.textOffsetL.copyto(Point.mk(this.textPad,-this.textUp));
   this.textOffsetR.copyto(Point.mk(-this.textPad,-this.textUp));
-  //core.setProperties(this.textP,this,['font-size']);
-  /*this.nodes.forEach((node) => 
-    {  
-      debugger;
-      if (node.winner) {
-        node.winner.width = this.textWidth;
-      } else {
-        node.topText.width = this.textWidth;
-      }
-    });
-    */
   this.layout(this.rootRight,this.height);
   this.layout(this.rootLeft,this.height);
+  this.background.update();
   this.draw();
-  if (this.firstUpdatee) {
+  if (this.firstUpdate) {
      dom.svgMain.fitContentsIfNeeded();
-    //dom.svgMain.fitContents(0.9);
   }
   this.firstUpdate = false;
 }
 
-item.setFieldType('editMode','boolean');
 
 
-item.popInstructions = function () {
-  editor.popInfo('way back when <b>upon</b> the river<br/> the boat sank');
-}
-
-item.selectKit = function () {
-  this.__select('svg');
-}
-
-item.actions = function (node) {
-  let rs = [];
-  if (!node) return;
-  rs.push({title:'Select Kit Root',action:'selectKit'});
-  rs.push({title:'Bracket Instructions',action:'popInstructions'});
-   
-  return rs;
- 
-}
-ui.hide(item,['background','bracketWidth','builtLevels','editMode','firstUpdate','height','hideAdvancedButtons',
+ui.hide(item,['background','bracketWidth','builtLevels','firstUpdate','height','hideAdvancedButtons',
               'nodes','textOffsetL','textOffsetR','textPad','width','textWidth']);
 
 

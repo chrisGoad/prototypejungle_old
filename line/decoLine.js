@@ -1,4 +1,4 @@
-//okok
+//decoLine
 
 core.require('/line/utils.js',function (utils) {
 
@@ -12,7 +12,6 @@ item.waveLength = 40;
 item.waveAmplitude = 0.2; // as a fraction of the wave length
 item.wavesToSkip = 0;
 /* end adjustable parameters */
-//item.adjustableProperties = utils.adjustableProperties.concat(['waveLength','waveAmplitude','wavesToSkip']);
 
 item.cornerFraction = 0.2; // the fraction of the wave taken up by  corners
 item.cornerPosition = 1.0;
@@ -26,7 +25,6 @@ item.setEnds =  function (p0,p1) {
 }
 
 item.update = function () {
-  //utils.fromParent(this);
   let thisHere = this;
   let e0 = this.end0,e1 = this.end1;
   let v = e1.difference(e0);
@@ -34,7 +32,6 @@ item.update = function () {
   const p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
-  
   const pathForHalfWave = function (startPoint,endPoint,up) {
     let delta = endPoint.difference(startPoint);
     let a = 0.5 * thisHere.waveAmplitude;

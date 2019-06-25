@@ -11,7 +11,6 @@ item.height = 35;
 item.fill = 'black';
 item['font-style'] = "normal";
 item['font-size'] = "12";
-//item.minDimension = 10; // a standard value conveyed up to the container
 item.topPadding = 0;
 item.vSep = 5; // between image and text
 item.bottomPadding = 0;
@@ -21,6 +20,9 @@ item["font-family"] = "arial";
 item["font-weight"]="normal";
 /*end adjustable parameters*/
 
+item.lastWidth = item.width;
+item.lastHeight = item.height;
+item.lastDim = item.dimension;
 
 item.text = '';
 
@@ -37,11 +39,9 @@ item.text = '';
     let bottomPadding = extraBottomPadding+itm.bottomPadding;
     let extraSidePadding = itm.extraSidePadding?itm.extraSidePadding:0;
     let sidePadding = extraSidePadding+itm.sidePadding;
-    //let imFraction = 1/2; // top fraction allocated to the image
     let imHeight=0;
     let imWidth = 0;
     let aspectRatio = image.aspectRatio;
-   
     let maxImHeight = itm.height - topPadding - (textHeight?itm.vSep:0) - textHeight - bottomPadding;
     let maxImWidth = itm.width - 2*sidePadding;
     if ((maxImHeight < 0) || (maxImWidth < 0)) {
@@ -49,7 +49,6 @@ item.text = '';
     } else {
       image.show();
     }
-   // let imHeightAvail = imFraction * this.height;
     let imWidthAtMaxHeight = maxImHeight * aspectRatio; // how wide would the image be if its height were at max
     if (imWidthAtMaxHeight < maxImWidth) { // bounded by height
        imHeight = maxImHeight;
@@ -60,15 +59,10 @@ item.text = '';
     }
     image.width = imWidth;
     image.height = imHeight;
-    // for dummied image
-    //image.setDomAttribute('x',-0.5*imWidth);
-    //image.setDomAttribute('y',-0.5*imHeight);
-    
     let midIm = textHeight?(-0.5*itm.height+itm.topPadding+0.5*imHeight):0;
     image.moveto(geom.Point.mk(0,midIm));
     if (textHeight) {
       let midText = 0.5*itm.height - bottomPadding - 0.5*textHeight;
-      //console.log('HHH',this.height,vPadding,textHeight,midText);
       textItem.moveto(geom.Point.mk(0,midText));
     }
   }
@@ -107,7 +101,6 @@ item.containerUpdate =  function () {
   if (!this.border) {
     this.set('border',this.borderP.instantiate()).show();
     this.__hideInUI = true;
-    //this.border.unselectable = true;
     this.border.neverselectable = true;
   }
   this.border.role = undefined;
@@ -120,7 +113,6 @@ item.containerUpdate =  function () {
   if (this.contents || this.text || this.image) {
     if (!this.contents) {
       this.set('contents',this.contentsP.instantiate()).show();
-      //this.contents.unselectable = true;
       this.contents.neverselectable = true;
       this.contents.__hideInUI = true;
     }
@@ -132,9 +124,7 @@ item.containerUpdate =  function () {
     } else {
       this.contents.width = this.dimension;
       this.contents.height = this.dimension;
-    }
-    //this.contents.text = this.text;
-   
+    }   
   }
   let topSize=0;
   let bottomSize=0;
@@ -145,7 +135,7 @@ item.containerUpdate =  function () {
     return;
   }
   hideContainerProperties(proto,false);
-  core.setProperties(this.contents,this,containerProperties);//['topPadding','vSep','bottomPadding','sidePadding','lineSep']);
+  core.setProperties(this.contents,this,containerProperties);
   if (this.border.topSize) { // borders might need areas to themselves
      topSize = this.border.topSize();
      bottomSize = this.border.bottomSize();
@@ -154,10 +144,14 @@ item.containerUpdate =  function () {
      this.contents.extraBottomPadding = bottomSize;
     this.contents.extraSidePadding = sideSize;
   }
-  this.contents.update();
-  return; // now, we omit the code for enlarging the container when the contents are too big, since this causes the user to lose control of connection to the prototype
- // The code is kept, though for future reference
-  if (this.dimension) {
+  // rearranging text is too expensive for every inheritor during a resize 
+  if ((ui.controlActivity !== 'draggingResizeControl') || (this === (ui.controlled)))  {
+    this.contents.update();
+  }
+ /* now, we omit the code for enlarging the container when the contents are too big, since this causes the user to lose control 
+ of connection to the prototype
+ The code is kept here , though for future reference
+   if (this.dimension) {
     let maxDim = sideSize + Math.max(this.contents.width,this.contents.height);
     
     if (maxDim > this.dimension) {
@@ -171,11 +165,17 @@ item.containerUpdate =  function () {
   if ((this.contents.height+topSize+bottomSize) > this.height) {
     this.height = this.contents.height+topSize+bottomSize;
   }
+  */
+}
+
+item.containerInitialize = function () {
+  if (this.borderP.initialize) {
+    this.borderP.initialize();
+  }
 }
 
 item.containerSetImage = function (image) {
   image.role = undefined;
-  //image.unselectable = true;
   image.neverselectable = true;
   this.set('image',image);
 };
@@ -195,8 +195,22 @@ item.containerTransferState = function (src,own) { //own = consider only the own
   let borderProperties = this.borderProperties;
   if (borderProperties) {
     core.setProperties(this,src,borderProperties,own);
+    let protos = core.isPrototype(this) && core.isPrototype(src);
+    let outerFill,fill;
+    if (own) {
+      outerFill = src.__get('outerFill');
+      fill = src.__get('fill');
+    } else {
+      outerFill = src.outerFill;
+      fill = src.fill;
+    }
+    //special case transfer  fill to outerfill if outerfill is missing in the source, but present in the dest
+    if ((outerFill === undefined) && (fill !== undefined) && (fill !== 'transparent') && borderProperties.includes('outerFill')) { 
+        this.outerFill = src.fill;
+    }
+
   }
-  // to avoid disappearance eg of a rectangle when swapped for a shaded circle
+  // to avoid disappearance eg of a rectangle when swapped for a shaded circle, for example
   const invis = function (vl) {
     return (typeof vl === undefined) || (vl === 'transparent');
   }
@@ -209,22 +223,23 @@ item.containerTransferState = function (src,own) { //own = consider only the own
 }
 
 
-
-
-
-item.installContainerMethods = function (container,iborderPP,icontentsPP) {
-   container.stdUpdate = this.containerUpdate;
-   container.setImage = this.containerSetImage;
-   container.transferState = this.containerTransferState;
-   //container.initialize = this.containerInit;
-   container.set('textProperties',core.lift(dom.defaultTextPropertyValues));
-   borderPP = iborderPP;
-   contentsPP = icontentsPP;
-   core.setPropertiesIfMissing(container,this,contentProperties);
-   container.textProperties.__setFieldType('stroke','svg.Rgb');
-   ui.hide(container,['text','borderProperties','containerPropertiesShown','containerPropertiesHidden','border']);
-   hideContainerProperties(container,true);
-
+item.installContainerMethods = function (container,borderPP,contentsPP) {
+  container.role = 'vertex';
+  container.resizable = true;
+  container.text = '';
+  container.stdUpdate = this.containerUpdate;
+  container.update = this.containerUpdate;
+  container.initialize = this.containerInitialize;
+  container.setImage = this.containerSetImage;
+  container.transferState = this.containerTransferState;
+  container.set('textProperties',core.lift(dom.defaultTextPropertyValues));
+  core.setPropertiesIfMissing(container,this,contentProperties);
+  container.textProperties.__setFieldType('stroke','svg.Rgb');
+  ui.hide(container,['text','borderProperties','containerPropertiesShown','containerPropertiesHidden','border']);
+  hideContainerProperties(container,true);
+  container.initializePrototype = function () {
+    core.assignPrototypes(this,'borderP',borderPP,'contentsP',contentsPP);
+  }
 }
 
 

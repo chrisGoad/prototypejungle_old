@@ -1,7 +1,6 @@
-//cArrow
+//twoBends
 
 core.require('/shape/twoBends.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
-core.standsAlone(['/shape/twoBends.js','/arrow/solidHead.js']);  // suitable for loading into code editor
 
 let item = svg.Element.mk('<g/>');
 
@@ -16,22 +15,17 @@ item.elbowWidth = 10;
 item.depth = 19; // fraction of along the way where the elbow appears
 item.set("end0",Point.mk(-20,12));
 item.set("end1",Point.mk(20,-12));
-//item.text = '';
 /* end adjustable parameters */
 
+
+item.initializePrototype = function () {
+  core.assignPrototypes(this,'arrowHeadP',arrowHeadPP,'shaftP',shaftPP);
+}
 
 item.set('direction0',geom.Point.mk(1,0));
 
 item.set('direction1',geom.Point.mk(1,0));
 
-/*
-item.pointsPositive0 = function () { // end0 points positive
- let middle = this.shaft.middlePoint();
- let end = this.end0;
- return this.vertical? middle.x < end.x:  middle.y < end.y;
- 
-}
-*/
 item.pointsPositive = function (whichEnd) { // end1 points positive
  let middle = this.shaft.middlePoint();
  let end = (whichEnd === 0)?this.end0:this.end1;
@@ -50,10 +44,6 @@ item.update = function () {
   let e1 = this.end1;
   let includeArrow = this.includeArrow;
   if (this.includeArrow && (!this.head)) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.arrowHeadP) {
-      proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-    }
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
@@ -62,18 +52,12 @@ item.update = function () {
     this.head = undefined;
   }
   if (!this.shaft) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.shaftP) {
-      proto.shaftP = core.installPrototype('shaft',shaftPP);
-    }
     this.set('shaft',this.shaftP.instantiate()).show();
     this.shaft.neverselectable = true;
   }
-  
- // let x1 = e1.x;
- // let cx = e0.x + this.width;
- // let flip = cx > x1;
   let shaft = this.shaft;
+  shaft.end0.copyto(e0);
+  shaft.end1.copyto(e1);
   let head = this.head;
   let vertical = this.vertical;
   this.connectionType = vertical?"EastWest":"UpDown"; 
@@ -89,8 +73,6 @@ item.update = function () {
   this.shaft.end0.copyto(e0);
   this.shaft.end1.copyto(shaftEnd);
   this.shaft.update();
-  //thhead.headPoint.copyto(e1);
-  //this.head.direction.copyto(this.direction.times(flip?-1:1));
   if (includeArrow) {
     if (head.solidHead) {
       head.fill = this.stroke;
@@ -121,13 +103,10 @@ item.update = function () {
 
 item.controlPoints = function () {
   let rs = [this.end0,this.end1,this.shaft.middlePoint()]
-  //let rs = this.shaft.controlPoints();
   if (this.includeArrow) {
     rs.push(this.head.controlPoint());
   }
   return rs;
-  //let headControlPoint = this.head.controlPoint();
- // return [this.end0,this.end1,shaftControlPoints[2],headControlPoint];
 }
 
 
@@ -168,12 +147,6 @@ item.updateControlPoint = function (idx,rpos) {
 
 item.transferState = function (src,own) { //own = consider only the own properties of src
   core.setProperties(this,src,['stroke','stroke-width','headLength','headWidth','depth','end0','end1'],own);
-  /*if (this.head && src.head) {
-    if ((this.head.__sourceUrl !== src.head.__sourceUrl)) {
-      this.set('head',Object.getPrototypeOf(src.head).instantiate());
-      this.head.transferState(src.head,own);
-    }
-  }*/
   if (src.textItem) {
     if (!this.textItem) {
       this.set('textItem',textItemP.instantiate()).show();

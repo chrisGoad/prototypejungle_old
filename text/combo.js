@@ -20,7 +20,6 @@ let textProperties =
          "font-style",
          "font-family",
          "font-weight",
-      //   "fill",
          "lineSep"];
   
 
@@ -33,8 +32,6 @@ item.updateCombo = function (itm,whichExtent,dealWithImage) {
   }
   let sidePadding,bottomPadding,oneWord;
   if (dealWithImage) {
-    //let extraTopPadding = itm.extraTopPadding?itm.extraTopPadding:0;
-    //let topPadding = extraTopPadding+itm.topPadding;
     let extraBottomPadding = itm.extraBottomPadding?itm.extraBottomPadding:0;
     bottomPadding = extraBottomPadding+itm.bottomPadding;
     let extraSidePadding = itm.extraSidePadding?itm.extraSidePadding:0;
@@ -46,9 +43,6 @@ item.updateCombo = function (itm,whichExtent,dealWithImage) {
   let textHeight = 0;
   let textItem;// single line or text area
   let txt = dealWithImage?itm.__parent.text:itm.text;
-  //if ((typeof txt !== 'string') || (txt === '')) {
-  //  return;
- //}
   let textarea = itm.textarea;
   let singleLine = itm.singleLine;
   let multiLine = txt.indexOf('\n') > -1;

@@ -3,7 +3,6 @@
 
 core.require('/shape/twoBends.js','/arrow/solidHead.js',function (elbowPP,arrowHeadPP) {
 
-core.standsAlone(['/shape/twoBends.js','/arrow/solidHead.js']);  // suitable for loading into code editor
 
 let item = svg.Element.mk('<g/>');
 
@@ -14,9 +13,7 @@ item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 10;
 item.headWidth = 8;
-item.stroke = "black";
 item.elbowWidth = 10;
-item.joinY = 25; // distance from join to end1
 item.set('singleEnd',item.vertical?Point.mk(0,-15):Point.mk(-15,0));
 item.set("ends",core.ArrayNode.mk());
 item.ends.push(item.vertical?Point.mk(0,15):Point.mk(15,0));
@@ -30,16 +27,17 @@ item.role = 'multiOut';
 item.outCount = item.ends.length;
 item.includeEndControls = true;
 
+item.initializePrototype = 	function () {
+  core.assignPrototypes(this,'elbowP',elbowPP,'arrowHeadP',arrowHeadPP);
+}
+
+    
 item.set("shafts",core.ArrayNode.mk());
 
 
 item.elbowPlacement = 0.5;
-// each prototype of this multiOUt should have its own associated elbow prototype
+
 item.buildShafts = function () {
-  let proto = Object.getPrototypeOf(this);
-  if (!proto.elbowP) {
-    proto.elbowP = core.installPrototype('elbowP',elbowPP);
-  }
   this.elbowP.vertical = !this.vertical;
   let ln = this.ends.length;
   let lns = this.shafts.length;
@@ -50,12 +48,8 @@ item.buildShafts = function () {
     this.shafts.push(shaft);
   }
 }
-// each prototype of this multiOUt should have its own associated arrowHead prototype
+
 item.buildArrowHeads= function () {
-  let proto = Object.getPrototypeOf(this);
-  if (!proto.arrowHeadP) {
-    proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-  }
   let ln = this.ends.length;
   let arrowHeads = this.arrowHeads;
   let lns = arrowHeads.length;
@@ -295,7 +289,8 @@ item.setFieldType('includeArrows','boolean');
 
 ui.hide(item,['helper','head','shaft','singleEnd','end1','shafts','ends','joinX','e01','end0x',
               'elbowP','arrowHeadP','arrowHeadPName','arrowHeads','outConnections','vertices','inConnection',
-              'elbowWidth','end1x','includeEndControls','numHeads']);
+              'end1x','includeEndControls','numHeads','singleDirection',
+              'end1v','vertical','armDirections']);
 
 return item;
 

@@ -1,4 +1,4 @@
-//okok
+//free curve
 
 core.require(function () {
 let item = svg.Element.mk('<path />');
@@ -10,7 +10,6 @@ item.stroke = 'black';
 item.fill = 'none';
 item['stroke-width'] = 2;
 item.bendLength  =  20;
-
 /* end adjustable parameters */
 
 
@@ -32,7 +31,6 @@ item.bendStartOrEnd = function (start,corner,isStart) {
   let nrmVec = vec.times(1/dist);
   return start.plus(nrmVec.times(fraction*dist));
 }
-
 
 item.startPointSeries = function () {}
 
@@ -89,8 +87,6 @@ item.recenter = function () {
   return bnds.extent;
 }
 
-  
-  
 item.addToPointSeries = function (point) {
   let relPoint = point.difference(this.getTranslation());
   this.points.push(relPoint);
@@ -101,7 +97,6 @@ item.addToPointSeries = function (point) {
 const p2str = function (letter,point,after) {
     return  letter+' '+point.x+' '+point.y+(after?after:' ');
 }
-
 
 let extensionPoint;
 
@@ -140,7 +135,7 @@ item.update = function (options) {
     this.pathCopy = this.d;
     return;
   }
-  let controlPoints =[];// core.ArrayNode.mk(); // these come in triples bendStart, corner, bendEnd, with straight lines between them
+  let controlPoints =[]; // these come in triples bendStart, corner, bendEnd, with straight lines between them
   let i=0;
   path = '';
   addToPath('M',pnts[0]);
@@ -175,14 +170,9 @@ item.update = function (options) {
   this.d = path;
 }
   
-  
-  
-  
-  
 item.controlPoints = function () {
   return this.points;
 }
-
 
 item.updateControlPoint = function (idx,rpos) {
   this.points[idx].copyto(rpos);

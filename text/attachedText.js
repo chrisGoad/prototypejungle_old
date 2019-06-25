@@ -1,10 +1,9 @@
-// arrow
+// attachedText
 
 core.require(function () {
 
 let item = svg.Element.mk('<text text-anchor="middle" fill="black" font-size="12" font-style="normal" '+
                           ' font-family="arial" stroke-width="0.2">1</text>');
-
 
 item.side = 'left';
 item.sep = 15;

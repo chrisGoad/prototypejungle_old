@@ -1,10 +1,7 @@
-
-
+//oneBend
 
 core.require('/shape/oneBend.js','/arrow/solidHead.js','/text/attachedText.js',function (shaftPP,arrowHeadPP,textItemPP) {
   
-core.standsAlone(['/shape/oneBend.js','/arrow/solidHead.js']);  // suitable for loading into code editor
-
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
@@ -18,9 +15,11 @@ item.elbowWidth = 10;
 item.width = 19; // fraction of along the way where the elbow appears
 item.set("end0",Point.mk(-20,12));
 item.set("end1",Point.mk(20,-12));
-//item.text = '';
 /* end adjustable parameters */
 
+item.initializePrototype = function () {
+  core.assignPrototypes(this,'arrowHeadP',arrowHeadPP,'shaftP',shaftPP);
+}
 
 // put the arrow on end1 if vertical, end0 if not
 
@@ -31,10 +30,6 @@ item.update = function () {
   let vertical = this.vertical;
   let includeArrow = this.includeArrow;
   if (includeArrow && (!this.head)) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.arrowHeadP) {
-      proto.arrowHeadP = core.installPrototype('arrowHead',arrowHeadPP);
-    }
     this.set('head',this.arrowHeadP.instantiate()).show();
     this.head.neverselectable = true;
   }
@@ -43,10 +38,6 @@ item.update = function () {
     this.head = undefined;
   }
   if (!this.shaft) {
-    let proto = Object.getPrototypeOf(this);
-    if (!proto.shaftP) {
-      proto.shaftP = core.installPrototype('shaft',shaftPP);
-    }
     this.set('shaft',this.shaftP.instantiate()).show();
     this.shaft.neverselectable = true;
   }

@@ -7,9 +7,9 @@ let kit = svg.Element.mk('<g/>');
 kit.vertical = false;
 kit.hSpacing = 50;
 kit.vSpacing = 50;
-kit.includeArrows = false;
+kit.includeArrows = false; 
 kit.hideAdvancedButtons = true;
-
+kit.resizable = true;
 
 // the layout operator takes across tree and out tree spacing arguments, and these little functions generate those parameters from orientation
 kit.acrossSpacing = function () {
@@ -167,6 +167,12 @@ kit.buildFromData = function (data) {
   this.set("vertices",svg.Element.mk('<g/>'))
   this.set("multis",svg.Element.mk('<g/>'))
   this.vertices.set('x',root);
+  this.isGraph = true;
+  this.vertices.unselectable = true;
+  //node.edges.unselectable = true;
+  this.__setExtent = (xt) => {
+    graph.graphSetExtent(this,xt);
+  }
   this.root = root;
   data.id = 'x';
   let vertices = this.vertices;  
@@ -217,8 +223,7 @@ kit.actions = function (node) {
   let rs = [];
   if (!node) return;
   if (node.role === 'vertex') {
-     rs.push({title:'Select Kit Root',action:'selectTree'},
-               {title:'Add Child',action:'addChild'});
+     rs.push({title:'Add Child',action:'addChild'});
     if (node.__parentVertex) {
       rs.push({title:`Add Sibling ${vertical?'Left':'Above'}`,action:'addSiblingLeft'});
       rs.push({title:`Add Sibling ${vertical?'Right':'Below'}`,action:'addSiblingRight'});
@@ -253,8 +258,14 @@ kit.update = function () {
   graph.graphUpdate();
 }
 
+
+kit.hideProperties = function () {
+  this.vertexP.set('hiddenProperties',core.ObjectNode.mk());
+  this.vertexP.hiddenProperties.treeWidth  = 1;
+}
+
 kit.setFieldType('includeArrows','boolean');
-ui.hide(kit,['hideAdvancedButtons','multis','vertical']);
+ui.hide(kit,['hideAdvancedButtons','multis','vertical','includeArrows']);// Not sure if includeArrows is confusing, so left it out of UI
 
 return kit;
 });

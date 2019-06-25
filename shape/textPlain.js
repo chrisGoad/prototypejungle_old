@@ -13,32 +13,27 @@ item["font-weight"] = "normal";
 item.stroke = "black"; // turned into fill in the actual text. 
 item.lineSep = 2;
 
-
 item.role = 'vertex';
 item.resizable = true;
-
 
 let textProperties = 
          ["font-size",
          "font-style",
          "font-family",
          "font-weight",
-        // "fill",
          "lineSep"];
-  
 
- 
+item.update = function (whichExtent) {
+  combo.updateCombo(this,whichExtent);
+}
 
+item.afterCopy = function (src) {
+  this.text = src.text;
+}
 
-  item.update = function (whichExtent) {
-    combo.updateCombo(this,whichExtent);
-  }
-  
-  item.afterCopy = function (src) {
-    this.text = src.text;
-  }
-  
-  graph.installRectanglePeripheryOps(item);
-  return item;
+graph.installRectanglePeripheryOps(item);
+
+ui.hide(item,['singleLine']);
+return item;
 });
 
