@@ -97,21 +97,6 @@ item.update = function () {
   }      
   this.updatePositions();
   this.numNodesBuilt = numNodes;
-  
-  return;
-  let edgeIndex = 0;
-  const addEdge =  (v0,v1) => {
-    let edge = this.edgeP.instantiate().show();
-    let nm = 'e'+(edgeIndex++);
-    this.edges.set(nm,edge);
-    graph.connectVertices(edge,v0,v1);
-  }
-  for (let i=0;i<numNodes;i++) {
-    let v = this.vertices['v'+i];
-    addEdge(center,v);
-   
-  }
- this.numNodesBuilt = numNodes;
 }
 
 ui.hide(item,['builtDimension','vertices','edges','numNodesBuilt','inRowSep','betweenRowSep','hideAdvancedButtons']);
