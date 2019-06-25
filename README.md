@@ -1,7 +1,8 @@
 PrototypeJungle
 ===============
 
-An open repository of prototype structures for the visual domain. See
+Prototype-based diagramming
+via persistence for JavaScript's prototype realm. See
 [https://prototypejungle.org](https://prototypejungle.org).
 
 This GitHubb repo contains the PrototypeJungle [base directory](https://prototypejungle.org/doc/code.html#codeWork): a collection of prototype structures
